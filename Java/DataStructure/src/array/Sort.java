@@ -35,10 +35,28 @@ public class Sort {
 				}
 			}
 		});
+		
+		for (People i : arr) { // 오름차순 출력
+			System.out.print("[" + i.print() + "]");
+		}
+		System.out.println();
+		
+		// comparator 
+		Arrays.sort(arr, (o1,o2)-> {
+			if (o1.age < o2.age) {
+				return -1;
+			} else if (o1.age == o2.age) {
+				return 0;
+			} else {
+				return 1;
+			}
+		});
 
 		for (People i : arr) { // 오름차순 출력
 			System.out.print("[" + i.print() + "]");
 		}
+		
+		
 
 	}
 
