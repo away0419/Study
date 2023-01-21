@@ -3,7 +3,14 @@ package baekjoon;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
-
+/*
+ * N : 행의 수 
+ * M : 열의 수 
+ * arr[][] : 주어지는 2차원 배열
+ * sum[][] : 주어진 2차원 배열의 누적합
+ * 
+ * 
+ * */
 public class B2167 {
 	static int N, M, K, arr[][], sum[][];
 
@@ -39,7 +46,7 @@ public class B2167 {
 			int x = Integer.parseInt(st.nextToken());
 			int y = Integer.parseInt(st.nextToken());
 
-			sb.append(sum[x][y] - sum[s][e] + arr[s][e]).append("\n");
+			sb.append(sum[x][y] - sum[s-1][y] - sum[x][e-1] + sum[s-1][e-1]).append("\n");
 
 		}
 
