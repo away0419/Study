@@ -1,10 +1,9 @@
-package baekjoon;
+package prefixSum;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.StringTokenizer;
-import java.util.zip.InflaterInputStream;
 
 /* 이건 꼭 풀어야 해!
  * 
