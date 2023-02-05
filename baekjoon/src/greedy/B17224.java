@@ -40,16 +40,19 @@ public class B17224 {
 		});
 
 		int cnt = 0;
-		for (int i = 0; i < N; i++) {
-			if (arr[i][0] <= L) {
-				answer += 100;
-				cnt++;
-				if (arr[i][1] <= L) {
-					answer += 40;
+		if (K != 0) {
+
+			for (int i = 0; i < N; i++) {
+				if (arr[i][0] <= L) {
+					answer += 100;
+					cnt++;
+					if (arr[i][1] <= L) {
+						answer += 40;
+					}
 				}
-			}
-			if (cnt == K) {
-				break;
+				if (cnt == K) {
+					break;
+				}
 			}
 		}
 
