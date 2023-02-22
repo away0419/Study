@@ -17,5 +17,6 @@ public class B14607 {
 		System.out.print((N * N - N) / 2);
 
 	}
+	
 
 }
