@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.By.ByXPath;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -65,6 +66,44 @@ public class Crawling {
 			System.out.println(idx);
 		}
 
+		return list;
+	}
+	
+	
+	public List<ExcelDTO> makeDirectNoticeList(WebDriver driver) {
+		List<String> boardUrlList = new ArrayList<>();
+		
+		for (int page = 2; page <= ConstUtil.DIRECT_NOTICE_NUM_PAGES; page++) {
+			String url = ConstUtil.DIRECT_NOTICE_BASE_URL + page;
+			
+			driver.get(url);
+			List<WebElement> el1 = driver.findElements(By.className("link"));
+			System.out.println(url);
+			
+			for (WebElement el : el1) {
+				String str = el.getAttribute("href");
+				boardUrlList.add(str);
+				System.out.println(str);
+			}
+		}
+		
+		
+		List<ExcelDTO> list = new ArrayList<>();
+		int a = 97;
+		for (String url : boardUrlList) {
+			driver.get(url);
+			
+			String imgArr[] = new String[5];
+			imgArr[0] = url;
+			imgArr[1] = driver.findElement(By.className("tit")).getText();
+			imgArr[2] = driver.findElement(By.className("date")).getText();
+			imgArr[3] = driver.findElement(By.className("bbs_view_cont")).findElement(ByXPath.xpath("..")).getAttribute("innerHTML");
+			imgArr[4] = String.valueOf(a--);
+
+			ExcelDTO dto = new ExcelDTO(imgArr);
+			list.add(dto);
+		}
+		
 		return list;
 	}
 

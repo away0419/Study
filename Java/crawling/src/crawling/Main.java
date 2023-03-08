@@ -18,11 +18,11 @@ public class Main {
 
 		
 		Crawling crawling = new Crawling();
-		List<ExcelDTO> list = crawling.makeNoticeList(driver);
+		List<ExcelDTO> list = crawling.makeDirectNoticeList(driver);
 
 
 		ExcelFunction excelFunction = new ExcelFunction();
-		excelFunction.makeExcel("notice", list);
+		excelFunction.makeExcel("direct_notice", list);
 
 		driver.quit();
 	}
