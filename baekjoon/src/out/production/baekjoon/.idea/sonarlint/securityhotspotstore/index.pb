@@ -29,3 +29,5 @@ S
 -.idea/sonarlint/securityhotspotstore/index.pb,8\8\88a9255124c95bdc913197c120a8d560edc59c8e
 D
 dijkstra/B18352.java,9\e\9e836f56f7aafbe2b7d1074077d29a6c3825a7c5
+C
+dijkstra/B1446.java,6\6\667ed7ee5e204c607b2ec4206b423273b4a37a21
