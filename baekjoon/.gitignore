@@ -1,1 +1,6 @@
 /bin/
+/.metadata/
+.idea
+*.iml
+out
+gen
