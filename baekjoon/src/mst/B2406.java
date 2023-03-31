@@ -15,7 +15,7 @@ cnt : 연결 할 쌍 수
 visit[][] : 방문 여부
  */
 public class B2406 {
-    static int N, M, cnt,minCnt, map[][];
+    static int N, M, cnt, minCnt, map[][];
     static long min;
     static boolean visit[][];
     static List<Edge> list[];
@@ -66,7 +66,7 @@ public class B2406 {
                 if (visit[i][j]) {
                     map[i][j] = 0;
                 }
-                list[i].add(new Edge(i,j, map[i][j]));
+                list[i].add(new Edge(i, j, map[i][j]));
             }
         }
         prim();
@@ -77,29 +77,29 @@ public class B2406 {
 
     public static void prim() {
         PriorityQueue<Edge> pq = new PriorityQueue<>();
-        pq.add(new Edge(0,1, 0));
+        pq.add(new Edge(0, 1, 0));
         boolean vis[] = new boolean[N];
         while (!pq.isEmpty()) {
             Edge edge = pq.poll();
             int cur = edge.to;
             int cost = edge.cost;
 
-            if (vis[cur] || cur==0) {
+            if (vis[cur] || cur == 0) {
                 continue;
             }
             min += cost;
             vis[cur] = true;
-            if(cost!=0){
-                sb.append(edge.from+1).append(" ").append(cur+1).append("\n");
+            if (cost != 0) {
+                sb.append(edge.from + 1).append(" ").append(cur + 1).append("\n");
                 minCnt++;
             }
             if (++cnt == N) {
                 return;
             }
 
-            for (Edge next:
-                 list[cur]) {
-                if(vis[next.to]) continue;
+            for (Edge next :
+                    list[cur]) {
+                if (vis[next.to]) continue;
                 pq.add(next);
             }
         }
