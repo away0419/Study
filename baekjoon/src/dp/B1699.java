@@ -16,14 +16,15 @@ public class B1699 {
         int dp[] = new int[N + 1];
 
         for (int i = 1; i <= N; i++) {
-            dp[i] = 1;
+            dp[i] = i;
+
             for (int j = 1; j * j <= i; j++) {
-                int k = dp[i - j * j] + 1;
-                if (dp[i] > k) {
-                    dp[i] = k;
+                if (dp[i] > dp[i - j * j] + 1) {
+                    dp[i] = dp[i - j * j] + 1;
                 }
             }
         }
+
         System.out.println(dp[N]);
     }
 
