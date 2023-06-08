@@ -33,6 +33,7 @@ public class B16571 {
         answer = 'D';
         List<Info> list = new ArrayList<>();
 
+
         for (int i = 0; i < 3; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j = 0; j < 3; j++) {
