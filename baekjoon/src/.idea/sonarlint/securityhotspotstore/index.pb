@@ -113,11 +113,9 @@ I
 implementation/B1063.java,b\b\bbf48b871fbdca8ebe40454665cc90e58020f15d
 <
 baekjoon.iml,a\f\afc7e93d4dd772ba9084d8849752112c3b9afd87
-S
-#.idea/sonarlint/issuestore/index.pb,9\f\9fe84ebb15faf917b7def6236dba604453cc61e0
-]
--.idea/sonarlint/securityhotspotstore/index.pb,8\8\88a9255124c95bdc913197c120a8d560edc59c8e
 D
 level3_1/B16571.java,4\a\4a9b9b8815570e6dd244847c1520275a0801e70c
 D
 level3_1/B17182.java,3\4\34b456634ff6bfbd23aa33367641342bfa6caa40
+D
+level3_1/B15684.java,8\4\8446c9fc560bec25ab71d927665dc86fa14564bf
