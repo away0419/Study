@@ -1,7 +1,5 @@
 최종 작성일 : 2023.07.26.</br>
 
-# AOP
-
 ## AOP란 무엇인가
 
 관점 지향은 로직을 핵심적인 관점, 부가적인 관점으로 나누어 보는 것입니다.
@@ -94,6 +92,8 @@ AOP는 이처럼 자주 사용되는 관점을 모듈화하여 프로그래밍�
 
 @Aspect는 Advisor를 쉽게 만들 수 있도록 도와주는 역할을 하는 것이지 컴포넌트 스캔이 되는 것은 아님. 따라서 반드시 빈 등록을 해야함.
 
+<br/>
+
 ### 프록시 내부 호출
 
 ```java
@@ -121,6 +121,8 @@ public class CallService {
 - external(), internal()을 호출하면 해당 프록시를 통해 호출 됨.
 - external(), internal()을 각각 호출하면 둘 다 적용이 됨. 그러나 external() 안의 internal()은 AOP가 적용되지 않음.
 - 대안 방법으로는 구조 변경, 지연 조회 등이 있음. (지연 조회는 ObjectProvider, ApplicationContext를 사용)
+
+<br/>
 
 ### JDK 동적 프록시 사용할 경우
 
