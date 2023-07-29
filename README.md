@@ -71,10 +71,10 @@ AOP는 이처럼 자주 사용되는 관점을 모듈화하여 프로그래밍�
 ## AOP 동작 과정
 
 @Aspect가 있을 경우 Advisor로 변환해서 @Aspect Advisor 빌더 내부에 저장하는 작업을 수행함.
-![Alt text](image.png)
+![Alt text](/image/image.png)
 
 이후 다음 과정을 통해 Advisor 로직을 넣음.
-![Alt text](image-1.png)
+![Alt text](/image/image-1.png)
 
 1. 스프링 빈 대상이 되는 객체를 생성. (Component Scan 대상)
 2. 생성된 객체를 빈 저장소에 등록하기 직전에 빈 후처리기에 전달.
@@ -115,7 +115,7 @@ public class CallService {
 }
 ```
 
-![Alt text](image-2.png)
+![Alt text](/image/image-2.png)
 
 - 해당 소스일 경우, 빈 컨테이너에는 CallServic() 프록시가 있음.
 - external(), internal()을 호출하면 해당 프록시를 통해 호출 됨.
@@ -126,14 +126,14 @@ public class CallService {
 
 ### JDK 동적 프록시 사용할 경우
 
-![Alt text](image-3.png)
+![Alt text](/image/image-3.png)
 
 - MemberServiceImpl을 대상으로 프록시를 생성할 경우 MemberService 기반으로 프록시를 생성하여 빈에 등록함.
 - 해당 프록시는 MemberServiceImpl로 타입캐스팅이 불가능함. 따라서 의존관계 주입에서 문제가 발생함.
 
 <br/>
 
-![Alt text](image-4.png)
+![Alt text](/image/image-4.png)
 
 - MemberServiceImpl을 대상으로 프록시를 생성할 경우 MemberServiceImpl을 기반으로 프록시를 만들어 빈으로 등록함.
 - 해당 프록시는 MemberService로 타입캐스팅이 가능함.
