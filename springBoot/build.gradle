@@ -32,6 +32,9 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"                   // Google Simple JSON
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2'           // Jackson Databind
+	implementation "io.jsonwebtoken:jjwt:0.9.1"                                     // Spring Json-Web-Token
 }
 
 tasks.named('test') {
