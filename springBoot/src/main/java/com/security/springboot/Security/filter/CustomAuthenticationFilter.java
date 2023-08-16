@@ -24,8 +24,13 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        UsernamePasswordAuthenticationToken authRequest // request로 받은 유저 이메일과 비밀번호를 Toekn으로 만든다.
-                = new UsernamePasswordAuthenticationToken(request.getParameter("userEmail"), request.getParameter("userPW"));
+        UsernamePasswordAuthenticationToken authRequest; // request로 받은 유저 이메일과 비밀번호를 Toekn으로 만든다.
+        try {
+            authRequest= getAuthRequest(request);
+            setDetails(request, authRequest);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return this.getAuthenticationManager().authenticate(authRequest); // 해당 토큰을 검사한 뒤 인증된 사용자면 정상적으로 리턴. 아니라면 예외 발생
     }
 

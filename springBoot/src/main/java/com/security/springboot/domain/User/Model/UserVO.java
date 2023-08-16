@@ -3,8 +3,10 @@ package com.security.springboot.domain.User.Model;
 
 import com.security.springboot.domain.User.Role.UserRole;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class UserVO {
     private String userEmail;
     private String userPw;

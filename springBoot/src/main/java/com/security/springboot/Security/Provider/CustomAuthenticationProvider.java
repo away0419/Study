@@ -22,15 +22,19 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        log.debug("2.CustomAutenticationProvider");
-
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication; // Filter를 거쳐 생성된 토큰
         String userEmail = token.getName(); // 아이디를 가져온다.
         String userPw = (String) token.getCredentials(); //비밀번호를 가져온다.
+
+        log.debug("2.CustomAutenticationProvider userEmail = {}, UserPw = {}",userEmail, userPw);
+
         UserDetailsVO userDetailsVO = (UserDetailsVO) userDetailsService.loadUserByUsername(userEmail); // 아이디로 사용자 조회
 
         // 찾은 사용자의 비밀번호가 일치하지 않는 경우 예외 처리
-        if(!passwordEncoder.matches(userPw, userDetailsVO.getPassword())) {
+//        if(!passwordEncoder.matches(userPw, userDetailsVO.getPassword())) {
+//            throw new BadCredentialsException(userDetailsVO.getUsername());
+//        }
+        if(!userPw.equals(userDetailsVO.getPassword())) {
             throw new BadCredentialsException(userDetailsVO.getUsername());
         }
 

@@ -1,16 +1,16 @@
-최종 작성일 : 2023.07.17.</br>
-# Spring-Security 
+최종 작성일 : 2023.08.16.</br>
+# Spring-Security
 
 ## 0. 들어가기 앞서
 - spring Security는 버전에 따라 Deprecated 된 클래스, 함수들이 존재함. 따라서 버전을 잘 맞추고 사용해야 하는 메서드가 무엇인지 판단하기 바랍니다.
 - [docs](https://docs.spring.io/spring-security/reference/index.html)가 가장 정확합니다.
 - 흐름도를 참고하여 무엇을 먼저 작성해야 하는지 확인하기 바랍니다.
-  ![Alt text](image.png)
+  ![Alt text](image/image.png)
   
 
 <br/>
 
-## 1. 라이브러리 추가 및 H2 설정
+## 1. 라이브러리 추가 및 설정
 
 <details> 
   <summary>gradle</summary>
@@ -18,18 +18,19 @@
   ```gradle
   dependencies {
       implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-      implementation 'org.springframework.boot:spring-boot-starter-security'
-      implementation 'org.springframework.boot:spring-boot-starter-web'
-      compileOnly 'org.projectlombok:lombok'
-      developmentOnly 'org.springframework.boot:spring-boot-devtools'
-      runtimeOnly 'com.h2database:h2'
-      implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-      annotationProcessor 'org.projectlombok:lombok'
-      testImplementation 'org.springframework.boot:spring-boot-starter-test'
-      testImplementation 'org.springframework.security:spring-security-test'
-      implementation "com.googlecode.json-simple:json-simple:1.1.1"                   // Google Simple JSON
-      implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2'           // Jackson Databind
-      implementation "io.jsonwebtoken:jjwt:0.9.1"                                     // Spring Json-Web-Token
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'com.h2database:h2'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'			// LocalDateTime 역직렬화 해결 패키지
+	implementation "com.googlecode.json-simple:json-simple:1.1.1"                   // Google Simple JSON
+	implementation 'com.fasterxml.jackson.core:jackson-databind'           // Jackson Databind
+	implementation "io.jsonwebtoken:jjwt:0.9.1"                                     // Spring Json-Web-Token                                  // Spring Json-Web-Token
   }
   ```
 </details>
@@ -40,13 +41,19 @@
   ```properties
   spring.h2.console.enabled=true
   spring.h2.console.path=/h2-console
-  
+
   spring.datasource.driverClassName=org.h2.Driver
   spring.datasource.url=jdbc:h2:mem:test
   spring.datasource.username=sa
   spring.datasource.password=
-  
+
   spring.sql.init.mode=always
+
+  spring.jpa.hibernate.ddl-auto=create 
+  spring.jpa.properties.hibernate.format_sql=true 
+  spring.jpa.show-sql=true
+
+  logging.level.com.security.springboot=debug
   ```
 
 </details>
@@ -105,10 +112,14 @@
         @Column
         private Long id;
   
+        @JsonSerialize(using = LocalDateTimeSerializer.class)
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
         @CreationTimestamp
         @Column(nullable = false, length = 20, updatable = false)
         private LocalDateTime createdAt;
   
+        @JsonSerialize(using = LocalDateTimeSerializer.class)
+        @JsonDeserialize(using = LocalDateTimeDeserializer.class)
         @UpdateTimestamp
         @Column(length = 20)
         private LocalDateTime updateAt;
@@ -241,7 +252,7 @@
     
         UserEntity findByUserEmailAndUserPw(String userId, String userPw);
     
-        Optional<UserEntity> findByUserEmail(String userId);
+        Optional<UserEntity> findByUserEmail(String userEmail);
     }
     ```
 
@@ -270,10 +281,10 @@
         private final UserRepository userRepository;
     
         @Override
-        public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-            return userRepository.findByUserEmail(userId)
+        public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
+            return userRepository.findByUserEmail(userEmail)
                     .map(user -> new UserDetailsVO(user, Collections.singleton(new SimpleGrantedAuthority(user.getRole().getPosition()))))
-                    .orElseThrow(()-> new UsernameNotFoundException(userId));
+                    .orElseThrow(()-> new UsernameNotFoundException(userEmail));
         }
     }
     ```
@@ -288,6 +299,7 @@
     import com.security.springboot.domain.User.Role.UserRole;
     import lombok.Data;
     
+    @NoArgsConstructor
     @Data
     public class UserVO {
         private String userEmail;
@@ -437,9 +449,6 @@
   </details>
 
 
-
-
-
 <br/>
 
 
@@ -484,8 +493,13 @@
       
         @Override
         public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-          UsernamePasswordAuthenticationToken authRequest // request로 받은 유저 이메일과 비밀번호를 Toekn으로 만든다.
-                  = new UsernamePasswordAuthenticationToken(request.getParameter("userEmail"), request.getParameter("userPW"));
+          UsernamePasswordAuthenticationToken authRequest; // request로 받은 유저 이메일과 비밀번호를 Toekn으로 만든다.
+          try {
+              authRequest= getAuthRequest(request);
+              setDetails(request, authRequest);
+          } catch (Exception e) {
+              throw new RuntimeException(e);
+          }
           return this.getAuthenticationManager().authenticate(authRequest); // 해당 토큰을 검사한 뒤 인증된 사용자면 정상적으로 리턴. 아니라면 예외 발생
         }
       
@@ -541,16 +555,20 @@
   
         @Override
         public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-          log.debug("2.CustomAutenticationProvider");
-  
           UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication; // Filter를 거쳐 생성된 토큰
           String userEmail = token.getName(); // 아이디를 가져온다.
           String userPw = (String) token.getCredentials(); //비밀번호를 가져온다.
           UserDetailsVO userDetailsVO = (UserDetailsVO) userDetailsService.loadUserByUsername(userEmail); // 아이디로 사용자 조회
   
+          log.debug("2.CustomAutenticationProvider userEmail = {}, UserPw = {}",userEmail, userPw);
+            
           // 찾은 사용자의 비밀번호가 일치하지 않는 경우 예외 처리
-          if(!passwordEncoder.matches(userPw, userDetailsVO.getPassword())) {
-            throw new BadCredentialsException(userDetailsVO.getUsername());
+          // 현재 암호화해서 db에 넣지 않았으므로 넘어간다.
+          // if(!passwordEncoder.matches(userPw, userDetailsVO.getPassword())) {
+          //    throw new BadCredentialsException(userDetailsVO.getUsername());
+          // }
+          if(!userPw.equals(userDetailsVO.getPassword())) {
+              throw new BadCredentialsException(userDetailsVO.getUsername());
           }
   
           return new UsernamePasswordAuthenticationToken(userDetailsVO, userPw, userDetailsVO.getAuthorities());
@@ -593,10 +611,9 @@
   
         // 인증이 성공할 경우 처리.
         @Slf4j
-        public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
-  
+        public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
           @Override
-          public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
+          public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
             log.debug("3.CustomLoginSuccessHandler");
   
             JSONObject jsonObject; // response로 내보려는 정보를 담은 Json 객체
@@ -764,15 +781,24 @@
       }
       ```
     </details>
+  - <details>
+    <summary>결과</summary>
+    
+    ![img.png](image/img.png)
+    ![img_1.png](image/img_1.png)
+  
+    </details>
+
 </details>
 
 <details>
-<summary>H2 사용시 설정</summary>
+    <summary>H2 사용시 설정</summary>
 
 - Security 적용 후 Web에서 확인하려면 추가 설정이 필요함.
+    
     ```java
     package com.security.springboot.Security.configuration;
-
+    
     import com.security.springboot.Security.Provider.CustomAuthenticationProvider;
     import com.security.springboot.Security.filter.CustomAuthenticationFilter;
     import com.security.springboot.Security.handler.CustomLoginFailureHandler;
@@ -863,7 +889,7 @@
     
     
     }
-
+    
     ```
 </details>
 

@@ -4,15 +4,13 @@ import com.security.springboot.domain.User.Model.UserDetailsVO;
 import com.security.springboot.domain.User.Model.UserEntity;
 import com.security.springboot.domain.User.Role.UserRole;
 import com.security.springboot.utils.ConvertUtil;
-import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,10 +18,9 @@ import java.util.HashMap;
 
 // 인증(로그인) 성공할 경우 처리.
 @Slf4j
-public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
-
+public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.debug("3.CustomLoginSuccessHandler");
 
         JSONObject jsonObject; // response로 내보려는 정보를 담은 Json 객체
@@ -31,10 +28,10 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
         UserEntity userEntity = ((UserDetailsVO) authentication.getPrincipal()).getUserEntity(); // 사용자와 관련된 정보 조회
         JSONObject userEntityJson = (JSONObject) ConvertUtil.convertObjectToJsonObject(userEntity); // 사용자 정보 Json 객체로 변환
 
-        if(userEntity.getRole()==UserRole.ADMIN) {
+        if (userEntity.getRole() == UserRole.ADMIN) {
             responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
             responseMap.put("msg", "관리자 로그인 성공");
-        }else{
+        } else {
             responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
             responseMap.put("msg", "일반 사용자 로그인 성공");
         }
@@ -47,7 +44,8 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
         printWriter.flush();
         printWriter.close();
 
-        SecurityContextHolder.getContext().setAuthentication(authentication); // 인증이 완료된 객체를 저장해 두고 다른 서비스에서 사용자 정보를 사용할 때 꺼내 쓴다. (jwt를 안쓰므로 세션에 저장하는 것)
+//        SecurityContextHolder.getContext().setAuthentication(authentication); // 인증이 완료된 객체를 저장해 두고 다른 서비스에서 사용자 정보를 사용할 때 꺼내 쓴다. (jwt를 안쓰므로 세션에 저장하는 것)
 
     }
+
 }
