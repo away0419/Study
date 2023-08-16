@@ -2,7 +2,7 @@
 # Spring-Security
 
 ## 0. 들어가기 앞서
-- spring Security는 버전에 따라 Deprecated 된 클래스, 함수들이 존재함. 따라서 버전을 잘 맞추고 사용해야 하는 메서드가 무엇인지 판단하기 바랍니다.
+- spring Security는 버전에 따라 Deprecated 된 클래스, 함수들이 존재함. 따라서 버전을 확인한 뒤, 사용해야 하는 메서드가 무엇인지 판단하기 바랍니다.
 - [docs](https://docs.spring.io/spring-security/reference/index.html)가 가장 정확합니다.
 - 흐름도를 참고하여 무엇을 먼저 작성해야 하는지 확인하기 바랍니다.
   ![Alt text](image/image.png)
@@ -882,14 +882,31 @@
     //                .authorizeHttpRequests(request -> request // HTTP 요청에 대한 인증을 구성
     //                        .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll() // DispatcherType.FORWARD 유형의 모든 요청을 허용
     //                        .anyRequest().authenticated()) // 다른 요청은 인증을 받아야 함.
-    .addFilterBefore(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // 커스텀 필터 추가
-    .build();
+                    .addFilterBefore(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // 커스텀 필터 추가
+                    .build();
+        }
     }
+    ```
+  
+    ```properties
+    # JPA 설정
+    spring.jpa.hibernate.ddl-auto=create
+    spring.jpa.properties.hibernate.format_sql=true
+    spring.jpa.show-sql=true
     
-    
-    
-    }
-    
+    # H2 설정
+    spring.h2.console.enabled=true
+    spring.h2.console.path=/h2-console
+    spring.datasource.driverClassName=org.h2.Driver
+    spring.datasource.url=jdbc:h2:mem:test
+    spring.datasource.username=sa
+    spring.datasource.password=
+    spring.sql.init.mode=always
+    # 바로 위 구문이 먼저 있어야 JPA로 먼저 테이블 생성
+    # spring.sql.init.data-locations=classpath:data.sql (h2 dependencies Implementation 했을 경우 사용. data.sql는 dml, schema.sql은 ddl 여기서 경로 설정한 data.sql 파일을 data(dml용) sql로 설정하겠다는 뜻 )
+
+    # log 출력 설정
+    logging.level.com.security.springboot=debug
     ```
 </details>
 
