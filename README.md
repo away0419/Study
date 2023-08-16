@@ -259,7 +259,7 @@ GrantedAuthority 객체는 UserDetailsService로 불러올 수 있고, 특정 �
     - 클라이언트는 서버에 요청을 보낼 때 세션 ID를 Header에 담아 보냄.
     - 세션ID가 탈취 될 위험성이 있으며 서버가 세션 저장소를 필요로 하기 때문에 추가적인 저장 공간이 필요.
 
-        ![Alt text](image-2.png)
+        ![Alt text](image/image-2.png)
     
 
 
@@ -277,5 +277,5 @@ GrantedAuthority 객체는 UserDetailsService로 불러올 수 있고, 특정 �
     - Token 정보를 저장하는 저장소가 필요함. 또한, 토큰이 만료되기 전까지 대처 방법이 없고 구현이 복잡하며 AccessToken이 만료될 때마다 새롭게 발급하기 때문에 서버의 자원 낭비가 발생됨.
       
 
-      ![Alt text](image-3.png)
+      ![Alt text](image/image-3.png)
       
