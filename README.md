@@ -252,6 +252,38 @@ GrantedAuthority 객체는 UserDetailsService로 불러올 수 있고, 특정 �
 
 # JWT
 
+### JWT란 
+- JSON 객체를 통해 안정하게 정보를 전송할 수 있는 웹 표준.
+- '.' 구분자로 세 부분으로 구분되어 있음.
+- 세션-쿠키 기반이 아니므로 세션이 유지 되지않는 다중 서버 환경에서도 로그인 유지 가능함. 따라서 여러 도메인에서 사용 가능.
+    ![Alt text](image/image.png)
+- header는 토큰 타입과 signature에서 사용하는 알고리즘으로 구성
+    ```json
+    {
+        "typ" : "JWT",
+        "alg" : "HS256"
+    }
+    ```
+- payload는 인증을 위해 사용할 실제 정보들(클레임)으로 구성되어 있으며, 등록 클레임, 공개 클레임, 비공개 클레임 등으로 구성되어 있음.
+    ```json
+    {
+        "sub" : "123456789",
+        "name" : "Jone Doe",
+        "admin" : true
+    }
+    ```
+    - 클레임이란 key와 value가 한쌍으로 이루어진 형태로 "sub" : "123456789" 가 하나의 클레임임.
+    - 등록 클레임은 필수로 사용되는 정보(데이터)는 아니지만 JWT가 기본적으로 가지는 정의된 key-value을 이용하여 Token 생성 정보를 만들 때 사용함.
+    - 공개 클레임은 말 그대로 공개용 정보를 뜻하며 key에 URI 포맷을 이용함. ({"https://github.comn/away0419" : true})
+    - 비공개 클레임은 실제 사용되는 정보(데이터)임. 
+    ({"userId" : "away0419", "userEmail" : "away0419@c.com"})
+    - 이러한 클레임들이 모여 인코딩 되어 JSON payload가 됨.
+- signature는 인코딩된 헤더(Header)와 인코딩된 페이로드(payload), 비밀 키(Secret)와 알고리즘을 기반으로 백엔드에서 발급됨.
+
+
+
+<br>
+
 ### 로그인 후 회원 검증 방식
 
 - 세션 
