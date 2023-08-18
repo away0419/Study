@@ -4,6 +4,7 @@ import com.security.springboot.Security.Provider.CustomAuthenticationProvider;
 import com.security.springboot.Security.filter.CustomAuthenticationFilter;
 import com.security.springboot.Security.handler.CustomLoginFailureHandler;
 import com.security.springboot.Security.handler.CustomLoginSuccessHandler;
+import com.security.springboot.jwt.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -69,6 +71,11 @@ public class SecurityConfig {
         return customAuthenticationFilter;
     }
 
+    @Bean
+    public JwtAuthorizationFilter jwtAuthorizationFilter(){
+        return new JwtAuthorizationFilter();
+    }
+
     // security 설정
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -83,6 +90,7 @@ public class SecurityConfig {
 //                .authorizeHttpRequests(request -> request // HTTP 요청에 대한 인증을 구성
 //                        .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll() // DispatcherType.FORWARD 유형의 모든 요청을 허용
 //                        .anyRequest().authenticated()) // 다른 요청은 인증을 받아야 함.
+                .addFilterBefore(jwtAuthorizationFilter(), BasicAuthenticationFilter.class) // JWT 필터 추가
                 .addFilterBefore(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // 커스텀 필터 추가
                 .build();
     }

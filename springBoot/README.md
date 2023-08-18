@@ -302,11 +302,13 @@
     @NoArgsConstructor
     @Data
     public class UserVO {
+        private Long id;
         private String userEmail;
         private String userPw;
         private UserRole role;
     
         public UserVO(UserEntity userEntity) {
+            this.id = userEntity.getId();
             this.userEmail = userEntity.getUserEmail();
             this.userPw = userEntity.getUserPw();
             this.role = userEntity.getRole();
@@ -385,7 +387,7 @@
 
 <br/>
 
-## 3. Config
+## 3. SecurityConfig
 - 인증과 인가를 담당.
 - 사용자가 만든 필터, 어드바이저, 핸들러를 등록하거나, 추가적인 설정을 등록할 수 있는 클래스. 
 - 클래스명은 상관 없음.
@@ -910,11 +912,52 @@
     ```
 </details>
 
+<br/>
+
+# JWT
+
+## 0. 들어가기 앞서
+
+- JWT는 Security와 함께 적용하지 않고 따로 사용 가능합니다.
+- 해당 실습은 Security + JWT로 진행했습니다.
+
+<br/>
+
+## 1. 라이브러리 추가 및 설정
+
+- Security와 동일
+- java 11 이상일 경우 해당 라이브러리 추가
+  ```properties
+  implementation 'com.sun.xml.bind:jaxb-impl:4.0.1'
+  implementation 'com.sun.xml.bind:jaxb-core:4.0.1'
+  implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+  ```
 
 
+<br/>
 
+## 2. JWT
 
+- <details>
+    <summary>AuthConstants</summary>
+
+    - 상수 파일로 JWT Header에 키 값인 authorization과 클라이언트에서 JWT로 전송할 때 사용하는 BEARER 값을 상수로 정의함.
   
+    ```JAVA
+    public final class AuthConstants {
+        public static final String AUTH_HEADER = "Authorization";
+        public static final String TOKEN_TYPE = "BEARER";
+    }
+    ```
+
+    </details>
+- <details>
+    <summary>TokenUtil</summary>    
+
+    - JWT 생성, 유효성 체크 등, 전반적인 기능을 모아둔 클래스.
+    - private static final String jwtSecretKey는 따로 관리.
+
+    </details>
 
 
 

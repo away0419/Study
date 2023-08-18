@@ -8,11 +8,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class UserVO {
+    private Long id;
     private String userEmail;
     private String userPw;
     private UserRole role;
 
     public UserVO(UserEntity userEntity) {
+        this.id = userEntity.getId();
         this.userEmail = userEntity.getUserEmail();
         this.userPw = userEntity.getUserPw();
         this.role = userEntity.getRole();
