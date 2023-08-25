@@ -43,7 +43,7 @@ last modified date : 2023.08.25
 <br/>
 
 ## 엣지 로케이션
-![Alt text](imgae/image-3.png)
+![Alt text](image/image-3.png)
 ![Alt text](image/image-4.png)
 - AWS 서비스 요청자에 가장 가까이 있는 지점.
 - 엣지 로케이션은 전 세계 주요 도시에 있음.
