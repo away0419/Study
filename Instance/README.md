@@ -50,5 +50,54 @@
 4. [접속] 기본 로그인은 ubuntu. 
 ![Alt text](image2/3.png)
 
+</details>
+
+<details>
+    <summary>방화벽 설정</summary>
+
+1. 먼저 ubuntu에서 업데이트를 해줌.
+    ```linux
+    sudo apt update
+    ```
+
+<br/>
+
+2. ubuntu에서 특정 포트 방화벽 해제
+    ```linux
+    # 특정 포트 규칙 추가
+    sudo iptables -I INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
+
+    # 특정 포트 규칙 삭제
+    sudo iptables -D INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
+
+    # 특정 IP로만 특정 포트 규칙 추가
+    sudo iptables -I INPUT -p tcp -s 123.123.123.123 --dport 8009 -j ACCEPT
+
+    # 위의 규칙 삭제
+    iptables -D INPUT -p tcp -s 123.123.123.123 --dport 8009 -j ACCEPT
+
+    # 변경 사항 저장
+    sudo netfilter-persistent save
+    ```
+
+<br/>
+
+3. 서브넷 방화벽 해제를 위해 서브넷 접속
+![Alt text](image3/1.png)
+
+<br/>
+
+4. 보안 목록 선택
+![Alt text](image3/2.png)
+
+<br/>
+
+4. 신규 규칙 추가
+![Alt text](image3/3.png)
+
+<br/>
+
+5. 서버간 라우팅 허용 규칙 추가
+![Alt text](image3/4.png)
 
 </details>
