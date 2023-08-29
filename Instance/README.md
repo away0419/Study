@@ -101,3 +101,11 @@
 ![Alt text](image3/4.png)
 
 </details>
+
+<details>
+    <summary>시간 설정</summary>
+
+```
+sudo timedatectl set-timezone Asia/Seoul
+```
+</details>
