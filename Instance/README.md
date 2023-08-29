@@ -56,14 +56,14 @@
     <summary>방화벽 설정</summary>
 
 1. 먼저 ubuntu에서 업데이트를 해줌.
-    ```linux
+    ```ubuntu
     sudo apt update
     ```
 
 <br/>
 
 2. ubuntu에서 특정 포트 방화벽 해제
-    ```linux
+    ```ubuntu
     # 특정 포트 규칙 추가
     sudo iptables -I INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
 
@@ -105,7 +105,119 @@
 <details>
     <summary>시간 설정</summary>
 
-```
+```ubuntu
 sudo timedatectl set-timezone Asia/Seoul
 ```
 </details>
+
+<details>
+    <summary>Java 설치</summary>
+
+```ubuntu
+# 운영체제에 기본으로 있는 jdk 설치, 또는 원하는 버전 설치 #
+sudo apt install default-jdk
+sudo apt-get install openjdk-11-jdk
+
+# 설치 확인 #
+java -version
+javac -version
+
+# 환경 변수 설정 #
+sudo vim /etc/profile
+
+# 맨 아래에 추가
+...
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64      // 본인의 자바 설치 경로
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=$CLASSPATH:$JAVA_HOME/jre/lib/ext:$JAVA_HOME/lib/tools.jar
+...
+
+#확인
+source /etc/profile
+echo $JAVA_HOME
+```
+
+</details>
+
+<details>
+    <summary>docker 설치</summary>
+
+```ubuntu
+# docker 설치
+sudo apt-get install docker.io -y
+
+# docker 실행
+sudo service docker start
+
+# 파일의 권한을 666으로 변경하여 그룹 내 다른 사용자도 접근 가능하게 변경
+sudo chmod 666 /var/run/docker.sock
+
+# ubuntu 유저를 docker 그룹에 추가 후 재시작
+sudo usermod -aG docker $USER
+sudo service docker restart
+
+# 버전 확인 
+docker --version
+
+# 현재 실행중인 도커 확인
+docker ps
+
+```
+</details>
+
+<details>
+    <summary>docker 실행 시 설명</summary>
+
+```ubuntu
+docker run --name jenkins-docker -d -p 8000:8080 -p 8888:50000 -v /home/jenkins:/var/jenkins_home -u root jenkins/jenkins:lts
+```
+
+- `d` : detached mode, 백그라운드에서 컨테이너가 실행되게 한다.
+
+- `p`: 서버의 9090포트와 컨테이너 내부 8080포트를 연결한다.
+
+- `v`: 서버의 `/home/jenkins`경로와 컨테이너 내부 `/var/jenkins_home`경로를 마운트한다.  이것을 하는 이유는, Jenkins 설치 시 ssh 키값 생성, 저장소 참조 등을 용이하게 하기 위함입니다.
+
+- `-name`: 실행될 컨테이너의 이름을 jenkins-docker으로 설정한다.
+
+- `u`: 실행할 사용자를 root으로 설정한다.
+
+- 포트는 ec2 인스턴스의 8000, 8888번 포트를 도커 컨테이너의 8080, 50000번 포트에 대응시킨다.
+
+
+
+</details>
+
+<details>
+    <summary>docker 기타 명령어</summary>
+
+1. [주요 명령어](https://captcha.tistory.com/49)
+2. [도커 삭제 명령어](https://www.lainyzine.com/ko/article/docker-rm-removing-docker-containers/)
+
+</details>
+
+<details>
+    <summary>docker-compose 설치</summary>
+
+```ubuntu
+#설치
+sudo curl -L https://github.com/docker/compose/releases/download/1.26.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+
+#권환
+sudo chmod +x /usr/local/bin/docker-compose
+
+#버전확인
+docker-compose --version
+```
+
+</details>
+
+<details>
+    <summary>docker-compose 명령어</summary>
+
+1. [주요 명령어](https://kimjingo.tistory.com/108)
+2. [간단 문법](https://darrengwon.tistory.com/793)
+
+</details>
+
+
