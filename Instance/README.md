@@ -221,3 +221,55 @@ docker-compose --version
 </details>
 
 
+<details>
+    <summary>nginx 설치</summary>
+
+```ubuntu
+# 설치
+sudo apt install nginx
+
+# 실행
+sudo systemctl start nginx
+
+# 상태 보기
+sudo service status nginx
+
+# 연결 상태를 보기 위한 툴 설치
+sudo apt install net-tools
+netstat - lntp
+
+# 제거
+sudo apt remove nginx
+sudo apt purge nginx
+
+# docker로 설치하기
+docker pull nginx
+
+# docker로 실행하기
+docker run --name 원하는이름 -v docker와 공유하려는 폴더 경로:docker 안에서 공유하려는 폴더 경로
+```
+</details>
+
+<details>
+    <summary>HTTPS 설정</summary>
+
+```ubuntu
+
+# https 설정을 위한 툴 설치
+sudo apt-get install letsencrypt -y
+
+# nginx 중단
+sudo service nginx stop
+
+# certbot 인증서 발급 동의, 이메일 수신은 미동의
+sudo certbot certonly --standalone -d 도메인(example.com)
+
+
+# https 파일 설정
+sudo vim /etc/nginx/sites-available/default
+
+
+
+```
+
+</details>
