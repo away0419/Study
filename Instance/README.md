@@ -64,6 +64,18 @@
 
 2. ubuntu에서 특정 포트 방화벽 해제
     ```ubuntu
+    ## firewall을 이용한 포트 열기
+    # firewall 설치
+    sudo apt install firewalld
+
+    # 특정 포트 열기 규칙 추가
+    sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
+
+    # 규칙 초기화
+    sudo firewall reload
+
+
+    ## iptables를 이용한 포트 열기
     # 특정 포트 규칙 추가
     sudo iptables -I INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
 
@@ -78,6 +90,10 @@
 
     # 변경 사항 저장
     sudo netfilter-persistent save
+
+    # 규칙 초기화
+    sudo iptables -F // iptables
+
     ```
 
 <br/>
@@ -162,6 +178,8 @@ docker --version
 # 현재 실행중인 도커 확인
 docker ps
 
+# 기존 docker 지우고 다시 설치
+sudo apt-get remove docker docker-engine docker.io -y
 ```
 </details>
 
@@ -261,15 +279,170 @@ sudo apt-get install letsencrypt -y
 # nginx 중단
 sudo service nginx stop
 
-# certbot 인증서 발급 동의, 이메일 수신은 미동의
+# certbot 발급을 위한 80, 433 방화벽 열기
+# certbot 이메일 입력, 인증서 발급 동의, 이메일 수신은 미동의
 sudo certbot certonly --standalone -d 도메인(example.com)
-
 
 # https 파일 설정
 sudo vim /etc/nginx/sites-available/default
 
+...
+# 80포트 접근 시 443 포트로 리다이렉트
+server {
+    if ($host = beanzido.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
 
+    listen 80 ;
+    listen [::]:80 ;
+    server_name beanzido.com;
+    return 404; # managed by Certbot
+}
+
+# domain을 두개 연결해서 사용하고 싶다면 똑같은걸 만들기만 하면 된다.
+server {
+    if ($host = k7a206.p.ssafy.io) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    listen 80 ;
+    listen [::]:80 ;
+    server_name k7a206.p.ssafy.io;
+    return 404; # managed by Certbot
+}
+
+server {
+  index index.html index.htm index.nginx-debian.html;
+  server_name beanzido.com; # managed by Certbot
+  root /home/ubuntu/compose/jenkins/workspace/release/frontend/build/;
+  location / {
+    root /home/ubuntu/compose/jenkins/workspace/release/frontend/build/;
+    try_files $uri $uri/ @router;
+ 	}
+  location /chat-server{
+    proxy_pass http://13.125.39.100:8091;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header X-Forwarded-Proto $scheme;		
+ 	}
+  location /keyword-server{
+    proxy_pass http://13.125.39.100:8092;
+  }
+ 	location @router{
+       	    rewrite ^(.+)$ /index.html last;
+ 	}
+    
+ 	ssl_certificate /etc/letsencrypt/live/beanzido.com/fullchain.pem; # managed by Certbot
+ 	ssl_certificate_key /etc/letsencrypt/live/beanzido.com/privkey.pem; # managed by Certbot
+  listen 443 ssl; # managed by Certbot
+    
+}
+
+server {
+  index index.html index.htm index.nginx-debian.html;
+  server_name k7a206.p.ssafy.io; # managed by Certbot
+  root /home/ubuntu/compose/jenkins/workspace/front/frontend/build/;
+  location / {
+    root /home/ubuntu/compose/jenkins/workspace/front/frontend/build/;
+    try_files $uri $uri/ @router;
+ 	}
+  location /chat-server{
+    proxy_pass http://13.125.39.100:8061;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header X-Forwarded-Proto $scheme;		
+ 	}
+  location /keyword-server{
+    proxy_pass http://13.125.39.100:8062;
+  }
+ 	location @router{
+       	    rewrite ^(.+)$ /index.html last;
+ 	}
+    
+ 	ssl_certificate /etc/letsencrypt/live/k7a206.p.ssafy.io/fullchain.pem; # managed by Certbot
+ 	ssl_certificate_key /etc/letsencrypt/live/k7a206.p.ssafy.io/privkey.pem; # managed by Certbot
+  listen 443 ssl; # managed by Certbot
+    
+    
+}
+...
+
+
+
+# nginx 제대로 실행 되는지 테스트 확인  
+sudo nginx -t
+
+# nginx 재시작
+sudo service nginx restart
 
 ```
 
 </details>
+
+<details>
+    <summary>nginx 명령어</summary>
+
+```ubuntu
+# nginx 실행
+service nginx start
+sudo service nginx start
+sudo systemctl start nginx
+
+# nginx 재실행
+service nginx restart
+sudo service nginx restart
+sudo systemctl restart nginx
+
+# nginx 중단
+service nginx stop
+sudo service nginx stop
+sudo systemctl stop nginx
+
+# nginx 상태 보기
+service nginx status
+sudo service nginx status
+ps -ef | grep nginx
+
+```
+
+</details>
+
+<details>
+    <summary>Certbot(인증서) 명령어</summary>
+
+```ubuntu
+# 인증서 해지 명령어
+sudo certbot revoke --cert-name www.domain.com
+
+# 인증서 삭제 명령어
+sudo certbot delete --cert-name www.domain.com
+
+# 인증서 발급 명령어 (서버 소유주 인증 방식)
+sudo certbot --nginx -d www.domain.com
+
+# 인증서 발급 명령어 (nginx 웹서버 인증 방식)
+sudo certbot certonly --standalone -d www.domain.com
+
+# 인증서 발급 명령어 (도메인 소유주 방식)
+sudo certbot certonly --manual --preferred-challenges dns-01 --server https://acme-v02.api.letsencrypt.org/directory -d "*.domain.com"
+
+# 인증서 갱신 명령어
+sudo certbot renew
+
+# nginx로 받은 인증서 갱신 명령어
+sudo nginx -s stop
+sudo certbot renew
+sudo nginx
+
+# 만료 이메일 업데이트 (1년마다 갱싱해야함)
+certbot update_account --email yourname+1@example.com
+```
+
+</details>
+
