@@ -287,6 +287,41 @@ sudo certbot certonly --standalone -d 도메인(example.com)
 sudo vim /etc/nginx/sites-available/default
 
 ...
+# 기본
+server {
+        if ($host = 도메인) {
+                return 301 https://$host$request_uri;
+        } # managed by Certbot
+
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        server_name 도메인;
+        return 404;
+}
+
+server {
+  index index.html index.htm index.nginx-debian.html;
+  server_name 도메인; # managed by Certbot
+
+  location / {
+
+    try_files $uri $uri/ @router;
+        }
+
+        location @router{
+            rewrite ^(.+)$ /index.html last;
+        }
+
+        ssl_certificate /etc/letsencrypt/live/도메인/fullchain.pem; # managed by Certbot
+        ssl_certificate_key /etc/letsencrypt/live/도메인/privkey.pem; # managed by Certbot
+  listen 443 ssl; # managed by Certbot
+
+}
+
+
+
+## 이 밑으로는 내가 보기위한 예시임.
 # 80포트 접근 시 443 포트로 리다이렉트
 server {
     if ($host = beanzido.com) {
