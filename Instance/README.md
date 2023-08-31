@@ -446,3 +446,16 @@ certbot update_account --email yourname+1@example.com
 
 </details>
 
+<details>
+    <summary>CI/CD</summary>
+
+- <details>
+    <summary>github action</summary>
+
+    1. github 프로젝트 세팅
+    ![Alt text](image.png)
+
+
+</details>
+
+</details>
