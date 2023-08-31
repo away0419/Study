@@ -72,7 +72,7 @@
     sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
 
     # 규칙 초기화
-    sudo firewall reload
+    sudo firewall-cmd --reload
 
 
     ## iptables를 이용한 포트 열기
