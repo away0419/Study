@@ -71,8 +71,8 @@
     # 특정 포트 열기 규칙 추가
     sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
 
-    # 규칙 초기화
-    sudo firewall reload
+    # 추가한 규칙 적용 하는 초기화
+    sudo firewall-cmd --reload
 
 
     ## iptables를 이용한 포트 열기
@@ -91,8 +91,8 @@
     # 변경 사항 저장
     sudo netfilter-persistent save
 
-    # 규칙 초기화
-    sudo iptables -F // iptables
+    # 추가한 규칙 초기화
+    sudo iptables -F
 
     ```
 
@@ -250,7 +250,7 @@ sudo apt install nginx
 sudo systemctl start nginx
 
 # 상태 보기
-sudo service status nginx
+sudo systemctl status nginx
 
 # 연결 상태를 보기 위한 툴 설치
 sudo apt install net-tools
@@ -279,7 +279,7 @@ sudo apt-get install letsencrypt -y
 # nginx 중단
 sudo service nginx stop
 
-# certbot 발급을 위한 80, 433 방화벽 열기
+# certbot 발급을 위한 80, 443 방화벽 열기
 # certbot 이메일 입력, 인증서 발급 동의, 이메일 수신은 미동의
 sudo certbot certonly --standalone -d 도메인(example.com)
 
@@ -287,6 +287,41 @@ sudo certbot certonly --standalone -d 도메인(example.com)
 sudo vim /etc/nginx/sites-available/default
 
 ...
+# 기본
+server {
+        if ($host = 도메인) {
+                return 301 https://$host$request_uri;
+        } # managed by Certbot
+
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        server_name 도메인;
+        return 404;
+}
+
+server {
+  index index.html index.htm index.nginx-debian.html;
+  server_name 도메인; # managed by Certbot
+
+  location / {
+
+    try_files $uri $uri/ @router;
+        }
+
+        location @router{
+            rewrite ^(.+)$ /index.html last;
+        }
+
+        ssl_certificate /etc/letsencrypt/live/도메인/fullchain.pem; # managed by Certbot
+        ssl_certificate_key /etc/letsencrypt/live/도메인/privkey.pem; # managed by Certbot
+  listen 443 ssl; # managed by Certbot
+
+}
+
+
+
+## 이 밑으로는 내가 보기위한 예시임.
 # 80포트 접근 시 443 포트로 리다이렉트
 server {
     if ($host = beanzido.com) {
