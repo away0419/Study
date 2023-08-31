@@ -71,7 +71,7 @@
     # 특정 포트 열기 규칙 추가
     sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
 
-    # 규칙 초기화
+    # 축한 규칙 적용 하는 초기화
     sudo firewall-cmd --reload
 
 
@@ -279,7 +279,7 @@ sudo apt-get install letsencrypt -y
 # nginx 중단
 sudo service nginx stop
 
-# certbot 발급을 위한 80, 433 방화벽 열기
+# certbot 발급을 위한 80, 443 방화벽 열기
 # certbot 이메일 입력, 인증서 발급 동의, 이메일 수신은 미동의
 sudo certbot certonly --standalone -d 도메인(example.com)
 
