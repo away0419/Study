@@ -250,7 +250,7 @@ sudo apt install nginx
 sudo systemctl start nginx
 
 # 상태 보기
-sudo service status nginx
+sudo systemctl status nginx
 
 # 연결 상태를 보기 위한 툴 설치
 sudo apt install net-tools
