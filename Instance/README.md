@@ -71,7 +71,7 @@
     # 특정 포트 열기 규칙 추가
     sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
 
-    # 축한 규칙 적용 하는 초기화
+    # 추가한 규칙 적용 하는 초기화
     sudo firewall-cmd --reload
 
 
@@ -91,8 +91,8 @@
     # 변경 사항 저장
     sudo netfilter-persistent save
 
-    # 규칙 초기화
-    sudo iptables -F // iptables
+    # 추가한 규칙 초기화
+    sudo iptables -F
 
     ```
 
