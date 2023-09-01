@@ -7,6 +7,7 @@ on:
   # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
+    paths: ./test/**
 
 jobs:
   # Build job
@@ -26,4 +27,17 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: execute remote ssh
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_SSH_HOST }}
+          username: ${{ secrets.REMOTE_SSH_USERNAME }}
+          key: ${{ secrets.REMOTE_SSH_KEY }}
+          passphrase: ${{ secrets.REMOTE_SSH_PASSPHRASE }}
+          port: ${{ secrets.REMOTE_SSH_PORT }}
+          script: |
+            cd /usr/github/git-action-projects-practice
+            git pull origin main
+            cd ../test
+            
 
