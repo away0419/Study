@@ -36,6 +36,6 @@ jobs:
           port: ${{ secrets.REMOTE_SSH_PORT }}
           script: |
             cd /usr/github/git-action-projects-practice/test
-            git pull origin main
+            sudo git pull origin main
             
 
