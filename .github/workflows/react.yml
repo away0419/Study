@@ -36,8 +36,7 @@ jobs:
           passphrase: ${{ secrets.REMOTE_SSH_PASSPHRASE }}
           port: ${{ secrets.REMOTE_SSH_PORT }}
           script: |
-            cd /usr/github/git-action-projects-practice
+            cd /usr/github/git-action-projects-practice/test
             git pull origin main
-            cd ../test
             
 
