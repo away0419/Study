@@ -488,13 +488,13 @@ certbot update_account --email yourname+1@example.com
     <summary>github action</summary>
 
     1. github 프로젝트 세팅
-    ![Alt text](image.png)
+    ![Alt text](image4/image.png)
 
     2. action에 들어가서 기본 파일 선택 (프로젝트랑 비슷한 것 고르면 됨. 아무거나 하고 수정해도 됨)
-    ![Alt text](image-1.png)
+    ![Alt text](image4/image-1.png)
 
     3. 선택한 파일 안의 코드를 다음과 같이 수정
-    ![Alt text](image-2.png)
+    ![Alt text](image4/image-2.png)
         - name: 파일 설명이라 보면 됨.
         - on: yml을 실행하는 시점, 실행 경로 등 기본 세팅을 설정함.
             - branches: 어떤 브랜치에 적용할 것인지 선택(다중 가능).
@@ -511,9 +511,40 @@ certbot update_account --email yourname+1@example.com
     <br/>                
     
     4. yml의 소스에 맞춰 레파지토리에 변화가 생기면 action 실행 됨.
-    ![Alt text](image-3.png)
+    ![Alt text](image4/image-3.png)
 
+    5. 인스턴스 서버에 git 설치 및 github clone.
+        ```
+        # git 설치 및 확인
+        sudo apt install git
+        git --version
 
+        # git 구성 및 확인
+        git config --global user.name "Your Name"
+        git config --global user.email "youremail@yourdomain.com"
+        git config --list
+
+        # 원하는 경로에서 git clone할 폴더 생성 및 clone. 
+        cd /usr
+        sudo mkdir github
+        cd github
+        sudo git clone repository주소
+        ```
+    <br/>
+
+    6. repository > settings > Secrets and variables > Actions > new repository secret 을 통해 yml에서 사용할 변수 등록.
+    ![Alt text](image4/image-5.png)
+        - 해당 변수에 들어갈 값들은 7번 참조.
+        
+    <br/>
+
+    7. 배포를 위해 oracle cloud에 접속해야함. appleboy/ssh-action@master 라이브러리를 이용하여 ssh 접속.
+    ![Alt text](image4/image-4.png)
+        - host: oracle cloud ip
+        - username: 오라클 클라우드 홈페이지 인스턴스 정보에 들어가면 사용자 이름이 있음.
+        - key: 인스턴스 생성할 때 만든 key 파일을 메모장으로 열면 값이 나옴. 전체 복사해야함. (맨위, 맨아래 ---- 부분도 복사 다해야함)  
+        - port: 인스턴스 접속 포트 (기본 22)
+        - script : 인스턴스 접속한 뒤 실행할 명령어. 
 
 </details>
 
