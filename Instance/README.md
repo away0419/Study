@@ -490,6 +490,30 @@ certbot update_account --email yourname+1@example.com
     1. github 프로젝트 세팅
     ![Alt text](image.png)
 
+    2. action에 들어가서 기본 파일 선택 (프로젝트랑 비슷한 것 고르면 됨. 아무거나 하고 수정해도 됨)
+    ![Alt text](image-1.png)
+
+    3. 선택한 파일 안의 코드를 다음과 같이 수정
+    ![Alt text](image-2.png)
+        - name: 파일 설명이라 보면 됨.
+        - on: yml을 실행하는 시점, 실행 경로 등 기본 세팅을 설정함.
+            - branches: 어떤 브랜치에 적용할 것인지 선택(다중 가능).
+            - paths: test/** -> 해당 경로에 있는 모든 파일을 대상으로 하나라도 변경 된다면 yml 실행.
+        - jobs: 어떤 작업을 할지 정하는 단계.
+            - build: 빌드를 할때의 설정.
+                - runs-on: 뭐로 할지 정하는 것.
+                - defaults: build 안의 작업에 전역으로 세팅. 
+                - steps: 실제 작업을 작성하는 단계.
+                    - name: 별칭
+                      uses: 다른 사람이 만들어 놓은 것을 사용
+                      run: 명령어
+
+    <br/>                
+    
+    4. yml의 소스에 맞춰 레파지토리에 변화가 생기면 action 실행 됨.
+    ![Alt text](image-3.png)
+
+
 
 </details>
 
