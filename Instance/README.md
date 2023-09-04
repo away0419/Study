@@ -159,8 +159,20 @@ echo $JAVA_HOME
     <summary>docker 설치</summary>
 
 ```ubuntu
-# docker 설치
-sudo apt-get install docker.io -y
+# 필요한 패키지 설치
+sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+
+# Docker 공식 GPG키 추가
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+# Docker 공식 api 저장소 추가
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+# Docker 설치
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+
+# 도커 실행상태 확인
+sudo systemctl status docker
 
 # docker 실행
 sudo service docker start
@@ -178,8 +190,16 @@ docker --version
 # 현재 실행중인 도커 확인
 docker ps
 
-# 기존 docker 지우고 다시 설치
-sudo apt-get remove docker docker-engine docker.io -y
+# Docker 삭제-1
+sudo snap remove docker
+
+# Docker 삭제-2
+sudo apt-get purge -y docker-engine docker docker.io docker-ce
+sudo apt-get autoremove -y --purge docker-engine docker docker.io docker-ce
+sudo rm -rf /var/lib/docker /etc/docker
+sudo rm /etc/apparmor.d/docker
+sudo groupdel docker
+sudo rm -rf /var/run/docker.sock
 ```
 </details>
 
@@ -545,6 +565,14 @@ certbot update_account --email yourname+1@example.com
         - key: 인스턴스 생성할 때 만든 key 파일을 메모장으로 열면 값이 나옴. 전체 복사해야함. (맨위, 맨아래 ---- 부분도 복사 다해야함)  
         - port: 인스턴스 접속 포트 (기본 22)
         - script : 인스턴스 접속한 뒤 실행할 명령어. 
+
+    8. 클라우드에 배포하기
+    ![Alt text](image4/image-6.png)
+        - front server 구성을 예시로 만듬.
+        - 하나의 도커에 nginx와 vue 프로젝트를 구동 시킴.
+        - dockerfile은 다음과 같음.
+        
+     
 
 </details>
 
