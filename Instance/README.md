@@ -204,19 +204,34 @@ sudo rm -rf /var/run/docker.sock
 </details>
 
 <details>
-    <summary>docker 실행 시 설명</summary>
+    <summary>docker 이미지 빌드 및 실행 옵션</summary>
+
+<br/>
 
 ```ubuntu
-docker run --name jenkins-docker -d -p 8000:8080 -p 8888:50000 -v /home/jenkins:/var/jenkins_home -u root jenkins/jenkins:lts
+docker build -t portfolio:1.0 /home/ubuntu/about-me/
 ```
 
-- `d` : detached mode, 백그라운드에서 컨테이너가 실행되게 한다.
+- `-t`: 태그를 뜻하며 이미지이름:태그 이다.
+
+- `경로`: 이미지로 만들 Dockerfile이 있는 경로
+
+<br/>
+
+```ubuntu
+docker run -m 512m --name jenkins-docker -d -p 8000:8080 -p 8888:50000 -v /home/jenkins:/var/jenkins_home -u root jenkins/jenkins:lts
+```
+
+- `-m`: docker에 할당할 최대 메모리를 설정한다.
+
+- `--name`: 실행될 컨테이너의 이름을 jenkins-docker으로 설정한다.
+
+- `d`: detached mode, 백그라운드에서 컨테이너가 실행되게 한다.
 
 - `p`: 서버의 9090포트와 컨테이너 내부 8080포트를 연결한다.
 
 - `v`: 서버의 `/home/jenkins`경로와 컨테이너 내부 `/var/jenkins_home`경로를 마운트한다.  이것을 하는 이유는, Jenkins 설치 시 ssh 키값 생성, 저장소 참조 등을 용이하게 하기 위함입니다.
 
-- `-name`: 실행될 컨테이너의 이름을 jenkins-docker으로 설정한다.
 
 - `u`: 실행할 사용자를 root으로 설정한다.
 
@@ -231,6 +246,30 @@ docker run --name jenkins-docker -d -p 8000:8080 -p 8888:50000 -v /home/jenkins:
 
 1. [주요 명령어](https://captcha.tistory.com/49)
 2. [도커 삭제 명령어](https://www.lainyzine.com/ko/article/docker-rm-removing-docker-containers/)
+
+</details>
+
+<details>
+    <summary>Dockerfile</summary>
+
+- docker image를 만들기 위한 파일임.
+- 확장자 명은 따로 없으며 Dockerfile 이라는 이름을 가짐.
+```Dockerfile
+# 해당 Dockerfile은 front 배포 시 사용한 예시
+
+FROM node:14.21.3 as build-stage
+WORKDIR /app
+COPY package*.json ./
+RUN npm install 
+COPY . .
+RUN npm run build
+
+FROM nginx:stable-alpine as production-stage
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
 
 </details>
 
@@ -284,7 +323,7 @@ sudo apt purge nginx
 docker pull nginx
 
 # docker로 실행하기
-docker run --name 원하는이름 -v docker와 공유하려는 폴더 경로:docker 안에서 공유하려는 폴더 경로
+docker run -i -d --name 도커별칭 -p 클라우드포트번호:도커포트번호 -v 공유하려는 클라우드 폴더 경로:공유받으려는 도커의 폴더 경로
 ```
 </details>
 
@@ -309,39 +348,69 @@ sudo vim /etc/nginx/sites-available/default
 ...
 # 기본
 server {
-        if ($host = 도메인) {
-                return 301 https://$host$request_uri;
-        } # managed by Certbot
+    if ($host = 도메인) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
 
-        listen 80 default_server;
-        listen [::]:80 default_server;
+    listen 80 default_server;
+    listen [::]:80 default_server;
 
-        server_name 도메인;
-        return 404;
+    server_name 도메인;
+    return 404;
 }
 
 server {
-  index index.html index.htm index.nginx-debian.html;
-  server_name 도메인; # managed by Certbot
+    index index.html index.htm index.nginx-debian.html;
+    server_name 도메인; # managed by Certbot
 
-  location / {
+    location / {
+        try_files $uri $uri/ @router;
+    }
 
-    try_files $uri $uri/ @router;
-        }
+    location @router{
+        rewrite ^(.+)$ /index.html last;
+    }
 
-        location @router{
-            rewrite ^(.+)$ /index.html last;
-        }
+    ssl_certificate /etc/letsencrypt/live/도메인/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/도메인/privkey.pem; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+}
 
-        ssl_certificate /etc/letsencrypt/live/도메인/fullchain.pem; # managed by Certbot
-        ssl_certificate_key /etc/letsencrypt/live/도메인/privkey.pem; # managed by Certbot
-  listen 443 ssl; # managed by Certbot
+## Nginx front 배포 예시
+server {
+    if ($host = about-ljk.store) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    server_name about-ljk.store;
+    return 404;
+}
+
+server {
+    root /home/ubuntu/about-me/dist/;
+    index index.html index.htm index.nginx-debian.html;
+    server_name about-ljk.store; # managed by Certbot
+
+    location / {
+        root /home/ubuntu/about-me/dist/;
+        try_files $uri $uri/ @router;
+    }
+
+    location @router{
+        rewrite ^(.+)$ /index.html last;
+    }
+
+    ssl_certificate /etc/letsencrypt/live/about-ljk.store/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/about-ljk.store/privkey.pem; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
 
 }
 
 
-
-## 이 밑으로는 내가 보기위한 예시임.
+## 이 밑에는 nginx를 API-gateway 기능도 활용한 방식
 # 80포트 접근 시 443 포트로 리다이렉트
 server {
     if ($host = beanzido.com) {
@@ -436,6 +505,12 @@ sudo nginx -t
 # nginx 재시작
 sudo service nginx restart
 
+# ubuntu일 때, 도메인 접속 시 500 에러가 난다면 해당 파일 열어서 맨 윗줄의 user 변경
+sudo vim /etc/nginx/nginx.conf
+'''
+user ubuntu; 
+'''
+
 ```
 
 </details>
@@ -497,6 +572,56 @@ sudo nginx
 
 # 만료 이메일 업데이트 (1년마다 갱싱해야함)
 certbot update_account --email yourname+1@example.com
+```
+
+</details>
+
+<details>
+    <summary>nvm, node, npm 설치</summary>
+
+```ubuntu
+# curl 설치 (기본으로 설치되어있음)
+sudo apt install build-essential curl
+
+
+# nvm 설치
+$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
+
+# nvm 설정 리로드 (설정 파일은 여러가지 일 수 있으니 있는 파일은 다해주면 됨)(~/.bash_profile, ~/.zshrc, ~/.profile, ~/.bashrc )
+source ~/.bashrc
+
+
+# node 설치 (sudo는 사용하지 말것. 나중에 권한 문제 발생함.)
+nvm install node
+
+# node 특정 버전 설치
+nvm install x.x.x
+
+# node 버전 전환
+nvm use x.x.x
+
+
+# npm 설치 (node 설치 시 자동 설치 됨)
+sudo apt install npm
+
+
+# nvm 삭제
+rm -rf ./nvm
+
+# node 특정 버전삭제
+nvm uninstall x.x.x
+
+# npm 삭제
+sudo apt remove npm
+
+# npm 설정 파일까지 삭제
+sudo apt purge npm
+
+
+
+#### nvm 없이 node, npm 설치 하기 (8.x는 node 버전)
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+sudo apt-get install -y nodejs
 ```
 
 </details>
@@ -566,11 +691,6 @@ certbot update_account --email yourname+1@example.com
         - port: 인스턴스 접속 포트 (기본 22)
         - script : 인스턴스 접속한 뒤 실행할 명령어. 
 
-    8. 클라우드에 배포하기
-    ![Alt text](image4/image-6.png)
-        - front server 구성을 예시로 만듬.
-        - 하나의 도커에 nginx와 vue 프로젝트를 구동 시킴.
-        - dockerfile은 다음과 같음.
         
      
 
