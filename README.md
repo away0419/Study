@@ -304,9 +304,57 @@ function App() {
 </details>
 
 <details>
-    <summary></summary>
+    <summary>useReducer</summary>
+
+- useState처럼 상태 업데이트에 사용됨.
+- useState와 달리 상태 업데이트 로직을 분리할 수 있음.
+
+```jsx
+import React, { useReducer } from 'react';
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'INCREMENT':
+      return state + 1;
+    case 'DECREMENT':
+      return state - 1;
+    default:
+      return state;
+  }
+}
+
+function Counter() {
+  const [number, dispatch] = useReducer(reducer, 0);
+
+  const onIncrease = () => {
+    dispatch({ type: 'INCREMENT' });
+  };
+
+  const onDecrease = () => {
+    dispatch({ type: 'DECREMENT' });
+  };
+
+  return (
+    <div>
+      <h1>{number}</h1>
+      <button onClick={onIncrease}>+1</button>
+      <button onClick={onDecrease}>-1</button>
+    </div>
+  );
+}
+
+export default Counter;
+
+```
+
 </details>
 
 <details>
-    <summary></summary>
+    <summary>커스텀 Hooks 만들기</summary>
+
+- 반복되는 로직을 쉽게 재사용하기 위해 만듬.
+- 보통 use로 시작하는 파일을 만들고 그 안에 함수 작성.
+- 함수 작성 시 useState, useEffect, useReducer, useCallBak 등 Hooks를 사용하여 원하는 기능을 만들고 값을 반환하면 됨.
 </details>
+
+
