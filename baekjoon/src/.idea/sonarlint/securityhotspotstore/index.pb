@@ -119,3 +119,13 @@ D
 level3_1/B17182.java,3\4\34b456634ff6bfbd23aa33367641342bfa6caa40
 D
 level3_1/B15684.java,8\4\8446c9fc560bec25ab71d927665dc86fa14564bf
+C
+level3_1/B1937.java,e\a\ea2b938c9531c3ae9e941dcaf0c5a00d264bf5bf
+D
+level3_1/B11049.java,b\a\ba2a047431b1d8ee8372371e623fdc808fcda58d
+C
+level3_1/B2533.java,b\2\b2aee64f60ee9302105e54079453320310d097ea
+D
+level3_1/B16986.java,6\d\6dcc7d515fb0f728a8225e13e39a0d284fd5b5e4
+C
+level3_1/B1005.java,2\6\26d9c48ab79dfe0abda9e84e18a823209c8dbc32
