@@ -139,3 +139,227 @@ oauth2.client:
     secret: kakao에서 받은 KEY
 ```
 </details>
+
+### 멤버
+
+- security 실습을 위한 도메인
+
+<details>
+    <summary>Role</summary>
+
+- 사용자 권한
+
+```kotlin
+package com.example.kotlin.member
+
+enum class Role(
+    val key: String,
+    val title: String
+) {
+    ADMIN("ROLE_ADMIN", "관리자"),
+    USER("ROLE_USER", "사용자")
+}
+```
+</details>
+
+<details>
+    <summary>Member</summary>
+
+```kotlin
+package com.example.kotlin.member
+
+import jakarta.persistence.*
+import java.util.*
+
+@Entity
+@Table(name = "MEMBER_TABLE")
+class Member(
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "member_id", nullable = false)
+    var id: UUID?,
+
+    @Column(name = "name", nullable = false)
+    var name: String?,
+
+    @Column(name = "email")
+    var email: String?,
+
+    @Column(name = "picture")
+    var picture: String?,
+
+    @Enumerated(EnumType.STRING)
+    var role: Role?
+
+)
+```
+</details>
+
+<details>
+    <summary>MemberRepository</summary>
+
+```kotlin
+package com.example.kotlin.member.repository
+
+import com.example.kotlin.member.Member
+import org.springframework.data.jpa.repository.JpaRepository
+
+interface MemberRepository : JpaRepository<Member, Long> {
+    fun findByEmail(email: String): Member?
+}
+```
+</details>
+
+### Security
+
+- security의 OAuth2를 사용하기 위한 설정 및 로직 구현
+
+<details>
+    <summary>Oauth2UserInfo</summary>
+
+- OAuth2에서 가져온 사용자 정보를 담을 클래스.
+- 첫 로그인의 경우 관리자는 아닐 것이라 판단하여 user로 줌
+
+```kotlin
+package com.example.kotlin.security.oauth2
+
+import com.example.kotlin.member.Member
+import com.example.kotlin.member.Role
+
+class Oauth2UserInfo(
+    val id: String?,
+    val name: String?,
+    val email: String?,
+    val picture: String?
+){
+    fun toEntity(): Member {
+        return Member(id=null, name=name, email=email, picture=picture, role = Role.USER)
+    }
+}
+```
+</details>
+
+<details>
+    <summary>OAuth2Attribute</summary>
+
+- 사용자가 이용한 OAuth2 서비스가 무엇인지 판단하고, 해당 서비스의 정보를 알맞게 가져오기 위한 클래스
+- naver와 kakao는 Spring Security가 제공하지 않으므로 추가 설정이 필요함.
+
+```kotlin
+package com.example.kotlin.security.oauth2
+
+enum class OAuth2Attributes(
+    val nameAttributeKey: String?,
+    val oauth2UserInfo: (Map<String, Any>?) -> Oauth2UserInfo
+) {
+    GOOGLE("google", { map ->
+        Oauth2UserInfo(
+            map?.get("sub").toString(),
+            map?.get("name").toString(),
+            map?.get("email").toString(),
+            map?.get("picture").toString()
+        )
+    }),
+
+    NAVER("naver", { attributes ->
+        val content = attributes?.get("response");
+        val map: Map<String, Any>? = if (content is Map<*, *>) {
+            content as? Map<String, Any>
+        } else {
+            emptyMap()
+        }
+        Oauth2UserInfo(
+            map?.get("id").toString(),
+            map?.get("nickname").toString(),
+            map?.get("email").toString(),
+            map?.get("profile_image").toString()
+        )
+    }),
+
+    KAKAO("kakao", { attributes ->
+        val content = attributes?.get("properties");
+        val map: Map<String, Any>? = if (content is Map<*, *>) {
+            content as? Map<String, Any>
+        } else {
+            emptyMap()
+        }
+        Oauth2UserInfo(
+            map?.get("sub").toString(),
+            map?.get("name").toString(),
+            map?.get("account_email").toString(),
+            map?.get("thumbnail_image").toString()
+        )
+    });
+
+    companion object {
+        fun extract(registrationId: String, attributes: Map<String, Any>?): Oauth2UserInfo? {
+            return values().find { it.nameAttributeKey == registrationId }?.oauth2UserInfo?.invoke(attributes)
+        }
+    }
+}
+```
+</details>
+
+<details>
+    <summary>securityConfig</summary>
+</details>
+
+- 사용자가 로그인 할 때 수행할 비즈니스 로직
+```kotlin
+package com.example.kotlin.security.oauth2
+
+import com.example.kotlin.member.Member
+import com.example.kotlin.member.repository.MemberRepository
+import jakarta.servlet.http.HttpSession
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User
+import org.springframework.security.oauth2.core.user.OAuth2User
+import org.springframework.stereotype.Service
+
+@Service
+class CustomOAuth2MemberService(
+    private val memberRepository: MemberRepository,
+    private val httpSession: HttpSession
+): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+    override fun loadUser(userRequest: OAuth2UserRequest?): OAuth2User {
+        if (userRequest == null) throw OAuth2AuthenticationException("Oauth2 UserRequest Error")
+
+        // userRequest에서 user 정보 가져오기
+        val delegate = DefaultOAuth2UserService()
+        val oAuth2User = delegate.loadUser(userRequest)
+
+        // registrationId는 Oauth2 서비스 이름 (구글, 네이버, 카카오 등)
+        val registrationId = userRequest.clientRegistration.registrationId
+        // OAuth2 로그인 진행시 키가 되는 필드값
+        val userNameAttributeName = userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
+        // OAuth2 서비스의 유저 정보들
+        val attributes = oAuth2User.attributes;
+        // userInfo 추출
+        val oauth2UserInfo = OAuth2Attributes.extract(registrationId,attributes)
+
+        // 전달받은 OAuth2User의 attribute를 이용하여 회원가입 및 수정의 역할을 한다.
+        val member = oauth2UserInfo?.let { saveOrUpdate(it) }
+
+        // session에 SessionUser(user의 정보를 담는 객체)를 담아 저장한다.
+//        httpSession.setAttribute("user", SessionUser(user))
+
+        return DefaultOAuth2User(
+            setOf(SimpleGrantedAuthority(member?.role?.key)),
+            attributes,
+            userNameAttributeName
+        )
+    }
+
+    fun saveOrUpdate(oauth2UserInfo: Oauth2UserInfo): Member {
+        val member = memberRepository.findByEmail(oauth2UserInfo.email?:"")
+            ?: oauth2UserInfo.toEntity()
+
+        return memberRepository.save(member)
+    }
+}
+```
+
