@@ -9,6 +9,76 @@ spring security : 6.1.4
 
 - google, naver, kakao 연동 로그인 구현
 
+### OAuth 서비스 등록
+
+<details>
+    <summary>google</summary>
+
+[구글 프로젝트](https://console.cloud.google.com/apis/dashboard?project=powerful-atlas-401406)
+
+![img.png](image/google/img.png)
+![img_1.png](image/google/img_1.png)
+![img_2.png](image/google/img_2.png)
+![img_3.png](image/google/img_3.png)
+![img_4.png](image/google/img_4.png)
+![img_5.png](image/google/img_5.png)
+![img_6.png](image/google/img_6.png)
+![img_7.png](image/google/img_7.png)
+![img_8.png](image/google/img_8.png)
+![img_9.png](image/google/img_9.png)
+![img_10.png](image/google/img_10.png)
+![img_11.png](image/google/img_11.png)
+![img_12.png](image/google/img_12.png)
+![img_13.png](image/google/img_13.png)
+```text
+http://localhost:8080/login/oauth2/code/google
+```
+![img_14.png](image/google/img_14.png)
+![img_15.png](image/google/img_15.png)
+
+</details>
+
+<details>
+    <summary>naver</summary>
+
+[naver](https://developers.naver.com/main/)
+
+![img.png](image/naver/img.png)
+![img_1.png](image/naver/img_1.png)
+![img_2.png](image/naver/img_2.png)
+![img_3.png](image/naver/img_3.png)
+```text
+서비스 URL: http://localhost:3000
+Callback URL: http://localhost:8080/login/ouath2/code/naver
+```
+![img_4.png](image/naver/img_4.png)
+![img_5.png](image/naver/img_5.png)
+![img_6.png](image/naver/img_6.png)
+</details>
+
+<details>
+    <summary>kakao</summary>
+
+[kakao](https://developers.kakao.com/)
+![img.png](img.png)
+![img_1.png](img_1.png)
+![img_2.png](img_2.png)
+![img_3.png](img_3.png)
+![img_4.png](img_4.png)
+![img_5.png](img_5.png)
+![img_6.png](img_6.png)
+![img_7.png](img_7.png)
+![img_8.png](img_8.png)
+![img_9.png](img_9.png)
+![img_10.png](img_10.png)
+![img_11.png](img_11.png)
+```text
+http://localhost:8080/login/oauth2/code/kakao
+```
+![img_12.png](img_12.png)
+
+</details>
+
 ### 라이브러리 및 yml
 
 <details>
