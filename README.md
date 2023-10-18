@@ -26,6 +26,15 @@
 
 <br>
 
+### SecurityFilterChain
+
+![Alt text](image/image-1.png)
+
+- Security를 적용하기 위해 여러가지 Filter를 상속 받아 로직을 구현함. 이때, 어떤 Filter을 상속 받아야 하는지 해당 표를 보면 됨.
+- 해당 그림만으로 설명하긴 힘드므로 실습을 통해서 알아가는 것이 좋음.
+
+<br>
+
 ### 인증 아키텍쳐 (Form 로그인 플로우)
 
 <img src="https://blog.kakaocdn.net/dn/Svk8p/btqEIKlEbTZ/vXKzokudAYZT9kRGXNHJe1/img.png" />
