@@ -1,6 +1,7 @@
 최종 작성일 : 2023.10.18.</br>
 
-# Spring-Security
+<details>
+  <summary>Spring-Security</summary>
 
 ### 스프링 시큐리티란
 
@@ -51,7 +52,7 @@ GrantedAuthority 객체는 UserDetailsService로 불러올 수 있고, 특정 �
 
 ### 인가 권한 확인 플로우
 
-![Alt text](image.png)
+![Alt text](image/image-4.png)
 
 1. AuthorizationFilter에서 SecurityContextHolder를 이용하여 SecurityContext에 저장되어 있는 인증 완료된 객체 획득.
 2. AuthorizationManager 인터페이스를 구현한 RequestMatcherDelegatingAuthorizationManager 호출. (매개변수 : 인증 완료된 객체, HttpServletRequest)
@@ -231,11 +232,56 @@ AuthenticationManagerBuilder.userDetailsService().passwordEncoder() 통해 패�
 - Security를 적용하기 위해 여러가지 Filter를 상속 받아 로직을 구현함. 이때, 어떤 Filter을 상속 받아야 하는지 해당 표를 보면 됨.
 - 해당 그림만으로 설명하긴 힘드므로 실습을 통해서 알아가는 것이 좋음.
 
-<br>
-<br>
-<br>
+### 기타
 
-# JWT
+<details>
+  <summary>로그인 이후 사용자 정보 얻기</summary>
+
+1. Bean을 통해 사용자 정보 가져오기
+
+   ```java
+   Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+   UserDetails userDetails = (UserDetails)principal;
+   String username = principal.getUsername();
+   String password = principal.getPassword();
+   ```
+
+2. controller에서 매개변수로 입력 받기
+
+   ```java
+   @Controller
+   public class UserController{}
+     @GetMapping
+     public String getMyInfo(Authentication authentication){
+       JwtAuthenticationToken authentication = (JwtAuthenticationToken) authentication;
+       User user = (User)authentication.getDetails();
+       return user.toString();
+     }
+   }
+   ```
+
+   - Authentication 또는 Principal를 매개 변수 받을 경우 SpringSecurityContext에 있는 정보를 가져온다.
+
+3. @AuthenticationPrincipal 로 가져오기
+   ```java
+   @Controller
+   public class SecurityController
+   {
+     @GetMapping("/messages/inbox")
+       public ModelAndView currentUserName(@AuthenticationPrincipal CustomUser customUser)
+       {
+         String username = customUser.getUsername();
+           // .. find messages for this user and return them ...
+       }
+   }
+   ```
+   - SpringSecurity 3.2 부터 사용 가능.
+
+</details>
+</details>
+
+<details>
+  <summary>JWT</summary>
 
 ### JWT란
 
@@ -254,15 +300,24 @@ AuthenticationManagerBuilder.userDetailsService().passwordEncoder() 통해 패�
   ```json
   {
     "sub": "123456789",
-    "name": "Jone Doe",
-    "admin": true
+    "userId": "Jone Doe",
+    "https://github.comn/away0419": true
   }
   ```
-  - 클레임이란 key와 value가 한쌍으로 이루어진 형태로 "sub" : "123456789" 가 하나의 클레임임.
+  - 클레임이란 key와 value가 한쌍으로 이루어진 형태
+    - "sub" : "123456789" 가 하나의 클레임임.
   - 등록 클레임은 필수로 사용되는 정보(데이터)는 아니지만 JWT가 기본적으로 가지는 정의된 key-value을 이용하여 Token 생성 정보를 만들 때 사용함.
-  - 공개 클레임은 말 그대로 공개용 정보를 뜻하며 key에 URI 포맷을 이용함. ({"https://github.comn/away0419" : true})
+    - iss : 토클 발급자
+    - sub : 토큰 제목
+    - aud : 토큰 대상자
+    - exp : 토큰 만료 시간
+    - nbf : 토큰 활성 날짜
+    - iat : 토큰 발급 시간
+    - jti : JWT 고유 식별자
+  - 공개 클레임은 말 그대로 공개용 정보를 뜻하며 key에 URI 포맷을 이용함.
+    - "https://github.comn/away0419" : true
   - 비공개 클레임은 실제 사용되는 정보(데이터)임.
-    ({"userId" : "away0419", "userEmail" : "away0419@c.com"})
+    - "userId" : "away0419"
   - 이러한 클레임들이 모여 인코딩 되어 JSON payload가 됨.
 - signature는 인코딩된 헤더(Header)와 인코딩된 페이로드(payload), 비밀 키(Secret)와 알고리즘을 기반으로 백엔드에서 발급됨.
 
@@ -296,14 +351,38 @@ AuthenticationManagerBuilder.userDetailsService().passwordEncoder() 통해 패�
 
    <br/>
 
+### Security + JWT 프로세스
+
+- JWT는 크게 두가지 방법을 사용함.
+
+  - 로그인 결과 값을 반환 하는 Controller에서 JWT를 발급.
+  - 로그인 도중 Filter를 거쳐 JWT를 발급.
+  - Security 특성 상 Filter 레벨에서 인증 처리 하는 것이 더 자연스러움.
+
+- 로그인(인증) 프로세스
+  ![Alt text](image/image-5.png)
+
+  - 기본적인 흐름은 Security 로그인 플로우와 동일함.
+  - 중간에 JwtAuthenticationFilter 추가하고 응답 값만 바꿔서 내보는 것임.
+  - 따라서 Security의 플로우를 확인하며 해당 프로세스 그림을 보면 이해하기 쉬움.
+  - JwtAuthenticationFilter는 UsernamePasswordAuthenticationFilter를 확장해서 구현.
+  - 이후 인증된 객체를 만드는 과정까진 동일한 흐름임.
+  - 전달 받은 인증된 객체를 이용하여 Token을 만들고 응답 값 헤더에 추가하면 끝.
+
+- 자격 검증 프로세스
+  ![Alt text](image/image-6.png)
+  - 사용자가 Header에 보낸 Token을 JwtVerificationFilter에서 검증함.
+  - 검증이 완료되었다면 인증된 객체를 만들어 SecurityContext에 저장함. 이를 통해 이후 Filter 문제 없이 통과 가능. (만약 저장하지 않는다면 다음 필터에서 인증된 객체를 찾지 못하여 에러가 날 수 있음)
+  - 이때 SecurityContext에 저장된 정보는 SecurityContextPersistenceFilter가 나중에 삭제하여 stateless로 만듬. (SecurityConfig에서 세션을 stateless로 설정 해야함)
+
 ### 기타
 
 <details>
     <summary>Authorization Header</summary>
 
 - 일반적으로 토큰은 Authorization Header에 담아서 서버에 전송함.
-- Authorization: `<type>` `<credentials>` 형식으로 우리가 흔히 사용하는 bearer는 type 형식에 해당함
-- type에는 여러 종류가 있음
+- Authorization: `<type>` `<credentials>` 형식으로 우리가 흔히 사용하는 bearer는 type 형식에 해당함.
+- type에는 여러 종류가 있음. (토큰 타입과는 별개)
   - basic : 아이디와 비밀번호를 Base64로 인코딩한 값 사용
   - bearer : JWT 또는 OAuth에 대한 토큰 사용
   - digest : 서버는 난수를, 클라이언트는 사용자 정보와 nonce를 포함하는 해시값 사용
@@ -311,3 +390,5 @@ AuthenticationManagerBuilder.userDetailsService().passwordEncoder() 통해 패�
   - Mutual : 암호를 이용한 서버-클라이언트 상호 인증
   - AWS4-HMAC-SHA256 : AWS 전자 서명 사용
   </details>
+
+</details>
