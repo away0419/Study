@@ -46,7 +46,7 @@ GrantedAuthority 객체는 UserDetailsService로 불러올 수 있고, 특정 �
 9. AuthenticationProvider는 UserDetails의 비밀번호와 인증용 객체의 비밀번호가 같은지 확인(같은 경우 인증 완료) 후 인증이 완료되면 인증 완료된 객체(UseNamePasswordAuthenticationToken)를 생성. (해당 토큰은 인증이 완료된 상태.)
 10. 생성한 인증 완료된 객체를 ProviderManager에 반환.
 11. 전달 받은 인증 완료된 객체를 UsernamePasswordAuthenicationFilter에 반환.
-12. 인증 완료된 객체를 SecurityContextHolder를 이용하여 SecurityContext에 저장. (기본적으로 SecurityContext에 저장된 정보는 SecurityContextPersistenceFilter를 통해 HttpSession에 다시 저장되어 인증 상태를 유지함.)
+12. 인증 완료된 객체는 SecurityContextHolder 안에 있는 SecurityContext에 저장됨. (기본적으로 SecurityContext에 저장된 정보는 SecurityContextPersistenceFilter를 통해 HttpSession에 다시 저장되어 인증 상태를 유지함.)
 
 <br>
 
