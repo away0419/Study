@@ -22,23 +22,24 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication; // Filter를 거쳐 생성된 토큰
-        String userEmail = token.getName(); // 아이디를 가져온다.
-        String userPw = (String) token.getCredentials(); //비밀번호를 가져온다.
+        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication; // [STEP.01] Filter에서 받은 인증 전 객체를 형 변환.
+        String userEmail = token.getName(); // [STEP.02] 토큰에서 아이디 추출.
+        String userPw = (String) token.getCredentials(); // [STEP.03] 토큰에서 비밀번호를 추출.
 
         log.debug("2.CustomAutenticationProvider userEmail = {}, UserPw = {}",userEmail, userPw);
 
-        UserDetailsVO userDetailsVO = (UserDetailsVO) userDetailsService.loadUserByUsername(userEmail); // 아이디로 사용자 조회
+        UserDetailsVO userDetailsVO = (UserDetailsVO) userDetailsService.loadUserByUsername(userEmail); // [STEP.04] 이메일로 사용자 정보 Details로 추출
 
-        // 찾은 사용자의 비밀번호가 일치하지 않는 경우 예외 처리
-//        if(!passwordEncoder.matches(userPw, userDetailsVO.getPassword())) {
-//            throw new BadCredentialsException(userDetailsVO.getUsername());
-//        }
+        // [STEP.05] DB에 있던 비밀번호와 사용자가 보낸 비밀번호가 다를 경우 에러.
+        // 실제로 가입할 때 passwordEncoder로 변환하여 DB에 저장해야하나 더미 데이터를 변환하지 않았기 때문에 바로 비교함.
         if(!userPw.equals(userDetailsVO.getPassword())) {
             throw new BadCredentialsException(userDetailsVO.getUsername());
         }
+//        if(!passwordEncoder.matches(userPw, userDetailsVO.getPassword())) {
+//            throw new BadCredentialsException(userDetailsVO.getUsername());
+//        }
 
-        return new UsernamePasswordAuthenticationToken(userDetailsVO, userPw, userDetailsVO.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetailsVO, userPw, userDetailsVO.getAuthorities()); // [STEP.06] 인증 완료한 객체(UsernamePasswordAuthenticationToken)로 만들고 반환
     }
 
     @Override

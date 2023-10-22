@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
 
-// 인증(로그인) 성공할 경우 처리.
+// 인증(로그인) 성공한 이후 추가 처리 로직.
 @Slf4j
 public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
@@ -43,8 +43,6 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         printWriter.print(jsonObject);
         printWriter.flush();
         printWriter.close();
-
-//        SecurityContextHolder.getContext().setAuthentication(authentication); // 인증이 완료된 객체를 저장해 두고 다른 서비스에서 사용자 정보를 사용할 때 꺼내 쓴다. (jwt를 안쓰므로 세션에 저장하는 것)
 
     }
 
