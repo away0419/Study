@@ -32,7 +32,7 @@ public class SecurityConfig {
     // 정적 자원 경로, h2 서버는 security 적용 하지 않음.
     @Bean
     public WebSecurityCustomizer configure() {
-        return (web) -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations()).requestMatchers("/h2-console/**");
+        return web -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations()).requestMatchers("/h2-console/**");
     }
 
     // 패스워드 인코더
@@ -90,6 +90,12 @@ public class SecurityConfig {
                 .headers(AbstractHttpConfigurer::disable) // h2 접근을 위해 사용. 다른 db 사용시 제거
                 .formLogin(AbstractHttpConfigurer::disable) // form bases authentication 비활성화 (기본 로그인 페이지 비활성화, UsernamePasswordAuthenticationFilter 비활성화, rest api만 작성하기 때문에 필요없음.)
                 .httpBasic(AbstractHttpConfigurer::disable) // http basic authentication 비활성화 (기본 로그인 인증창 비활성화, BasicAuthenticationFilter 비활성화, rest api만 작성하기 때문에 필요없음.)
+                .authorizeHttpRequests(request->
+                    request.requestMatchers("/", "/swagger-ui/**").permitAll() // 해당 페이지 인증, 권한 상관 없이 누구나 접근 허용
+                            .requestMatchers("/api/v1/admin/**").hasRole("ROLE_ADMIN") // 해당 페이지는 인증된 사람 중 ADMIN 권한이 있는 자만 접근 허용
+                            .requestMatchers("/api/v1/user/**").hasAnyRole("ROLE_ADMIN", "ROLE_USER") // 해당 페이지 인증된 사랑 중 ADMIN 또는 USER 권한이 있는 자만 접근 허용
+                            .anyRequest().authenticated() // 나머지 페이지는 권한 상관없이 인증된 사람만 접근 가능.
+                ) // 특정 페이지 접근 시 사용자 권한 확인 설정
 //                .sessionManagement(session -> session // session 기반이 아닌 jwt token 기반일 경우 stateless 설정
 //                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // UsernamePasswordAuthenticationFilter 실행 전 순서에 커스텀 필터 추가
