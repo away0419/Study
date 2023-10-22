@@ -1,5 +1,3 @@
-최종 작성일 : 2023.10.18.</br>
-
 <details>
   <summary>Spring-Security</summary>
 
