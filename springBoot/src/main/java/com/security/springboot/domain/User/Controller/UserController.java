@@ -2,7 +2,6 @@ package com.security.springboot.domain.User.Controller;
 
 import com.security.springboot.domain.User.Model.UserVO;
 import com.security.springboot.domain.User.Service.UserService;
-import com.security.springboot.jwt.TokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,12 +20,12 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/generateToken")
-    public ResponseEntity<String> generateToken(@RequestBody UserVO userVO){
-        String token = TokenUtil.generateJwtToken(userVO);
-
-        return new ResponseEntity<>(token, HttpStatus.OK);
-    }
+//    @PostMapping("/generateToken")
+//    public ResponseEntity<String> generateToken(@RequestBody UserVO userVO){
+//        String token = TokenUtil.generateJwtToken(userVO);
+//
+//        return new ResponseEntity<>(token, HttpStatus.OK);
+//    }
 
     @PostMapping("/login")
     public String loginPage(Model model){

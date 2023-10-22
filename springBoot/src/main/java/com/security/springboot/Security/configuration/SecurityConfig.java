@@ -4,7 +4,6 @@ import com.security.springboot.Security.Provider.CustomAuthenticationProvider;
 import com.security.springboot.Security.filter.CustomAuthenticationFilter;
 import com.security.springboot.Security.handler.CustomLoginFailureHandler;
 import com.security.springboot.Security.handler.CustomLoginSuccessHandler;
-import com.security.springboot.jwt.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -13,27 +12,16 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
-    private final UserDetailsService userDetailsService;
-
-    // 정적 자원 경로, h2 서버는 security 적용 하지 않음.
-    @Bean
-    public WebSecurityCustomizer configure() {
-        return web -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations()).requestMatchers("/h2-console/**");
-    }
 
     // 패스워드 인코더
     @Bean
@@ -76,10 +64,10 @@ public class SecurityConfig {
         return customAuthenticationFilter;
     }
 
-    @Bean
-    public JwtAuthorizationFilter jwtAuthorizationFilter(){
-        return new JwtAuthorizationFilter();
-    }
+//    @Bean
+//    public JwtAuthorizationFilter jwtAuthorizationFilter(){
+//        return new JwtAuthorizationFilter();
+//    }
 
     // [STEP.06] filterChain 생성
     @Bean
@@ -91,9 +79,10 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable) // form bases authentication 비활성화 (기본 로그인 페이지 비활성화, UsernamePasswordAuthenticationFilter 비활성화, rest api만 작성하기 때문에 필요없음.)
                 .httpBasic(AbstractHttpConfigurer::disable) // http basic authentication 비활성화 (기본 로그인 인증창 비활성화, BasicAuthenticationFilter 비활성화, rest api만 작성하기 때문에 필요없음.)
                 .authorizeHttpRequests(request->
-                    request.requestMatchers("/", "/swagger-ui/**").permitAll() // 해당 페이지 인증, 권한 상관 없이 누구나 접근 허용
-                            .requestMatchers("/api/v1/admin/**").hasRole("ROLE_ADMIN") // 해당 페이지는 인증된 사람 중 ADMIN 권한이 있는 자만 접근 허용
-                            .requestMatchers("/api/v1/user/**").hasAnyRole("ROLE_ADMIN", "ROLE_USER") // 해당 페이지 인증된 사랑 중 ADMIN 또는 USER 권한이 있는 자만 접근 허용
+                    request.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // 정적 자원 경로 인증, 권한 상관없이 누구나 접근 허용
+                            .requestMatchers(new AntPathRequestMatcher("/"),new AntPathRequestMatcher("/swagger-ui/**"),new AntPathRequestMatcher("/h2-console/**")).permitAll() // 해당 페이지 인증, 권한 상관 없이 누구나 접근 허용
+                            .requestMatchers(new AntPathRequestMatcher("/api/v1/admin/**")).hasRole("ADMIN") // 해당 페이지는 인증된 사람 중 ADMIN 권한이 있는 자만 접근 허용. 여기서 Enum엔 ROLE_ADMIN으로 되어있는데 ROLE_이 자동으로 앞에 붙기 때문에 Enum에서 ROLE_을 앞에 붙힌것이다.
+                            .requestMatchers(new AntPathRequestMatcher("/api/v1/user/**")).hasAnyRole("ADMIN", "USER") // 해당 페이지 인증된 사랑 중 ADMIN 또는 USER 권한이 있는 자만 접근 허용.
                             .anyRequest().authenticated() // 나머지 페이지는 권한 상관없이 인증된 사람만 접근 가능.
                 ) // 특정 페이지 접근 시 사용자 권한 확인 설정
 //                .sessionManagement(session -> session // session 기반이 아닌 jwt token 기반일 경우 stateless 설정
