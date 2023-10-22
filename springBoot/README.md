@@ -898,6 +898,44 @@
     ```
 </details>
 
+<details>
+  <summary>특정 페이지 접근 할 때, 로그인 한 사용자 권한 필요로 할 경우 설정</summary>
+
+- 2가지 방법이 있음.
+- Spring Security 구성 설정
+  ```java
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+      return http
+              .csrf(AbstractHttpConfigurer::disable) // csrf 공격 보호 옵션 끄기. (rest api 에서는 필요 없기 때문)
+              .cors(AbstractHttpConfigurer::disable) // cors 예방 옵션 끄기
+              .headers(AbstractHttpConfigurer::disable) // h2 접근을 위해 사용. 다른 db 사용시 제거
+              .formLogin(AbstractHttpConfigurer::disable) // form bases authentication 비활성화 (기본 로그인 페이지 비활성화, UsernamePasswordAuthenticationFilter 비활성화, rest api만 작성하기 때문에 필요없음.)
+              .httpBasic(AbstractHttpConfigurer::disable) // http basic authentication 비활성화 (기본 로그인 인증창 비활성화, BasicAuthenticationFilter 비활성화, rest api만 작성하기 때문에 필요없음.)
+              .authorizeHttpRequests(request->{
+                  request.requestMatchers("/", "/swagger-ui/**").permitAll() // 해당 페이지 인증, 권한 상관 없이 누구나 접근 허용
+                          .requestMatchers("/api/v1/admin/**").hasRole("ROLE_ADMIN") // 해당 페이지는 인증된 사람 중 ADMIN 권한이 있는 자만 접근 허용
+                          .requestMatchers("/api/v1/user/**").hasAnyRole("ROLE_ADMIN", "ROLE_USER") // 해당 페이지 인증된 사랑 중 ADMIN 또는 USER 권한이 있는 자만 접근 허용
+                          .anyRequest().authenticated(); // 나머지 페이지는 권한 상관없이 인증된 사람만 접근 가능. 
+              }) // 특정 페이지 접근 시 사용자 권한 확인 설정
+              .addFilterBefore(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // UsernamePasswordAuthenticationFilter 실행 전 순서에 커스텀 필터 추가
+              .build();
+  }
+  ```
+- Controller에 권한 추가
+  ```java
+  @RestController
+  public class AdminController {
+      @GetMapping("/admin/dashboard")
+      @PreAuthorize("hasRole('ROLE_ADMIN')")
+      public String adminDashboard() {
+          return "admin";
+      }
+  }
+  ```
+
+</details>
+
 <br/>
 
 # JWT
@@ -906,6 +944,7 @@
 
 - JWT는 Security와 함께 적용하지 않고 따로 사용 가능합니다.
 - 해당 실습은 Security + JWT로 진행했습니다.
+- 위에서 진행한 Security 구현에 추가하는 방식으로 진행됩니다.
 
 <br/>
 
