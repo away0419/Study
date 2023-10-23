@@ -107,8 +107,8 @@
     @AllArgsConstructor
     @Getter
     public enum UserRole {
-        USER("ROLE_USER"),
-        ADMIN("ROLE_ADMIN");
+        ROLE_USER("ROLE_USER"),
+        ROLE_ADMIN("ROLE_ADMIN");
 
         private final String position;
     }    
@@ -335,64 +335,63 @@
 - 딱히 수정 될 일이 없기 때문에 VO로 만듬.
 - 현재 UserDetailsVO 필드에 UserEntity를 넣음으로서 모든 정보를 넣고 있는데, 상황에 따라 필요한 정보만 넣는 걸 추천.
 
-    ```java
-    package com.security.springboot.domain.User.Model;
+  ```java
+  package com.security.springboot.domain.User.Model;
   
-    import lombok.Getter;
-    import lombok.RequiredArgsConstructor;
-    import lombok.experimental.Delegate;
-    import org.springframework.security.core.GrantedAuthority;
-    import org.springframework.security.core.userdetails.UserDetails;
+  import lombok.Getter;
+  import lombok.RequiredArgsConstructor;
+  import lombok.experimental.Delegate;
+  import org.springframework.security.core.GrantedAuthority;
+  import org.springframework.security.core.userdetails.UserDetails;
   
-    import java.util.Collection;
+  import java.util.Collection;
   
-    @RequiredArgsConstructor
-    @Getter
-    public class UserDetailsVO implements UserDetails {
+  @RequiredArgsConstructor
+  @Getter
+  public class UserDetailsVO implements UserDetails {
   
-        // UserEntity 메소드를 UserDetailVO 객체로 위임 시키는 어노테이션
-        // 즉, UserEntity의 메소드를 자신이 바로 사용할 수 있음.
-        @Delegate
-        private final UserEntity userEntity;
-        private final Collection<? extends GrantedAuthority> authorities;
+      // UserEntity 메소드를 UserDetailVO 객체로 위임 시키는 어노테이션
+      // 즉, UserEntity의 메소드를 자신이 바로 사용할 수 있음.
+      @Delegate
+      private final UserEntity userEntity;
+      private final Collection<? extends GrantedAuthority> authorities;
   
-        @Override
-        public Collection<? extends GrantedAuthority> getAuthorities() {
-            return authorities;
-        }
+      @Override
+      public Collection<? extends GrantedAuthority> getAuthorities() {
+          return authorities;
+      }
   
-        @Override
-        public String getPassword() {
-            return userEntity.getUserPw();
-        }
+      @Override
+      public String getPassword() {
+          return userEntity.getUserPw();
+      }
   
-        @Override
-        public String getUsername() {
-            return userEntity.getUserEmail();
-        }
+      @Override
+      public String getUsername() {
+          return userEntity.getUserEmail();
+      }
   
-        @Override
-        public boolean isAccountNonExpired() {
-            return userEntity.getIsEnable();
-        }
+      @Override
+      public boolean isAccountNonExpired() {
+          return userEntity.getIsEnable(); // 또는 true 
+      }
   
-        @Override
-        public boolean isAccountNonLocked() {
-            return userEntity.getIsEnable();
-        }
+      @Override
+      public boolean isAccountNonLocked() {
+          return userEntity.getIsEnable(); // 또는 true
+      }
   
-        @Override
-        public boolean isCredentialsNonExpired() {
-            return userEntity.getIsEnable();
-        }
+      @Override
+      public boolean isCredentialsNonExpired() {
+          return userEntity.getIsEnable(); // 또는 true
+      }
   
-        @Override
-        public boolean isEnabled() {
-            return userEntity.getIsEnable();
-        }
-    }
-  
-    ```
+      @Override
+      public boolean isEnabled() {
+          return userEntity.getIsEnable(); // 또는 true
+      }
+  } 
+  ```
 
 </details>
 
@@ -432,6 +431,119 @@
 
 </details>
 
+<details>
+  <summary>ConvertUtil</summary>
+
+- JSON <-> 객체 메소드
+
+  ```java
+  package com.security.springboot.utils;
+  
+  import com.fasterxml.jackson.core.JsonProcessingException;
+  import com.fasterxml.jackson.databind.ObjectMapper;
+  import org.json.simple.JSONObject;
+  import org.json.simple.parser.JSONParser;
+  import org.json.simple.parser.ParseException;
+  
+  import java.lang.reflect.Field;
+  import java.lang.reflect.Method;
+  import java.util.HashMap;
+  import java.util.Map;
+  
+  public class ConvertUtil {
+  
+      /**
+       * [공통함수] Object 형을 Map 형태로 변환 함수
+       *
+       * @param obj {Object}
+       * @return Map 형태로 반환함
+       */
+      public static HashMap<String, Object> convertObjectToMap(Object obj) {
+          try {
+              Field[] fields = obj.getClass().getDeclaredFields();
+              HashMap<String, Object> resultMap = new HashMap<String, Object>();
+              for (int i = 0; i <= fields.length - 1; i++) {
+                  fields[i].setAccessible(true);
+                  resultMap.put(fields[i].getName(), fields[i].get(obj));
+              }
+              return resultMap;
+          } catch (IllegalArgumentException | IllegalAccessException e) {
+              e.printStackTrace();
+          }
+          return null;
+      }
+  
+      /**
+       * [공통함수] Map 형을 JSON Object 형태로 변환 함수
+       *
+       * @param param {Map}
+       * @return {JSONObject}
+       */
+      public static JSONObject convertMapToJsonObject(Map<String, Object> param) {
+          return new JSONObject(param);
+      }
+  
+      /**
+       * [공통함수] Map 형을 Object 형태로 변환 함수
+       *
+       * @param map {Map<String, Object}
+       * @param obj {Object}
+       * @return {Object}
+       */
+      public static Object convertMapToObject(Map<String, Object> map, Object obj) {
+          String keyAttribute = null;
+          String setMethodString = "set";
+          String methodString = null;
+  
+          for (String s : map.keySet()) {
+              keyAttribute = s;
+              methodString = setMethodString + keyAttribute.substring(0, 1).toUpperCase() + keyAttribute.substring(1);
+              Method[] methods = obj.getClass().getDeclaredMethods();
+              for (Method method : methods) {
+                  if (methodString.equals(method.getName())) {
+                      try {
+                          method.invoke(obj, map.get(keyAttribute));
+                      } catch (Exception ignored) {
+                      }
+                  }
+              }
+          }
+          return obj;
+      }
+  
+  
+      /**
+       * [공통함수] Object(VO)형을 JSON Object 형태로 변환 함수
+       *
+       * @param obj {Object}
+       * @return {Object}
+       */
+      public static Object convertObjectToJsonObject(Object obj) {
+  
+          ObjectMapper om = new ObjectMapper();
+          JSONParser parser = new JSONParser();
+          String convertJsonString = "";
+          Object convertObj = new Object();
+  
+          // VO ==> JSON(String) 파싱
+          try {
+              convertJsonString = om.writeValueAsString(obj);
+          } catch (JsonProcessingException e) {
+              e.printStackTrace();
+          }
+          // JSON(String) => JSON 파싱
+          try {
+              convertObj = parser.parse(convertJsonString);
+          } catch (ParseException e) {
+              e.printStackTrace();
+          }
+          return convertObj;
+      }
+  
+  }
+  ```
+
+</details>
 
 <details> 
     <summary> CustomAuthenticationFilter </summary>
@@ -904,7 +1016,7 @@
 
 <br/>
 
-## 2. JWT
+## 2. AccessToken
 
 <details>
   <summary>AuthConstants</summary>
@@ -1063,7 +1175,7 @@
           }
       }
   
-      
+  
       /**
        * 토큰을 기반으로 Claims(정보) 반환
        *
@@ -1086,7 +1198,7 @@
           return getClaimsFormToken(token).get("userEmail").toString();
       }
   
-      
+  
       /**
        * 토큰의 Claims에서 사용자 권한을 반환
        *
@@ -1098,13 +1210,14 @@
       }
   
   }
-  
   ```
 
 </details>
 
 <details>
   <summary>CustomLoginSuccessHandler</summary>
+
+- 로그인 성공, 즉 인증 완료시 토큰 발급.
 
   ```java
   package com.security.springboot.Security.handler;
@@ -1131,38 +1244,144 @@
   // 인증(로그인) 성공한 이후 추가 처리 로직.
   @Slf4j
   public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
-      @Override
-      public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-          log.debug("3.CustomLoginSuccessHandler");
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+      log.debug("3.CustomLoginSuccessHandler");
   
-          JSONObject jsonObject; // response로 내보려는 정보를 담은 Json 객체
-          HashMap<String, Object> responseMap = new HashMap<>(); // response 할 데이터를 담기 위한 맵
-          UserEntity userEntity = ((UserDetailsVO) authentication.getPrincipal()).getUserEntity(); // 사용자와 관련된 정보 조회
-          JSONObject userEntityJson = (JSONObject) ConvertUtil.convertObjectToJsonObject(userEntity); // 사용자 정보 Json 객체로 변환
-          UserVO userVo = new UserVO(userEntity); // token 발급을 위한 userVO (사실 필요 없는데, UserProvider에서 매개변수로 UserVO로 만들었기 때문에 만듬
-          String accessToken = JWTProvider.generateJwtToken(userVo); // accessToken 생성
+      JSONObject jsonObject; // response로 내보려는 정보를 담은 Json 객체
+      HashMap<String, Object> responseMap = new HashMap<>(); // response 할 데이터를 담기 위한 맵
+      UserDetailsVO userDetailsVO = (UserDetailsVO) authentication.getPrincipal(); // userDetailsVO 조회
+      UserEntity userEntity = userDetailsVO.getUserEntity(); // 사용자와 관련된 정보 조회
+      JSONObject userEntityJson = (JSONObject) ConvertUtil.convertObjectToJsonObject(userEntity); // 사용자 정보 Json 객체로 변환
+      String accessToken = JWTProvider.generateJwtToken(userDetailsVO); // accessToken 생성
   
-          if (userEntity.getRole() == UserRole.ADMIN) {
-              responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
-              responseMap.put("msg", "관리자 로그인 성공");
-          } else {
-              responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
-              responseMap.put("msg", "일반 사용자 로그인 성공");
-          }
-  
-          jsonObject = new JSONObject(responseMap);
-          response.setCharacterEncoding("UTF-8");
-          response.setContentType("application/json");
-          response.addHeader(AuthConstants.AUTH_HEADER, AuthConstants.TOKEN_TYPE + accessToken); // header 토큰 추가
-          PrintWriter printWriter = response.getWriter();
-          printWriter.print(jsonObject);
-          printWriter.flush();
-          printWriter.close();
-  
+      if (userEntity.getRole() == UserRole.ROLE_ADMIN) {
+        responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
+        responseMap.put("msg", "관리자 로그인 성공");
+      } else {
+        responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
+        responseMap.put("msg", "일반 사용자 로그인 성공");
       }
   
-  }
+      jsonObject = new JSONObject(responseMap);
+      response.setCharacterEncoding("UTF-8");
+      response.setContentType("application/json");
+      response.addHeader(AuthConstants.AUTH_HEADER, AuthConstants.TOKEN_TYPE + accessToken); // header 토큰 추가
+      PrintWriter printWriter = response.getWriter();
+      printWriter.print(jsonObject);
+      printWriter.flush();
+      printWriter.close();
   
+    }
+  
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>JwtAuthorizationFilter</summary>
+
+- JWT의 경우 로그인 후 API 호출 시 Token을 검사해야 함.
+- 기존 Security Session과 다르게 인가 필터를 추가해서 JWT 유효성 검사 및 권한 판별 과정이 필요함.
+
+  ```java
+  package com.security.springboot.jwt;
+  
+  import jakarta.servlet.FilterChain;
+  import jakarta.servlet.ServletException;
+  import jakarta.servlet.http.HttpServletRequest;
+  import jakarta.servlet.http.HttpServletResponse;
+  import lombok.extern.slf4j.Slf4j;
+  import org.json.simple.JSONObject;
+  import org.springframework.beans.factory.annotation.Autowired;
+  import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+  import org.springframework.security.core.Authentication;
+  import org.springframework.security.core.authority.SimpleGrantedAuthority;
+  import org.springframework.security.core.context.SecurityContextHolder;
+  import org.springframework.security.core.userdetails.UserDetailsService;
+  import org.springframework.web.filter.OncePerRequestFilter;
+  
+  import java.io.IOException;
+  import java.io.PrintWriter;
+  import java.util.*;
+  
+  @Slf4j
+  public class JwtAuthorizationFilter extends OncePerRequestFilter {
+      // BasicAuthenticationFilter를 상속 받아도 됨.(BasicAuthenticationFilter 이 OncePerRequestFilter를 상속하고 있어서 상관없음.)
+      // 다만, BasicAuthenticationFilter는 기본적으로 Basic 타입 인증을 사용함.
+      // 따라서, BasicAuthenticationFilter 보단 OncePerRequestFilter를 상속 받는 경우가 많음.
+      // 대신, BasicAuthenticationFilter는 권한이 필요한 경로만 자동으로 필터링함. OncePerRequestFilter는 이를 구현해야 함.
+      
+      @Override
+      protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+  
+          // 1. Token이 필요하지 않은 API URL. (필요 없음. securityConfig에서 설정하면 됨.)
+  //        List<String> list = Arrays.asList(
+  //                "/api/v1/user/login",
+  //                "/api/v1/user/generateToken"
+  //        );
+  
+          // 2. 토큰이 필요하지 않은 API URL 다음 필터로 넘기기 (필요 없음. securityConfig에서 설정하면 됨.)
+  //        if (list.contains(request.getRequestURI())) {
+  //            filterChain.doFilter(request, response);
+  //        }
+  
+          // 3. OPTIONS 요청일 경우 다음 필터로 넘기기 (필요 없음. securityConfig에서 설정하면 됨.)
+  //        if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
+  //            filterChain.doFilter(request, response);
+  //        }
+  
+          try {
+              // [STEP.01] http header에서 AuthConstants.AUTH_HEADER를 가져옴 없으면 ""
+              String header = Optional.ofNullable(request.getHeader(AuthConstants.AUTH_HEADER)).orElseThrow(()->new Exception("Token is null"));
+              logger.info(header);
+  
+              // [STEP.02] Header에서 지정한 Token Type 검사 (Token이 가지는 타입과 다른 거임.)
+              if(!header.startsWith(AuthConstants.TOKEN_TYPE)){
+                  throw new Exception("Token type is invalid");
+              }
+  
+              // [STEP.03] Header에서 Token 추출
+              String token = JWTProvider.getTokenFromHeader(header);
+  
+              // [STEP.04] Token 유효성 검사
+              if (!JWTProvider.isValidToken(token)) {
+                  throw new Exception("Token is invalid");
+              }
+  
+              // [STEP.05] Token에서 Email 추출
+              String userEmail = Optional.ofNullable(JWTProvider.getUserEmailFromToken(token)).orElseThrow(()->new Exception("Token isn't userEmail"));
+  
+              // [STEP.06] Token에서 Role 추출
+              String userRole = Optional.ofNullable(JWTProvider.getUserRoleFromToken(token)).orElseThrow(()->new Exception("Token isn't userRole"));
+  
+              // [STEP.07] JWT에서 가져온 정보로 인증 완료된 객체 만들기
+              Authentication authentication = new UsernamePasswordAuthenticationToken(userEmail,null, Collections.singleton(new SimpleGrantedAuthority(userRole)));
+  
+              // [STEP.08] context에 저장하여 나머지 필터에서 해당 객체를 통해 검사할 수 있도록 함. stateless 설정을 하면 로직 종료 후 저장된 객체는 삭제가 된다.
+              SecurityContextHolder.getContext().setAuthentication(authentication);
+  
+              // [STEP.09] 다음 필터로 넘기기
+              filterChain.doFilter(request, response);
+  
+          } catch (Exception e) {
+              response.setCharacterEncoding("UTF-8");
+              response.setContentType("application/json");
+              PrintWriter printWriter = response.getWriter();
+  
+              HashMap<String, Object> jsonMap = new HashMap<>();
+              jsonMap.put("status", 401);
+              jsonMap.put("code", "9999");
+              jsonMap.put("message", e.getMessage());
+              JSONObject jsonObject = new JSONObject(jsonMap);
+  
+              printWriter.println(jsonObject);
+              printWriter.flush();
+              printWriter.close();
+          }
+      }
+  }
   ```
 
 </details>
@@ -1172,15 +1391,9 @@
 
 ![img.png](/image/img_2.png)
 ![img.png](/image/img_3.png)
+![img.png](/image/img_4.png)
 </details>
 
-<details>
-  <summary></summary>
 
-- JWT의 경우 로그인 후 API 호출 시 Token을 검사해야 함.
-- 기존 Security Session과 다르게 인가 필터를 추가해서 JWT 유효성 검사 및 권한 판별 과정이 필요함.
-
-
-</details>
 
 
