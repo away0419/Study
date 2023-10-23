@@ -4,6 +4,7 @@ import com.security.springboot.Security.Provider.CustomAuthenticationProvider;
 import com.security.springboot.Security.filter.CustomAuthenticationFilter;
 import com.security.springboot.Security.handler.CustomLoginFailureHandler;
 import com.security.springboot.Security.handler.CustomLoginSuccessHandler;
+import com.security.springboot.jwt.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -13,9 +14,11 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -64,10 +67,10 @@ public class SecurityConfig {
         return customAuthenticationFilter;
     }
 
-//    @Bean
-//    public JwtAuthorizationFilter jwtAuthorizationFilter(){
-//        return new JwtAuthorizationFilter();
-//    }
+    @Bean
+    public JwtAuthorizationFilter jwtAuthorizationFilter(){
+        return new JwtAuthorizationFilter();
+    }
 
     // [STEP.06] filterChain 생성
     @Bean
@@ -85,10 +88,10 @@ public class SecurityConfig {
                             .requestMatchers(new AntPathRequestMatcher("/api/v1/user/**")).hasAnyRole("ADMIN", "USER") // 해당 페이지 인증된 사랑 중 ADMIN 또는 USER 권한이 있는 자만 접근 허용.
                             .anyRequest().authenticated() // 나머지 페이지는 권한 상관없이 인증된 사람만 접근 가능.
                 ) // 특정 페이지 접근 시 사용자 권한 확인 설정
-//                .sessionManagement(session -> session // session 기반이 아닌 jwt token 기반일 경우 stateless 설정
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session // session 기반이 아닌 jwt token 기반일 경우 stateless 설정
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // UsernamePasswordAuthenticationFilter 실행 전 순서에 커스텀 필터 추가
-//                .addFilterBefore(jwtAuthorizationFilter(), BasicAuthenticationFilter.class) // JWT 필터 추가
+                .addFilterBefore(jwtAuthorizationFilter(), BasicAuthenticationFilter.class) // JWT 필터 추가
                 .build();
     }
 

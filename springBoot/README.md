@@ -1174,5 +1174,13 @@
 ![img.png](/image/img_3.png)
 </details>
 
+<details>
+  <summary></summary>
+
+- JWT의 경우 로그인 후 API 호출 시 Token을 검사해야 함.
+- 기존 Security Session과 다르게 인가 필터를 추가해서 JWT 유효성 검사 및 권한 판별 과정이 필요함.
+
+
+</details>
 
 
