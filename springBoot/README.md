@@ -872,12 +872,26 @@
 
 ## 1. 라이브러리 추가 및 설정
 
-- Security와 동일
-- java 11 이상일 경우 해당 라이브러리 추가
   ```gradle
+  dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  annotationProcessor 'org.projectlombok:lombok'
+  compileOnly 'org.projectlombok:lombok'
+  developmentOnly 'org.springframework.boot:spring-boot-devtools'
+  runtimeOnly 'com.h2database:h2'
+  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'	// LocalDateTime 역직렬화 해결 패키지
+  implementation "com.googlecode.json-simple:json-simple:1.1.1"	// Google Simple JSON
+  implementation 'com.fasterxml.jackson.core:jackson-databind'	// Jackson Databind
+  implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+  implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
   implementation 'com.sun.xml.bind:jaxb-impl:4.0.1'
   implementation 'com.sun.xml.bind:jaxb-core:4.0.1'
   implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.security:spring-security-test'
+  }
   ```
  
 
