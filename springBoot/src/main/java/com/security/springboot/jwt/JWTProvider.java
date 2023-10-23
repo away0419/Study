@@ -92,7 +92,7 @@ public class JWTProvider {
                 .setSubject(String.valueOf(userVO.getId())) // JWT Payload 등록 클레임
                 .setExpiration(createExpiredDate()) // JWT Payload 등록 클레임
                 .setIssuedAt(new Date()) // JWT Payload claims 등록 클레임
-                .signWith(SignatureAlgorithm.HS256, createSignature())  // JWT Signature
+                .signWith(createSignature(),SignatureAlgorithm.HS256)  // JWT Signature 매개변수 순서는 바뀌어도 상관 없는듯
                 .compact();
     }
 
