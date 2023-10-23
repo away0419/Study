@@ -225,6 +225,9 @@ AuthenticationManagerBuilder.userDetailsService().passwordEncoder() 통해 패�
 | ExceptionTranslationFilter | 이 필터는 보호된 요청을 처리하는 동안 발생할 수 있는 기대한 예외의 기본 라우팅과 위임을 처리함 |
 | FilterSecurityInterceptor | 이 필터는 권한부여와 관련한 결정을 AccessDecisionManager에게 위임해 권한 부여 결정 및 접근 제어 결정을 쉽게 만들어 줌 |
 
+- addFilter()는 해당 필터 뒤에 실행.
+- addFilterbefore()는 해당 필터 앞에 실행.
+
 <br>
 
 - Security를 적용하기 위해 여러가지 Filter를 상속 받아 로직을 구현함. 이때, 어떤 Filter을 상속 받아야 하는지 해당 표를 보면 됨.
