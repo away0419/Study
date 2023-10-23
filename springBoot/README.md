@@ -191,9 +191,10 @@
         private UserRole role;
 
         @Builder
-        public UserEntity(String userEmail, String userPw){
+        public UserEntity(String userEmail, String userPw, UserRole role){
             this.userEmail = userEmail;
             this.userPw = userPw;
+            this.role = role;
         }
 
     }
@@ -247,7 +248,7 @@
         }
     
         public UserEntity makeUserEntity() {
-            return UserEntity.builder().userEmail(this.userEmail).userPw(this.userPw).build();
+            return UserEntity.builder().userEmail(this.userEmail).userPw(this.userPw).role(this.role).build();
         }
     }
     
@@ -332,6 +333,7 @@
 - 인증된 객체에 넣을 UserDetailsVO.
 - Principal로 사용.
 - 딱히 수정 될 일이 없기 때문에 VO로 만듬.
+- 현재 UserDetailsVO 필드에 UserEntity를 넣음으로서 모든 정보를 넣고 있는데, 상황에 따라 필요한 정보만 넣는 걸 추천.
 
     ```java
     package com.security.springboot.domain.User.Model;
@@ -867,10 +869,14 @@
 - JWT는 Security와 함께 적용하지 않고 따로 사용 가능합니다.
 - 해당 실습은 Security + JWT로 진행했습니다.
 - 위에서 진행한 Security 구현에 추가하는 방식으로 진행됩니다.
+- AccessToken을 만든 후 RefreshToken을 구현하겠습니다.
 
 <br/>
 
 ## 1. 라이브러리 추가 및 설정
+
+<details>
+  <summary>gradle</summary>
 
   ```gradle
   dependencies {
@@ -886,6 +892,7 @@
   implementation 'com.fasterxml.jackson.core:jackson-databind'	// Jackson Databind
   implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
   implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
+  implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
   implementation 'com.sun.xml.bind:jaxb-impl:4.0.1'
   implementation 'com.sun.xml.bind:jaxb-core:4.0.1'
   implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
@@ -893,33 +900,279 @@
   testImplementation 'org.springframework.security:spring-security-test'
   }
   ```
- 
+</details> 
 
 <br/>
 
 ## 2. JWT
 
-- <details>
-    <summary>AuthConstants</summary>
+<details>
+  <summary>AuthConstants</summary>
 
-    - 상수 파일로 JWT Header에 키 값인 authorization과 클라이언트에서 JWT로 전송할 때 사용하는 BEARER 값을 상수로 정의함.
+- 상수 파일로 JWT Header에 키 값인 authorization과 클라이언트에서 JWT로 전송할 때 사용하는 BEARER 값을 상수로 정의함.
   
-    ```JAVA
-    public final class AuthConstants {
-        public static final String AUTH_HEADER = "Authorization";
-        public static final String TOKEN_TYPE = "BEARER";
-    }
-    ```
+  ```JAVA
+  public final class AuthConstants {
+      public static final String AUTH_HEADER = "Authorization";
+      public static final String TOKEN_TYPE = "BEARER "; // 띄어 쓰기가 있어야 한다.
+  }
+  ```
+</details>
 
-    </details>
-- <details>
-    <summary>TokenUtil</summary>    
+<details>
+  <summary>JWTProvider</summary>
 
-    - JWT 생성, 유효성 체크 등, 전반적인 기능을 모아둔 클래스.
-    - private static final String jwtSecretKey는 따로 관리.
+- JWT 생성, 반환, 유효성 검사 등 전반적인 기능을 가지는 클래스.
+- 기능을 따로 분리하여 필요한 곳에 사용하기 위해 만듬.
+  
+  ```java
+  package com.security.springboot.jwt;
+  
+  import com.security.springboot.domain.User.Model.UserVO;
+  import io.jsonwebtoken.*;
+  import jakarta.xml.bind.DatatypeConverter;
+  import lombok.extern.slf4j.Slf4j;
+  
+  import javax.crypto.spec.SecretKeySpec;
+  import java.security.Key;
+  import java.util.Calendar;
+  import java.util.Date;
+  import java.util.HashMap;
+  import java.util.Map;
+  
+  @Slf4j
+  public class JWTProvider {
+  
+      //    @Value(value = "${jwt-secret-key}")
+      private static final String jwtSecretKey = "exampleSecretKeyExampleSecretKeyExampleSecretKeyExampleSecretKey"; // HS256 알고리즘을 사용할 경우 256비트 보다 커야하므로 32글자 이상이어야 한다.
+  
+  
+      /**
+       * JWT의 Header 생성 후 반환
+       *
+       * @return
+       */
+      private static Map<String, Object> createHeader() {
+          Map<String, Object> header = new HashMap<>();
+  
+          header.put("typ", "JWT"); // 토큰 타입
+          header.put("alg", "HS256"); // signature(서명) 알고리즘
+  
+          return header;
+      }
+  
+  
+      /**
+       * JWT의 Payload UserVO 정보로 Claims 생성 후 반환.
+       *
+       * @param userVO
+       * @return
+       */
+      private static Map<String, Object> createClaims(UserVO userVO) {
+          Map<String, Object> claims = new HashMap<>();
+  
+          // 비공개 클레임
+          claims.put("userEmail", userVO.getUserEmail());
+          claims.put("userRole", userVO.getRole());
+  
+          // 공개 클레임
+          claims.put("https://github.com/away0419/spring-security/tree/main/springBoot", true);
+  
+          return claims;
+      }
+  
+  
+      /**
+       * JWT Signature 사용하는 시크릿키와 알고리즘을 이용하여 생성 후 반환
+       *
+       * @return
+       */
+      private static Key createSignature() {
+          byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(jwtSecretKey);
+          return new SecretKeySpec(apiKeySecretBytes, SignatureAlgorithm.HS256.getJcaName());
+      }
+  
+  
+      /**
+       * 토큰 만료 기간을 지정
+       *
+       * @return
+       */
+      private static Date createExpiredDate() {
+          Calendar c = Calendar.getInstance();
+          c.add(Calendar.MINUTE, 30); // 30분
+          return c.getTime();
+      }
+  
+  
+      /**
+       * 사용자 정보를 기반으로 토큰 생성 후 반환
+       *
+       * @param userVO
+       * @return
+       */
+      public static String generateJwtToken(UserVO userVO) {
+  
+          // 사용자 시퀀스를 기준으로 JWT 토큰 발급.
+          return Jwts.builder()
+                  .setHeader(createHeader())  // JWT Header
+                  .setClaims(createClaims(userVO))    // JWT Payload 공개, 비공개 클레임 (사용자 정보)
+                  .setSubject(String.valueOf(userVO.getId())) // JWT Payload 등록 클레임
+                  .setExpiration(createExpiredDate()) // JWT Payload 등록 클레임
+                  .setIssuedAt(new Date()) // JWT Payload claims 등록 클레임
+                  .signWith(SignatureAlgorithm.HS256, createSignature())  // JWT Signature
+                  .compact();
+      }
+  
+  
+      /**
+       * 요청의 Header에 있는 토킅 추출 후 반환
+       *
+       * @param header
+       * @return
+       */
+      public static String getTokenFromHeader(String header) {
+          return header.split(" ")[1];
+      }
+  
+  
+      /**
+       * 토큰 유효성 검사 후 반환
+       *
+       * @param token
+       * @return
+       */
+      public static boolean isValidToken(String token) {
+          try {
+              Claims claims = getClaimsFormToken(token);
+              log.info("userEmail : {}", claims.get("userId"));
+              log.info("userRole : {}", claims.get("userRole"));
+              log.info("토큰 발급자 : {}", claims.getSubject());
+              log.info("토큰 만료 시간 : {}", claims.getExpiration());
+              log.info("토큰 발급 시간 : {}", claims.getIssuedAt());
+              return true;
+          } catch (ExpiredJwtException e) {
+              log.error("Token Expired");
+              return false;
+          } catch (JwtException e) {
+              log.error("Token Tampered");
+              return false;
+          } catch (NullPointerException e) {
+              log.error("Token is null");
+              return false;
+          }
+      }
+  
+      
+      /**
+       * 토큰을 기반으로 Claims(정보) 반환
+       *
+       * @param token
+       * @return Claims
+       */
+      private static Claims getClaimsFormToken(String token) {
+          return Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(jwtSecretKey))
+                  .parseClaimsJws(token).getBody();
+      }
+  
+  
+      /**
+       * 토큰의 Claims에서 사용자 이메일을 반환
+       *
+       * @param token
+       * @return 사용자 아이디
+       */
+      public static String getUserEmailFromToken(String token) {
+          return getClaimsFormToken(token).get("userEmail").toString();
+      }
+  
+      
+      /**
+       * 토큰의 Claims에서 사용자 권한을 반환
+       *
+       * @param token
+       * @return 사용자 권한
+       */
+      public static String getUserRoleFromToken(String token) {
+          return getClaimsFormToken(token).get("userRole").toString();
+      }
+  
+  }
+  
+  ```
 
-    </details>
+</details>
 
+<details>
+  <summary>CustomLoginSuccessHandler</summary>
+
+  ```java
+  package com.security.springboot.Security.handler;
+  
+  import com.security.springboot.domain.User.Model.UserDetailsVO;
+  import com.security.springboot.domain.User.Model.UserEntity;
+  import com.security.springboot.domain.User.Model.UserVO;
+  import com.security.springboot.domain.User.Role.UserRole;
+  import com.security.springboot.jwt.AuthConstants;
+  import com.security.springboot.jwt.JWTProvider;
+  import com.security.springboot.utils.ConvertUtil;
+  import jakarta.servlet.ServletException;
+  import jakarta.servlet.http.HttpServletRequest;
+  import jakarta.servlet.http.HttpServletResponse;
+  import lombok.extern.slf4j.Slf4j;
+  import org.json.simple.JSONObject;
+  import org.springframework.security.core.Authentication;
+  import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+  
+  import java.io.IOException;
+  import java.io.PrintWriter;
+  import java.util.HashMap;
+  
+  // 인증(로그인) 성공한 이후 추가 처리 로직.
+  @Slf4j
+  public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
+      @Override
+      public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+          log.debug("3.CustomLoginSuccessHandler");
+  
+          JSONObject jsonObject; // response로 내보려는 정보를 담은 Json 객체
+          HashMap<String, Object> responseMap = new HashMap<>(); // response 할 데이터를 담기 위한 맵
+          UserEntity userEntity = ((UserDetailsVO) authentication.getPrincipal()).getUserEntity(); // 사용자와 관련된 정보 조회
+          JSONObject userEntityJson = (JSONObject) ConvertUtil.convertObjectToJsonObject(userEntity); // 사용자 정보 Json 객체로 변환
+          UserVO userVo = new UserVO(userEntity); // token 발급을 위한 userVO (사실 필요 없는데, UserProvider에서 매개변수로 UserVO로 만들었기 때문에 만듬
+          String accessToken = JWTProvider.generateJwtToken(userVo); // accessToken 생성
+  
+          if (userEntity.getRole() == UserRole.ADMIN) {
+              responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
+              responseMap.put("msg", "관리자 로그인 성공");
+          } else {
+              responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
+              responseMap.put("msg", "일반 사용자 로그인 성공");
+          }
+  
+          jsonObject = new JSONObject(responseMap);
+          response.setCharacterEncoding("UTF-8");
+          response.setContentType("application/json");
+          response.addHeader(AuthConstants.AUTH_HEADER, AuthConstants.TOKEN_TYPE + accessToken); // header 토큰 추가
+          PrintWriter printWriter = response.getWriter();
+          printWriter.print(jsonObject);
+          printWriter.flush();
+          printWriter.close();
+  
+      }
+  
+  }
+  
+  ```
+
+</details>
+
+<details>
+  <summary>결과</summary>
+
+![img.png](/image/img_2.png)
+
+</details>
 
 
 
