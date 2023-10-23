@@ -2,7 +2,10 @@ package com.security.springboot.Security.handler;
 
 import com.security.springboot.domain.User.Model.UserDetailsVO;
 import com.security.springboot.domain.User.Model.UserEntity;
+import com.security.springboot.domain.User.Model.UserVO;
 import com.security.springboot.domain.User.Role.UserRole;
+import com.security.springboot.jwt.AuthConstants;
+import com.security.springboot.jwt.JWTProvider;
 import com.security.springboot.utils.ConvertUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +30,8 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         HashMap<String, Object> responseMap = new HashMap<>(); // response 할 데이터를 담기 위한 맵
         UserEntity userEntity = ((UserDetailsVO) authentication.getPrincipal()).getUserEntity(); // 사용자와 관련된 정보 조회
         JSONObject userEntityJson = (JSONObject) ConvertUtil.convertObjectToJsonObject(userEntity); // 사용자 정보 Json 객체로 변환
+        UserVO userVo = new UserVO(userEntity); // token 발급을 위한 userVO (사실 필요 없는데, UserProvider에서 매개변수로 UserVO로 만들었기 때문에 만듬
+        String accessToken = JWTProvider.generateJwtToken(userVo); // accessToken 생성
 
         if (userEntity.getRole() == UserRole.ADMIN) {
             responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
@@ -39,6 +44,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         jsonObject = new JSONObject(responseMap);
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
+        response.addHeader(AuthConstants.AUTH_HEADER, AuthConstants.TOKEN_TYPE + accessToken); // header 토큰 추가
         PrintWriter printWriter = response.getWriter();
         printWriter.print(jsonObject);
         printWriter.flush();

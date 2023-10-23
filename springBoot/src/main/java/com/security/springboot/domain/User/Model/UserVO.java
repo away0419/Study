@@ -21,6 +21,6 @@ public class UserVO {
     }
 
     public UserEntity makeUserEntity() {
-        return UserEntity.builder().userEmail(this.userEmail).userPw(this.userPw).build();
+        return UserEntity.builder().userEmail(this.userEmail).userPw(this.userPw).role(this.role).build();
     }
 }

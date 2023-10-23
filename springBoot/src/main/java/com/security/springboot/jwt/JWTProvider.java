@@ -16,7 +16,7 @@ import java.util.Map;
 public class JWTProvider {
 
     //    @Value(value = "${jwt-secret-key}")
-    private static final String jwtSecretKey = "exampleSecretKeyExampleSecretKey"; // HS256 알고리즘을 사용할 경우 256비트 보다 커야하므로 32글자 이상이어야 한다.
+    private static final String jwtSecretKey = "exampleSecretKeyExampleSecretKeyExampleSecretKeyExampleSecretKey"; // HS256 알고리즘을 사용할 경우 256비트 보다 커야하므로 32글자 이상이어야 한다.
 
 
     /**
@@ -158,6 +158,7 @@ public class JWTProvider {
         return getClaimsFormToken(token).get("userEmail").toString();
     }
 
+
     /**
      * 토큰의 Claims에서 사용자 권한을 반환
      *
@@ -167,7 +168,5 @@ public class JWTProvider {
     public static String getUserRoleFromToken(String token) {
         return getClaimsFormToken(token).get("userRole").toString();
     }
-
-
 
 }

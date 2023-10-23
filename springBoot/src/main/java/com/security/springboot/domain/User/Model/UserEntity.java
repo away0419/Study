@@ -26,9 +26,10 @@ public class UserEntity extends CommonEntity implements Serializable{
     private UserRole role;
 
     @Builder
-    public UserEntity(String userEmail, String userPw){
+    public UserEntity(String userEmail, String userPw, UserRole role){
         this.userEmail = userEmail;
         this.userPw = userPw;
+        this.role = role;
     }
 
 }
