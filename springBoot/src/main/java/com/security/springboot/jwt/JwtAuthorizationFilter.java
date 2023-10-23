@@ -4,16 +4,21 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+@Slf4j
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     // BasicAuthenticationFilter를 상속 받아도 됨.(BasicAuthenticationFilter 이 OncePerRequestFilter를 상속하고 있어서 상관없음.)
     // 다만, BasicAuthenticationFilter는 기본적으로 Basic 타입 인증을 사용함.
@@ -60,7 +65,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             // [STEP.05] Token에서 Email 추출
             String userEmail = Optional.ofNullable(JWTProvider.getUserEmailFromToken(token)).orElseThrow(()->new Exception("Token isn't userEmail"));
 
-            // [STEP.06] 다음 필터로 넘기기
+            // [STEP.06] Token에서 Role 추출
+            String userRole = Optional.ofNullable(JWTProvider.getUserRoleFromToken(token)).orElseThrow(()->new Exception("Token isn't userRole"));
+
+            // [STEP.07] JWT에서 가져온 정보로 인증 완료된 객체 만들기
+            Authentication authentication = new UsernamePasswordAuthenticationToken(userEmail,null, Collections.singleton(new SimpleGrantedAuthority(userRole)));
+
+            // [STEP.08] context에 저장하여 나머지 필터에서 해당 객체를 통해 검사할 수 있도록 함. stateless 설정을 하면 로직 종료 후 저장된 객체는 삭제가 된다.
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            // [STEP.09] 다음 필터로 넘기기
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {

@@ -1,5 +1,7 @@
 package com.security.springboot.jwt;
 
+import com.security.springboot.domain.User.Model.UserDetailsVO;
+import com.security.springboot.domain.User.Model.UserEntity;
 import com.security.springboot.domain.User.Model.UserVO;
 import io.jsonwebtoken.*;
 import jakarta.xml.bind.DatatypeConverter;
@@ -37,15 +39,16 @@ public class JWTProvider {
     /**
      * JWT의 Payload UserVO 정보로 Claims 생성 후 반환.
      *
-     * @param userVO
+     * @param userDetailsVO
      * @return
      */
-    private static Map<String, Object> createClaims(UserVO userVO) {
+    private static Map<String, Object> createClaims(UserDetailsVO userDetailsVO) {
         Map<String, Object> claims = new HashMap<>();
 
         // 비공개 클레임
-        claims.put("userEmail", userVO.getUserEmail());
-        claims.put("userRole", userVO.getRole());
+        claims.put("userEmail", userDetailsVO.getUserEmail());
+        claims.put("userRole", userDetailsVO.getRole());
+//        claims.put("authority", userDetailsVO.getAuthorities()); 권한 목록인데 JWT에서 뽑아서 ObjectMapping 하는 것보다 위에처럼 바로 권한을 주는게 좋을 듯함. 이건 상황에 따라 구현 해야 함.
 
         // 공개 클레임
         claims.put("https://github.com/away0419/spring-security/tree/main/springBoot", true);
@@ -80,16 +83,16 @@ public class JWTProvider {
     /**
      * 사용자 정보를 기반으로 토큰 생성 후 반환
      *
-     * @param userVO
+     * @param userDetailsVO
      * @return
      */
-    public static String generateJwtToken(UserVO userVO) {
+    public static String generateJwtToken(UserDetailsVO userDetailsVO) {
 
         // 사용자 시퀀스를 기준으로 JWT 토큰 발급.
         return Jwts.builder()
                 .setHeader(createHeader())  // JWT Header
-                .setClaims(createClaims(userVO))    // JWT Payload 공개, 비공개 클레임 (사용자 정보)
-                .setSubject(String.valueOf(userVO.getId())) // JWT Payload 등록 클레임
+                .setClaims(createClaims(userDetailsVO))    // JWT Payload 공개, 비공개 클레임 (사용자 정보)
+                .setSubject(String.valueOf(userDetailsVO.getId())) // JWT Payload 등록 클레임
                 .setExpiration(createExpiredDate()) // JWT Payload 등록 클레임
                 .setIssuedAt(new Date()) // JWT Payload claims 등록 클레임
                 .signWith(createSignature(),SignatureAlgorithm.HS256)  // JWT Signature 매개변수 순서는 바뀌어도 상관 없는듯
@@ -117,7 +120,7 @@ public class JWTProvider {
     public static boolean isValidToken(String token) {
         try {
             Claims claims = getClaimsFormToken(token);
-            log.info("userEmail : {}", claims.get("userId"));
+            log.info("userEmail : {}", claims.get("userEmail"));
             log.info("userRole : {}", claims.get("userRole"));
             log.info("토큰 발급자 : {}", claims.getSubject());
             log.info("토큰 만료 시간 : {}", claims.getExpiration());

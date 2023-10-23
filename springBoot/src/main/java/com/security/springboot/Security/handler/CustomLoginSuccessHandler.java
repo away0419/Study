@@ -28,12 +28,12 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
 
         JSONObject jsonObject; // response로 내보려는 정보를 담은 Json 객체
         HashMap<String, Object> responseMap = new HashMap<>(); // response 할 데이터를 담기 위한 맵
-        UserEntity userEntity = ((UserDetailsVO) authentication.getPrincipal()).getUserEntity(); // 사용자와 관련된 정보 조회
+        UserDetailsVO userDetailsVO = (UserDetailsVO) authentication.getPrincipal(); // userDetailsVO 조회
+        UserEntity userEntity = userDetailsVO.getUserEntity(); // 사용자와 관련된 정보 조회
         JSONObject userEntityJson = (JSONObject) ConvertUtil.convertObjectToJsonObject(userEntity); // 사용자 정보 Json 객체로 변환
-        UserVO userVo = new UserVO(userEntity); // token 발급을 위한 userVO (사실 필요 없는데, UserProvider에서 매개변수로 UserVO로 만들었기 때문에 만듬
-        String accessToken = JWTProvider.generateJwtToken(userVo); // accessToken 생성
+        String accessToken = JWTProvider.generateJwtToken(userDetailsVO); // accessToken 생성
 
-        if (userEntity.getRole() == UserRole.ADMIN) {
+        if (userEntity.getRole() == UserRole.ROLE_ADMIN) {
             responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
             responseMap.put("msg", "관리자 로그인 성공");
         } else {

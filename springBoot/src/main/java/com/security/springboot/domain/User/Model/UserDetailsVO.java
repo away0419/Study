@@ -35,21 +35,21 @@ public class UserDetailsVO implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return userEntity.getIsEnable();
+        return userEntity.getIsEnable(); // 또는 true
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return userEntity.getIsEnable();
+        return userEntity.getIsEnable(); // 또는 true
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return userEntity.getIsEnable();
+        return userEntity.getIsEnable(); // 또는 true
     }
 
     @Override
     public boolean isEnabled() {
-        return userEntity.getIsEnable();
+        return userEntity.getIsEnable(); // 또는 true
     }
 }
