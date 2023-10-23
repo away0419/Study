@@ -2,10 +2,12 @@
 
 ## 0. 들어가기 앞서
 - Spring Security는 버전에 따라 Deprecated 된 클래스, 함수들이 존재함. 따라서 버전을 확인한 뒤, 사용해야 하는 메서드가 무엇인지 판단하기 바랍니다.
+- SpringBoot : 3.1.0, SpringSecurity : 6.1.5
 - [docs](https://docs.spring.io/spring-security/reference/index.html)가 가장 정확합니다.
 - 구현 전 Spring Security 개념과 프로세스를 파악 해야 합니다.
 - 흐름도를 참고하여 무엇을 먼저 작성해야 하는지 확인하기 바랍니다.
   ![Alt text](image/image.png)
+
 
 <br/>
 
@@ -1389,9 +1391,9 @@
 <details>
   <summary>결과</summary>
 
-![img.png](/image/img_2.png)
-![img.png](/image/img_3.png)
-![img.png](/image/img_4.png)
+![img.png](image/img_2.png)
+![img.png](image/img_3.png)
+![img.png](image/img_4.png)
 </details>
 
 
