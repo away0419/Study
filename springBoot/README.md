@@ -1397,7 +1397,8 @@
 </details>
 
 ## 3. RefreshToken
-
+  - 가장 기본적인 refresh token 사용법으로 구현. (전략 사용 안함.)
+  
 
 
 
