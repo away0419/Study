@@ -6,6 +6,7 @@ import com.security.springboot.domain.User.Model.UserVO;
 import io.jsonwebtoken.*;
 import jakarta.xml.bind.DatatypeConverter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
@@ -171,5 +172,44 @@ public class JWTProvider {
     public static String getUserRoleFromToken(String token) {
         return getClaimsFormToken(token).get("userRole").toString();
     }
+
+    /**
+     *
+     * @return 만료 시간
+     */
+    private static Date createRefreshTokenExpiredDate() {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.MONDAY, 30); // 30일
+        return c.getTime();
+    }
+
+    /**
+     *
+     * @return refresh token
+     */
+    public static String generateRefreshToken(){
+        return Jwts.builder()
+                .setHeader(createHeader())  // JWT Header
+                .setExpiration(createRefreshTokenExpiredDate()) // JWT Payload 등록 클레임
+                .setIssuedAt(new Date()) // JWT Payload claims 등록 클레임
+                .signWith(createSignature(),SignatureAlgorithm.HS256)  // JWT Signature 매개변수 순서는 바뀌어도 상관 없는듯
+                .compact();
+    }
+
+    /**
+     *
+     * @param refreshToken
+     * @return 쿠키
+     */
+    public static ResponseCookie generateRefreshTokenCookie(String refreshToken){
+        return ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)  // 클라이언트 측 JavaScript에서 쿠키에 접근 불가
+//                .secure(true)    // HTTPS 연결에서만 쿠키 전송
+                .sameSite("None") // SameSite 속성 설정 (크로스 사이트 요청 위조 방지)
+                .path("/refresh-token")
+                .maxAge(60 * 60 * 24 * 30) // 쿠키의 수명 (예: 30일)
+                .build();
+    }
+
 
 }

@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -32,6 +33,8 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         UserEntity userEntity = userDetailsVO.getUserEntity(); // 사용자와 관련된 정보 조회
         JSONObject userEntityJson = (JSONObject) ConvertUtil.convertObjectToJsonObject(userEntity); // 사용자 정보 Json 객체로 변환
         String accessToken = JWTProvider.generateJwtToken(userDetailsVO); // accessToken 생성
+        String refreshToken = JWTProvider.generateRefreshToken(); // refreshToken 생성
+        ResponseCookie responseCookie = JWTProvider.generateRefreshTokenCookie(refreshToken);
 
         if (userEntity.getRole() == UserRole.ROLE_ADMIN) {
             responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
@@ -41,10 +44,13 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
             responseMap.put("msg", "일반 사용자 로그인 성공");
         }
 
+
+
         jsonObject = new JSONObject(responseMap);
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        response.addHeader(AuthConstants.AUTH_HEADER, AuthConstants.TOKEN_TYPE + accessToken); // header 토큰 추가
+        response.addHeader(AuthConstants.AUTH_HEADER, AuthConstants.TOKEN_TYPE + accessToken); // header Access Token 추가
+        response.addHeader(AuthConstants.COOKIE_HEADER, responseCookie.toString()); // refresh token cookie 추가
         PrintWriter printWriter = response.getWriter();
         printWriter.print(jsonObject);
         printWriter.flush();
