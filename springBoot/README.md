@@ -1396,6 +1396,16 @@
 ![img.png](image/img_4.png)
 </details>
 
+## 3. RefreshToken
+
+- AccessToken 까지 구현한 소스에서 추가하여 구현.
+- RefreshToken은 클레임이 없음. (AccessToken을 재발급하는 용도이기 때문.)
+- 회원 pk에 맞춰 RefreshToken을 저장함. (보통 redis에 저장)
+- 인증 완료 시, AccessToken과 RefreshToken 둘 다 발행.
+- 인가 과정은 다음과 같다.
+  - Refresh 유효성 검사 후 회원과 Refresh 정보 DB 체크. 이후 만료 날짜 확인.
+    - 만약 Refresh 만료 날짜가 지난 경우 Refresh 새로 발급 후 DB 업데이트. 
+  - 
 
 
 
