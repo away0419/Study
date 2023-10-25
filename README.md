@@ -381,7 +381,7 @@ AuthenticationManagerBuilder.userDetailsService().passwordEncoder() 통해 패�
 ### AccessToken & RefreshToken
 
 - AccessToken은 위에서 설명한 것과 동일하게 사용자 정보를 암호화 한 Token임.
-- RefreshToken은 AccessToken을 재발급 하기 위한 Token임.
+- RefreshToken은 AccessToken을 재발급 하기 위한 Token임. (기본적으로 저장할 정보가 없음 -> 클레임 없음)
 - RefreshToken이 생긴 이유는 AccessToken의 경우 만료 시간이 크면 탈취 될 가능성이 있고, 만료 시간이 작으면 자주 로그아웃 된다는 단점이 있는데 이를 해결하고자 나옴.
 - 기본 방식은 AccessToken의 기간이 만료되면 RefreshToken을 확인하고 AccessToken을 재발급 해줌. 이때, RefreshToken 기간 만료가 1주일 이하라면, 응답으로 RefreshToken도 재발급 해줌.
 - RefreshToken를 사용할 경우 추가적인 요청/응답이 발생한다는 단점이 있음.
