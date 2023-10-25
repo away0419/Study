@@ -330,23 +330,25 @@ AuthenticationManagerBuilder.userDetailsService().passwordEncoder() 통해 패�
 
   - 사용자 정보를 세션에 저장. 이와 연결 되는 세션 ID 발급.
   - 클라이언트는 서버에 요청을 보낼 때 세션 ID를 Header에 담아 보냄.
-  - 세션ID가 탈취 될 위험성이 있으며 서버가 세션 저장소를 필요로 하기 때문에 추가적인 저장 공간이 필요.
+  - 세션 ID가 탈취 될 위험성이 있으며 서버가 세션 저장소를 필요로 하기 때문에 추가적인 저장 공간이 필요.
+  - 서버에서 사용자를 관리하기 때문에 서버에 부담을 줄 수 있음.
 
     ![Alt text](image/image-2.png)
 
 <br/>
 
-- JWT
+- JWT (AccessToken & RefreshToken)
 
   - 인증에 필요한 정보를 암호화하여 만든 토큰을 활용한 방법.
-  - 사용자가 로그인하면 해당 정보를 AccessToken으로 발급해 클라이언트에 줌.
-  - 클라이언트는 서버에 요청을 보낼 때 AccessToken을 Header에 담아 보냄.
-  - AcessToken의 유효 기간을 짧게 만들어 탈취에 최대한 대응하고자 RefreshToken을 만듬.
-  - RefreshToken은 AccessToken이 만료 되었을 때 사용 되는 토큰. 즉, AccessToken을 새로 발급해주기 위한 토큰.
-  - RefreshToken도 유효 기간이 있으며, 한번 사용되면 폐기 되고 다시 발급 됨. 이유는 RefreshToken 역시 탈취 가능성이 있기 때문임.
-  - AccessToken이 탈취 되더라도 기간이 짧으므로 악용 될 시간을 줄일 수 있음.
-  - RefreshToken이 탈취 되더라도 기간이 정해져 있으며, 한번이라도 사용된 이력이 있으면 해당 토큰은 사용할 수 없기 때문에, 실제 사용자가 RefreshToekn을 사용하면 탈취자는 RefreshToken을 사용할 수 없음. 반대로 탈취자가 RefreshToken을 이미 사용하여 사용자가 RefreshToken을 쓸 수 없을 경우 사용자에게 경고 메시지를 전달할 수도 있음. (사용한 RefreshToken으로 접근했을 때, 경고 메시지를 보여주는 형식)
-  - Token 정보를 저장하는 저장소가 필요함. 또한, 토큰이 만료되기 전까지 대처 방법이 없고 구현이 복잡하며 AccessToken이 만료될 때마다 새롭게 발급하기 때문에 서버의 자원 낭비가 발생됨.
+  - 사용자가 로그인 요청하면 해당 정보로 AccessToken을 발급하고 Http Header에 이를 담아 응답함.
+  - 이후, 클라이언트는 서버에 요청을 보낼 때 AccessToken을 Header에 담아 보냄.
+  - 서버에 권한이 필요한 요청이 들어온 경우, Header에서 AccessToken을 가져와 해독하여 사용자 정보를 확인함.
+    - 확인 결과 유효하면 요청에 대한 적절한 응답 보냄.
+    - 유효하지 않다면 해당 요청 접근 막고 로그아웃 시킴.
+  - 기본적으로 Session 방식처럼 DB에 접근하는 과정이 없어 빠름.
+  - RefreshToken 추가 시 빨간색 과정이 추가 됨.
+
+    - AccessToken을 재발급 하는 용도로 따로 추가 설명 예정.
 
     ![Alt text](image/image-3.png)
 
@@ -375,6 +377,41 @@ AuthenticationManagerBuilder.userDetailsService().passwordEncoder() 통해 패�
   - 사용자가 Header에 보낸 Token을 JwtVerificationFilter에서 검증함.
   - 검증이 완료되었다면 인증된 객체를 만들어 SecurityContext에 저장함. 이를 통해 이후 Filter 문제 없이 통과 가능. (만약 저장하지 않는다면 다음 필터에서 인증된 객체를 찾지 못하여 에러가 날 수 있음)
   - 이때 SecurityContext에 저장된 정보는 SecurityContextPersistenceFilter가 나중에 삭제하여 stateless로 만듬. (SecurityConfig에서 세션을 stateless로 설정 해야함)
+
+### AccessToken & RefreshToken
+
+- AccessToken은 위에서 설명한 것과 동일하게 사용자 정보를 암호화 한 Token임.
+- RefreshToken은 AccessToken을 재발급 하기 위한 Token임.
+- RefreshToken이 생긴 이유는 AccessToken의 경우 만료 시간이 크면 탈취 될 가능성이 있고, 만료 시간이 작으면 자주 로그아웃 된다는 단점이 있는데 이를 해결하고자 나옴.
+- 기본 방식은 AccessToken의 기간이 만료되면 RefreshToken을 확인하고 AccessToken을 재발급 해줌. 이때, RefreshToken 기간 만료가 1주일 이하라면, 응답으로 RefreshToken도 재발급 해줌.
+- RefreshToken를 사용할 경우 추가적인 요청/응답이 발생한다는 단점이 있음.
+- RefreshToken도 탈취 위험이 있음.
+- AccessToken과 RefreshToken에는 다양한 전략이 존재함.
+
+  #### RTR(Refresh Token Rotation) 전략
+
+  - RefreshToken 1회용 전략으로 한번이라도 Refresh가 사용되면 AccessToken, RefreshToken을 함께 재발급하는 전략으로 DB를 사용하는게 일반적임. (JWT 강점 약화)
+  - Refresh가 탈취 당하더라도 Refresh가 사용된 시점에 값이 바뀌어 DB에 저장됨. 따라서 다음 Refresh 요청 시 DB에 저장된 Refresh 요청이 아니라면 연결을 거부하고 DB에 저장된 Refresh 값을 임의로 바꿔 이후 로그인을 해야만 하는 상태로 바꿀 수 있음. 이때, 사용자에게 비정상 접근을 알려줄 수 있다면 좋을 듯.
+  - DB 저장소를 사용해야 한다는 단점이 있음. (Redis가 빨라서 많이 사용됨. 만약 AccessToken을 DB에 저장하면 Session 방식과 다를 바 없음.)
+  - XSS에 취약함.
+
+  #### Refresh Token에 http-only 적용 전략
+
+  - http-only를 적용하여 RefreshToken은 쿠키로 넘기는 전략.
+  - JS에서는 Refresh Token에 접근할 수 없음.
+  - csrf에 취약함.
+
+  #### Sliding Sessions 전략
+
+  - AccessToken 기간 만료 전 요청이 들어올 경우 해당 AccessToken의 기간을 늘려 응답 값과 함께 다시 보내는 전략.
+  - 시간이 소요되는 작업 직전 Access를 재발급 받아 해당 작업 이후 요청에서 기간 만료가 발생하는 불상사를 줄일 수 있음.
+  - 잦은 AccessToken 발급으로 안한 비용 증가가 단점.
+
+  #### Refresh Token의 한계점
+
+  - 보안적 역할을 하지 못한다는 평가 존재함.
+  - 탈취된 Access Token을 만료시킬 수 없음.
+  - Refresh Token이 탈취된다면 결국 아무것도 할 수 없음.
 
 ### 기타
 
