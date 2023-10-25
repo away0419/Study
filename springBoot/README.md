@@ -1396,6 +1396,8 @@
 ![img.png](image/img_4.png)
 </details>
 
+<br/>
+
 ## 3. RefreshToken
   - http-only 전략만 적용. RTR은 redis를 사용 해야 하므로 일단 패스.
   
