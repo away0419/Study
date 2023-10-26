@@ -34,7 +34,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         JSONObject userEntityJson = (JSONObject) ConvertUtil.convertObjectToJsonObject(userEntity); // 사용자 정보 Json 객체로 변환
         String accessToken = JWTProvider.generateJwtToken(userDetailsVO); // accessToken 생성
         String refreshToken = JWTProvider.generateRefreshToken(); // refreshToken 생성
-        ResponseCookie responseCookie = JWTProvider.generateRefreshTokenCookie(refreshToken);
+        ResponseCookie responseCookie = JWTProvider.generateRefreshTokenCookie(refreshToken); // refreshCookie 만들기
 
         if (userEntity.getRole() == UserRole.ROLE_ADMIN) {
             responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
@@ -43,8 +43,6 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
             responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
             responseMap.put("msg", "일반 사용자 로그인 성공");
         }
-
-
 
         jsonObject = new JSONObject(responseMap);
         response.setCharacterEncoding("UTF-8");
