@@ -1399,7 +1399,8 @@
 <br/>
 
 ## 3. RefreshToken
-  - http-only 전략만 적용. RTR은 redis를 사용 해야 하므로 일단 패스.
+  - http-only 전략 적용.
+  - RTR 전략 적용. 단, Redis가 없으므로 DB 조회 검증은 스킵.
   
 <details>
   <summary>AuthConstants</summary>
@@ -1410,10 +1411,12 @@
   package com.security.springboot.jwt;
   
   public interface AuthConstants {
-      String AUTH_HEADER = "Authorization";
-      String TOKEN_TYPE = "Bearer "; // 띄어 쓰기가 있어야 한다.
-      String COOKIE_HEADER = "Set-Cookie";
+    String AUTH_HEADER = "Authorization";
+    String TOKEN_TYPE = "Bearer "; // 띄어 쓰기가 있어야 한다.
+    String COOKIE_HEADER = "Set-Cookie";
+    String REFRESH_TOKEN_PREFIX = "refresh_token";
   }
+
   ```
 </details>
 
@@ -1422,14 +1425,14 @@
 
 - refresh token 생성 추가
 - cookie 생성 추가
+- refresh token 재발급 여부 추가
 
   ```java
   package com.security.springboot.jwt;
   
   import com.security.springboot.domain.User.Model.UserDetailsVO;
-  import com.security.springboot.domain.User.Model.UserEntity;
-  import com.security.springboot.domain.User.Model.UserVO;
   import io.jsonwebtoken.*;
+  import jakarta.servlet.http.Cookie;
   import jakarta.xml.bind.DatatypeConverter;
   import lombok.extern.slf4j.Slf4j;
   import org.springframework.http.ResponseCookie;
@@ -1522,18 +1525,23 @@
                   .setSubject(String.valueOf(userDetailsVO.getId())) // JWT Payload 등록 클레임
                   .setExpiration(createExpiredDate()) // JWT Payload 등록 클레임
                   .setIssuedAt(new Date()) // JWT Payload claims 등록 클레임
-                  .signWith(createSignature(),SignatureAlgorithm.HS256)  // JWT Signature 매개변수 순서는 바뀌어도 상관 없는듯
+                  .signWith(createSignature(), SignatureAlgorithm.HS256)  // JWT Signature 매개변수 순서는 바뀌어도 상관 없는듯
                   .compact();
       }
   
   
       /**
-       * 요청의 Header에 있는 토킅 추출 후 반환
+       * 요청의 Header에 있는 토킅 추출 후 반환. 만약 token 타입이 다르다면 에러 발생
        *
        * @param header
        * @return
        */
       public static String getTokenFromHeader(String header) {
+  
+          if (!header.startsWith(AuthConstants.TOKEN_TYPE)) {
+              return null;
+          }
+  
           return header.split(" ")[1];
       }
   
@@ -1600,6 +1608,7 @@
       }
   
       /**
+       * 토큰 만료 시간 현재 시간 기준 + 30일
        *
        * @return 만료 시간
        */
@@ -1610,33 +1619,74 @@
       }
   
       /**
+       * refresh token 만들기
        *
        * @return refresh token
        */
-      public static String generateRefreshToken(){
+      public static String generateRefreshToken() {
           return Jwts.builder()
                   .setHeader(createHeader())  // JWT Header
                   .setExpiration(createRefreshTokenExpiredDate()) // JWT Payload 등록 클레임
                   .setIssuedAt(new Date()) // JWT Payload claims 등록 클레임
-                  .signWith(createSignature(),SignatureAlgorithm.HS256)  // JWT Signature 매개변수 순서는 바뀌어도 상관 없는듯
+                  .signWith(createSignature(), SignatureAlgorithm.HS256)  // JWT Signature 매개변수 순서는 바뀌어도 상관 없는듯
                   .compact();
       }
   
       /**
+       * refresh toekn의 정보를 가진 cookie 만들기.
        *
        * @param refreshToken
        * @return 쿠키
        */
-      public static ResponseCookie generateRefreshTokenCookie(String refreshToken){
-          return ResponseCookie.from("refresh_token", refreshToken)
+      public static ResponseCookie generateRefreshTokenCookie(String refreshToken) {
+          return ResponseCookie.from(AuthConstants.REFRESH_TOKEN_PREFIX, refreshToken)
                   .httpOnly(true)  // 클라이언트 측 JavaScript에서 쿠키에 접근 불가
   //                .secure(true)    // HTTPS 연결에서만 쿠키 전송
-                  .sameSite("None") // SameSite 속성 설정 (크로스 사이트 요청 위조 방지)
-                  .path("/refresh-token")
-                  .maxAge(60 * 60 * 24 * 30) // 쿠키의 수명 (예: 30일)
-                  .build();
+  .sameSite("None") // SameSite 속성 설정 (크로스 사이트 요청 위조 방지)
+  .path("/") // 요청 api의 경로에 해당 경로가 포함 되어 있어야 cookie 사용 가능
+  .maxAge(60 * 60 * 24 * 30) // 쿠키의 수명 (예: 30일)
+  .build();
+  }
+  
+      /**
+       * cookie에 refresh token 있는지 확인.
+       *
+       * @param cookies
+       * @return refresh token
+       */
+      public static String getRefreshToken(Cookie[] cookies) {
+  
+          for (Cookie cookie :
+                  cookies
+          ) {
+              if (cookie.getName().equals(AuthConstants.REFRESH_TOKEN_PREFIX)) {
+                  return cookie.getValue();
+              }
+          }
+  
+          return null;
       }
   
+      /**
+       * refresh cookie 업데이트가 필요한지 판별.
+       * 만약 기간 만료라면 에러 발생
+       *
+       * @param refreshToken
+       * @return refresh token 재발급 여부
+       */
+      public static boolean isNeedToUpdateRefreshToken(String refreshToken) {
+          Date expiresAt = getClaimsFormToken(refreshToken).getExpiration(); // // 만료 시간이 이미 지난 경우 에러 발생
+          Calendar calendar = Calendar.getInstance();
+  
+          calendar.setTime(new Date()); // 현재 시간
+          calendar.add(Calendar.DATE, 7); // 7일 후
+  
+          if (expiresAt.before(calendar.getTime())) { // 만료 기간이 현재 시간+7일 보다 전인 경우. 즉, 만료까지 남은 기안이 7일 이내인 경우
+              return true;
+          }
+  
+          return false;
+      }
   
   }
   ```
@@ -1674,9 +1724,9 @@
   // 인증(로그인) 성공한 이후 추가 처리 로직.
   @Slf4j
   public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
-      @Override
-      public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-          log.debug("3.CustomLoginSuccessHandler");
+  @Override
+  public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+  log.debug("3.CustomLoginSuccessHandler");
   
           JSONObject jsonObject; // response로 내보려는 정보를 담은 Json 객체
           HashMap<String, Object> responseMap = new HashMap<>(); // response 할 데이터를 담기 위한 맵
@@ -1685,7 +1735,7 @@
           JSONObject userEntityJson = (JSONObject) ConvertUtil.convertObjectToJsonObject(userEntity); // 사용자 정보 Json 객체로 변환
           String accessToken = JWTProvider.generateJwtToken(userDetailsVO); // accessToken 생성
           String refreshToken = JWTProvider.generateRefreshToken(); // refreshToken 생성
-          ResponseCookie responseCookie = JWTProvider.generateRefreshTokenCookie(refreshToken);
+          ResponseCookie responseCookie = JWTProvider.generateRefreshTokenCookie(refreshToken); // refreshCookie 만들기
   
           if (userEntity.getRole() == UserRole.ROLE_ADMIN) {
               responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
@@ -1694,8 +1744,6 @@
               responseMap.put("userInfo", userEntityJson); // 유저 정보 Json 형식으로 넣기
               responseMap.put("msg", "일반 사용자 로그인 성공");
           }
-  
-  
   
           jsonObject = new JSONObject(responseMap);
           response.setCharacterEncoding("UTF-8");
@@ -1711,4 +1759,21 @@
   
   }
   ```
+</details>
+
+<details>
+  <summary></summary>
+
+</details>
+
+## 기타
+
+<details>
+  <summary>ResponseCookie</summary>
+
+- 서버에서 Cookie를 보낼 때 헤더에 저장하는데, 쿠키가 원래 헤더에 있음.
+- 클라이언트는 헤더에 Set-Cookie 가 있을 때, 해당 value를 이용하여 자동으로 쿠키를 저장하는 형식임.
+- 따라서 ResponseCookie는 Header에 추가하는 것임.
+- header 형식은 다음과 같음.
+  - Set-Cookie : refresh_token=값; refresh_token2=값;
 </details>
