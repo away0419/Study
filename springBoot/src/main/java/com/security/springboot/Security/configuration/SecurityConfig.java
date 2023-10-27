@@ -2,6 +2,8 @@ package com.security.springboot.Security.configuration;
 
 import com.security.springboot.Security.Provider.CustomAuthenticationProvider;
 import com.security.springboot.Security.filter.CustomAuthenticationFilter;
+import com.security.springboot.Security.handler.CustomAccessDeniedHandler;
+import com.security.springboot.Security.handler.CustomAuthenticationEntryPoint;
 import com.security.springboot.Security.handler.CustomLoginFailureHandler;
 import com.security.springboot.Security.handler.CustomLoginSuccessHandler;
 import com.security.springboot.jwt.JwtAuthorizationFilter;
@@ -67,12 +69,26 @@ public class SecurityConfig {
         return customAuthenticationFilter;
     }
 
+    // [STEP.06] CustomAccessDeniedHandler 생성
+    @Bean
+    public CustomAccessDeniedHandler customAccessDeniedHandler(){
+        return new CustomAccessDeniedHandler();
+    }
+
+    // [STEP.07] JwtAuthorizationFilter 생성
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter(){
         return new JwtAuthorizationFilter();
     }
 
-    // [STEP.06] filterChain 생성
+
+    // [STEP.08] CustomAuthenticationEntryPoint 생성
+    @Bean
+    public CustomAuthenticationEntryPoint customAuthenticationEntryPoint(){
+        return new CustomAuthenticationEntryPoint();
+    }
+
+    // [STEP.09] filterChain 생성
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
@@ -92,6 +108,10 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // UsernamePasswordAuthenticationFilter 실행 전 순서에 커스텀 필터 추가
                 .addFilterBefore(jwtAuthorizationFilter(), BasicAuthenticationFilter.class) // JWT 필터 추가
+                .exceptionHandling(it->{
+                    it.authenticationEntryPoint(customAuthenticationEntryPoint()); // 인증 되지 않은 사용자 접근 처리
+                    it.accessDeniedHandler(customAccessDeniedHandler()); // 인가 예외 처리
+                })
                 .build();
     }
 
