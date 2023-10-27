@@ -65,6 +65,11 @@ GrantedAuthority 객체는 UserDetailsService로 불러올 수 있고, 특정 �
 - Security에서 사용하는 인증 인가 예외 처리 방법은 여러가지 존재함.
 - 이는 인증 후 성공 및 실패 처리와는 별개로 로직에서 예외가 발생한 경우 이를 처리하는 로직임.
 
+#### [AuthenticationFailureHandler]
+
+- 인증 도중 예외가 발생하면 인증 실패 처리 이후 실행.
+- 모든 에러를 처리하는 것은 아님. (AuthenticationException 처리)
+
 #### [AuthenticationEntryPoint]
 
 - 인증 되지 않은 사용자가 보호된 리소스에 접근할 때 발생하는 예외 처리.
