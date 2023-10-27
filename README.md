@@ -88,7 +88,8 @@ GrantedAuthority 객체는 UserDetailsService로 불러올 수 있고, 특정 �
 #### [Global Exception Handling]
 
 - 사용자가 직접 예외를 만들고, 이를 처리하는 로직을 따로 구현하여 예외를 직접 처리.
-- @ControllerAdvice 또는 @ExceptionHandler를 사용함.
+- @ControllerAdvice 또는 @RestControllerAdvice를 작성하고 @ExceptionHandler를 통해 예외 처리.
+- AuthenticationException, AccessDeniedException은 위에 핸들러가 처리하기 때문에 핸들링 하려면 추가 설정이 필요함.
 - 장점
   - 위 방식들과 다르게 어디든 사용이 가능함.
   - 사용자가 만든 에러 처리 틀을 이욯할 수 있어 security 에러 뿐만 아니라 다른 에러와도 형식(반환 값 등)을 맞출 수 있음. (일관성)
