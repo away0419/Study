@@ -2472,7 +2472,7 @@
 ![img_1.png](image/img_6.png)
 </details>
 
-</details>
+
 
 ## 2. ControllerAdvice 예외 처리
 
@@ -2821,5 +2821,90 @@
   <summary>결과</summary>
 
 ![img.png](image/img_7.png)
+
+</details>
+
+</details>
+
+<details>
+  <summary>token 재발급</summary>
+
+## 0. 들어가기 앞서
+
+- accessToken 기간 만료시 오류를 내보냄.
+- 클라언트가 확인 후 재발급 요청
+- 보통 재발급 요청 시 accesstoken을 다시 검증하지는 않음.
+
+## 1. 재발급 요청
+
+<details>
+  <summary>JWTController</summary>
+
+- 재발급 요청을 보내면 refresh token만 검증하고 재발급함.
+- RTR 전략을 적용하여 한번이라도 refresh toekn을 사용하면 재발급함.
+
+  ```java
+  package com.security.springboot.domain.User.Controller;
+  
+  
+  import com.security.springboot.Security.exception.CustomErrorCode;
+  import com.security.springboot.Security.exception.CustomException;
+  import com.security.springboot.domain.User.Model.UserDetailsVO;
+  import com.security.springboot.jwt.AuthConstants;
+  import com.security.springboot.jwt.JWTProvider;
+  import jakarta.servlet.http.Cookie;
+  import jakarta.servlet.http.HttpServletRequest;
+  import jakarta.servlet.http.HttpServletResponse;
+  import lombok.RequiredArgsConstructor;
+  import org.springframework.http.ResponseCookie;
+  import org.springframework.security.core.userdetails.UserDetailsService;
+  import org.springframework.web.bind.annotation.PostMapping;
+  import org.springframework.web.bind.annotation.RequestMapping;
+  import org.springframework.web.bind.annotation.RestController;
+  
+  import java.util.Optional;
+  
+  @RestController
+  @RequestMapping("/api/v1/jwt")
+  @RequiredArgsConstructor
+  public class JWTController {
+      private final UserDetailsService userDetailsService;
+      @PostMapping("/token/update")
+      public String udateToken(HttpServletRequest request, HttpServletResponse response){
+  
+          Cookie[] cookies= request.getCookies(); // 쿠키 찾기
+          String refreshToken = JWTProvider.getRefreshToken(cookies); // refresh token 가져오기
+          JWTProvider.isValidToken(refreshToken); // token 검증
+  //
+  //        if(JWTProvider.isNeedToUpdateRefreshToken(refreshToken)){ refresh token 기간 만료 7일 전이면 업데이트
+  //            refreshToken = JWTProvider.generateRefreshToken();
+  //        }
+  
+          String header = Optional.ofNullable(request.getHeader(AuthConstants.AUTH_HEADER)).orElseThrow(()-> new CustomException(CustomErrorCode.AUTH_HEADER_NULL));
+          String accessToken = Optional.ofNullable(JWTProvider.getTokenFromHeader(header)).orElseThrow(() -> new CustomException(CustomErrorCode.TOKEN_NULL));
+          String userEmail = Optional.ofNullable(JWTProvider.getUserEmailFromToken(accessToken)).orElseThrow(() -> new CustomException(CustomErrorCode.USER_INFO_NULL));
+          UserDetailsVO userDetailsVO = (UserDetailsVO) Optional.ofNullable(userDetailsService.loadUserByUsername(userEmail)).orElseThrow(() -> new CustomException(CustomErrorCode.USER_INFO_NULL));
+  
+          accessToken = JWTProvider.generateJwtToken(userDetailsVO);
+          refreshToken = JWTProvider.generateRefreshToken(); // RTR 전략 적용
+          ResponseCookie responseCookie  =JWTProvider.generateRefreshTokenCookie(refreshToken); // refresh token 담은 cookie 생성
+          response.addHeader(AuthConstants.AUTH_HEADER, AuthConstants.TOKEN_TYPE +accessToken);
+          response.addHeader(AuthConstants.COOKIE_HEADER, responseCookie.toString());
+  
+          return "발급 성공";
+      }
+  }
+  ```
+</details>
+
+<details>
+  <summary>결과</summary>
+
+- 재발급 후 api 요청 확인까지 완료
+
+![img.png](image/img_8.png)
+![img_1.png](image/img_9.png)
+
+</details>
 
 </details>
