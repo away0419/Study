@@ -2477,8 +2477,349 @@
 ## 2. ControllerAdvice 예외 처리
 
 <details>
-  <summary></summary>
+  <summary>CustomExcptionHandler</summary>
 
+- 예외 발생 시 응답 값 처리
+ 
+  ```java
+  package com.security.springboot.Security.exception;
+  
+  import org.springframework.http.HttpStatusCode;
+  import org.springframework.http.ResponseEntity;
+  import org.springframework.web.bind.annotation.ExceptionHandler;
+  import org.springframework.web.bind.annotation.RestControllerAdvice;
+  
+  import java.util.HashMap;
+  import java.util.Map;
+  
+  @RestControllerAdvice
+  public class CustomExcptionHandler {
+  
+      @ExceptionHandler(value = CustomException.class)
+      public ResponseEntity<Map<String,String>> securityErrorHandler(CustomException exception){
+          Map<String,String> response = new HashMap<>();
+          response.put("msg",exception.getCustomErrorCode().getMessage());
+          response.put("status", String.valueOf(exception.getCustomErrorCode().getState()));
+          return new ResponseEntity<>(response, HttpStatusCode.valueOf(exception.getCustomErrorCode().getState()));
+      }
+  }
+  ```
 
+</details>
+
+<details>
+  <summary>JwtAuthorizationFilter</summary>
+
+- JWT 인가 필터에서 개발자가 만든 예외가 발생할 경우 request에 예외를 넣고 다음 필터로 넘긴다.
+- 예외가 발생했다는 뜻은 인증에서 예외가 나왔다는 뜻이므로 EntryPoint로 이동한다.(예외 발생안하면 이동 안함.)
+
+  ```java
+  package com.security.springboot.jwt;
+  
+  import com.security.springboot.Security.exception.CustomErrorCode;
+  import com.security.springboot.Security.exception.CustomException;
+  import jakarta.servlet.FilterChain;
+  import jakarta.servlet.ServletException;
+  import jakarta.servlet.http.HttpServletRequest;
+  import jakarta.servlet.http.HttpServletResponse;
+  import lombok.extern.slf4j.Slf4j;
+  import org.json.simple.JSONObject;
+  import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+  import org.springframework.security.core.Authentication;
+  import org.springframework.security.core.authority.SimpleGrantedAuthority;
+  import org.springframework.security.core.context.SecurityContextHolder;
+  import org.springframework.web.filter.OncePerRequestFilter;
+  
+  import java.io.IOException;
+  import java.io.PrintWriter;
+  import java.util.Collections;
+  import java.util.HashMap;
+  import java.util.Optional;
+  
+  @Slf4j
+  public class JwtAuthorizationFilter extends OncePerRequestFilter {
+      // BasicAuthenticationFilter를 상속 받아도 됨.(BasicAuthenticationFilter 이 OncePerRequestFilter를 상속하고 있어서 상관없음.)
+      // 다만, BasicAuthenticationFilter는 기본적으로 Basic 타입 인증을 사용함.
+      // 따라서, BasicAuthenticationFilter 보단 OncePerRequestFilter를 상속 받는 경우가 많음.
+      // 대신, BasicAuthenticationFilter는 권한이 필요한 경로만 자동으로 필터링함. OncePerRequestFilter는 이를 구현해야 함.
+  
+      @Override
+      protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+  
+          // 1. Token이 필요하지 않은 API URL. (필요 없음. securityConfig에서 설정하면 됨.)
+  //        List<String> list = Arrays.asList(
+  //                "/api/v1/user/login",
+  //                "/api/v1/user/generateToken"
+  //        );
+  
+          // 2. 토큰이 필요하지 않은 API URL 다음 필터로 넘기기 (필요 없음. securityConfig에서 설정하면 됨.)
+  //        if (list.contains(request.getRequestURI())) {
+  //            filterChain.doFilter(request, response);
+  //        }
+  
+          // 3. OPTIONS 요청일 경우 다음 필터로 넘기기 (필요 없음. securityConfig에서 설정하면 됨.)
+  //        if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
+  //            filterChain.doFilter(request, response);
+  //        }
+  
+          try {
+              // [STEP.01] http header에서 AuthConstants.AUTH_HEADER를 가져오고 null 이면 에러
+              String header = Optional.ofNullable(request.getHeader(AuthConstants.AUTH_HEADER)).orElseThrow(() -> new CustomException(CustomErrorCode.AUTH_HEADER_NULL));
+  
+              // [STEP.02] Header에서 Token 추출하는데 null 이면 에러
+              String token = Optional.ofNullable(JWTProvider.getTokenFromHeader(header)).orElseThrow(() -> new CustomException(CustomErrorCode.TOKEN_NULL));
+  
+              // [STEP.03] Token 유효성 검사.
+              JWTProvider.isValidToken(token);
+  
+              // [STEP.04] Token에서 Email 추출
+              String userEmail = Optional.ofNullable(JWTProvider.getUserEmailFromToken(token)).orElseThrow(() -> new CustomException(CustomErrorCode.USER_INFO_NULL));
+  
+              // [STEP.05] Token에서 Role 추출
+              String userRole = Optional.ofNullable(JWTProvider.getUserRoleFromToken(token)).orElseThrow(() -> new CustomException(CustomErrorCode.USER_INFO_NULL));
+  
+              // [STEP.06] JWT에서 가져온 정보로 인증 완료된 객체 만들기
+              Authentication authentication = new UsernamePasswordAuthenticationToken(userEmail, null, Collections.singleton(new SimpleGrantedAuthority(userRole)));
+  
+              // [STEP.07] context에 저장하여 나머지 필터에서 해당 객체를 통해 검사할 수 있도록 함. stateless 설정을 하면 로직 종료 후 저장된 객체는 삭제가 된다.
+              SecurityContextHolder.getContext().setAuthentication(authentication);
+  
+  
+              // 만약 CustomException이 발생할 경우 여기서 바로 처리할 것인지 또는 필터를 거친 뒤 RestControllerAdvice가 처리하게 할지 정하면 됨.
+              // 또한 CustomException이 아닌 [인증, 인가] 예외의 경우  [CustomAuthenticationEntryPoint, CustomAccessDeniedHandler] 만들고 이를 SecurityConfig에 등록하여 처리.
+              // 여기서 주의할 점은 JWT는 Security의 AuthenticationException를 상속 받지 않으므로 이 부분에서 처리해야함. 즉, CsutomException 처럼 만들어서 처리해야한다.
+          } catch (CustomException e) {
+              request.setAttribute("exception", e); // controlleradvice 용으로 저장
+  //            response.setCharacterEncoding("UTF-8");
+  //            response.setContentType("application/json");
+  //            PrintWriter printWriter = response.getWriter();
+  //
+  //            HashMap<String, Object> jsonMap = new HashMap<>();
+  //            jsonMap.put("status", e.getCustomErrorCode().getState());
+  //            jsonMap.put("code", e.getCustomErrorCode().getState());
+  //            jsonMap.put("message", e.getCustomErrorCode().getMessage());
+  //            JSONObject jsonObject = new JSONObject(jsonMap);
+  //
+  //            printWriter.println(jsonObject);
+  //            printWriter.flush();
+  //            printWriter.close();
+          }
+  
+          // [STEP.08] 다음 필터로 넘기기
+          filterChain.doFilter(request, response); // controllerAdvice 용
+  
+      }
+  }
+  ```
+</details>
+
+<details>
+  <summary>CustomAuthenticationEntryPoint</summary>
+
+- 인증 단계서 에러가 발생하면 실행.
+- 해당 에러를 확인 후 사용자가 만든 에러는 예외 핸들러에게 위임함.
+- 예외 핸들러는 spring boot에 기본적으로 bean에 등록된 핸들러임.
+
+  ```java
+  package com.security.springboot.Security.handler;
+  
+  import com.security.springboot.Security.exception.CustomException;
+  import io.jsonwebtoken.ExpiredJwtException;
+  import jakarta.servlet.ServletException;
+  import jakarta.servlet.http.HttpServletRequest;
+  import jakarta.servlet.http.HttpServletResponse;
+  import lombok.extern.slf4j.Slf4j;
+  import org.hibernate.annotations.Comment;
+  import org.json.simple.JSONObject;
+  import org.springframework.beans.factory.annotation.Qualifier;
+  import org.springframework.security.core.AuthenticationException;
+  import org.springframework.security.web.AuthenticationEntryPoint;
+  import org.springframework.stereotype.Component;
+  import org.springframework.web.servlet.HandlerExceptionResolver;
+  
+  import java.io.IOException;
+  import java.io.PrintWriter;
+  import java.util.HashMap;
+  
+  @Slf4j
+  @Component
+  public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+      private final HandlerExceptionResolver resolver; // 예외 처리 핸들러
+  
+      //빈에 등록된 예외 처리 핸들러 가져오기
+      public CustomAuthenticationEntryPoint(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
+          this.resolver = resolver;
+      }
+  
+      @Override
+      public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+          log.error("CustomAuthenticationEntryPoint");
+  
+          Exception exception = (Exception) request.getAttribute("exception");
+  
+          if (exception != null && exception instanceof CustomException) {
+              CustomException customException= (CustomException) exception;
+              resolver.resolveException(request, response, null,  customException);
+          } else {
+              JSONObject jsonObject; // response로 내보려는 정보를 담은 Json 객체
+              HashMap<String, Object> responseMap = new HashMap<>(); // response 할 데이터를 담기 위한 맵
+              responseMap.put("msg", "인증 실패.");
+              jsonObject = new JSONObject(responseMap);
+  
+              response.setCharacterEncoding("UTF-8");
+              response.setContentType("application/json");
+              response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 응답 코드 설정
+              PrintWriter printWriter = response.getWriter();
+              printWriter.print(jsonObject);
+              printWriter.flush();
+              printWriter.close();
+          }
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>SecurityConfig</summary>
+
+- security에서 entrypoint를 autowired로 가져옴. (entrypoint에서 spring boot 예외 핸들러를 가져오려면 어쩔 수가 없다.)
+
+  ```java
+  package com.security.springboot.Security.configuration;
+  
+  import com.security.springboot.Security.Provider.CustomAuthenticationProvider;
+  import com.security.springboot.Security.filter.CustomAuthenticationFilter;
+  import com.security.springboot.Security.handler.CustomAccessDeniedHandler;
+  import com.security.springboot.Security.handler.CustomAuthenticationEntryPoint;
+  import com.security.springboot.Security.handler.CustomLoginFailureHandler;
+  import com.security.springboot.Security.handler.CustomLoginSuccessHandler;
+  import com.security.springboot.jwt.JwtAuthorizationFilter;
+  import lombok.RequiredArgsConstructor;
+  import org.springframework.beans.factory.annotation.Autowired;
+  import org.springframework.beans.factory.annotation.Qualifier;
+  import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.security.authentication.AuthenticationManager;
+  import org.springframework.security.authentication.ProviderManager;
+  import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+  import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+  import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+  import org.springframework.security.config.http.SessionCreationPolicy;
+  import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+  import org.springframework.security.web.SecurityFilterChain;
+  import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+  import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+  import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+  import org.springframework.web.servlet.HandlerExceptionResolver;
+  
+  @Configuration
+  @EnableWebSecurity
+  @RequiredArgsConstructor
+  public class SecurityConfig {
+  
+      // [STEP.08] CustomAuthenticationEntryPoint Bean 에서 가져오기
+      @Autowired
+      private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+  
+      // 패스워드 인코더
+      @Bean
+      public BCryptPasswordEncoder bCryptPasswordEncoder() {
+          return new BCryptPasswordEncoder();
+      }
+  
+      // [STEP.01] customAuthenticationProvider 생성
+      @Bean
+      public CustomAuthenticationProvider customAuthenticationProvider() {
+          return new CustomAuthenticationProvider();
+      }
+  
+      // [STEP.02] authenticationManager 생성
+      @Bean
+      public AuthenticationManager authenticationManager() {
+          return new ProviderManager(customAuthenticationProvider());
+      }
+  
+      // [STEP.03] CustomLoginFailureHandler 생성
+      @Bean
+      public CustomLoginFailureHandler customLoginFailureHandler() {
+          return new CustomLoginFailureHandler();
+      }
+  
+      // [STEP.04] CustomLoginFailureHandler 생성
+      @Bean
+      public CustomLoginSuccessHandler customLoginSuccessHandler() {
+          return new CustomLoginSuccessHandler();
+      }
+  
+      // [STEP.05] customAuthenticationFilter 생성
+      @Bean
+      public CustomAuthenticationFilter customAuthenticationFilter() {
+          CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
+          customAuthenticationFilter.setFilterProcessesUrl("/api/v1/user/login");     // 접근 URL
+          customAuthenticationFilter.setAuthenticationSuccessHandler(customLoginSuccessHandler());    // '인증'(로그인) 성공 시 해당 핸들러로 처리를 전가한다.
+          customAuthenticationFilter.setAuthenticationFailureHandler(customLoginFailureHandler());    // '인증'(로그인) 실패 시 해당 핸들러로 처리를 전가한다.
+          customAuthenticationFilter.afterPropertiesSet();
+          return customAuthenticationFilter;
+      }
+  
+      // [STEP.06] CustomAccessDeniedHandler 생성
+      @Bean
+      public CustomAccessDeniedHandler customAccessDeniedHandler(){
+          return new CustomAccessDeniedHandler();
+      }
+  
+      // [STEP.07] JwtAuthorizationFilter 생성
+      @Bean
+      public JwtAuthorizationFilter jwtAuthorizationFilter(){
+          return new JwtAuthorizationFilter();
+      }
+  
+  
+      // [STEP.08] CustomAuthenticationEntryPoint 생성@Bean
+      //    public CustomAuthenticationEntryPoint customAuthenticationEntryPoint(){
+      //        return new CustomAuthenticationEntryPoint(resolver);
+      //    }
+  
+  
+      // [STEP.09] filterChain 생성
+      @Bean
+      public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+          return http
+                  .csrf(AbstractHttpConfigurer::disable) // csrf 공격 보호 옵션 끄기. (rest api 에서는 필요 없기 때문)
+                  .cors(AbstractHttpConfigurer::disable) // cors 예방 옵션 끄기
+                  .headers(AbstractHttpConfigurer::disable) // h2 접근을 위해 사용. 다른 db 사용시 제거
+                  .formLogin(AbstractHttpConfigurer::disable) // form bases authentication 비활성화 (기본 로그인 페이지 비활성화, UsernamePasswordAuthenticationFilter 비활성화, rest api만 작성하기 때문에 필요없음.)
+                  .httpBasic(AbstractHttpConfigurer::disable) // http basic authentication 비활성화 (기본 로그인 인증창 비활성화, BasicAuthenticationFilter 비활성화, rest api만 작성하기 때문에 필요없음.)
+                  .authorizeHttpRequests(request->
+                      request.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // 정적 자원 경로 인증, 권한 상관없이 누구나 접근 허용
+                              .requestMatchers(new AntPathRequestMatcher("/"),new AntPathRequestMatcher("/swagger-ui/**"),new AntPathRequestMatcher("/h2-console/**")).permitAll() // 해당 페이지 인증, 권한 상관 없이 누구나 접근 허용
+                              .requestMatchers(new AntPathRequestMatcher("/api/v1/admin/**")).hasRole("ADMIN") // 해당 페이지는 인증된 사람 중 ADMIN 권한이 있는 자만 접근 허용. 여기서 Enum엔 ROLE_ADMIN으로 되어있는데 ROLE_이 자동으로 앞에 붙기 때문에 Enum에서 ROLE_을 앞에 붙힌것이다.
+                              .requestMatchers(new AntPathRequestMatcher("/api/v1/user/**")).hasAnyRole("ADMIN", "USER") // 해당 페이지 인증된 사랑 중 ADMIN 또는 USER 권한이 있는 자만 접근 허용.
+                              .anyRequest().authenticated() // 나머지 페이지는 권한 상관없이 인증된 사람만 접근 가능.
+                  ) // 특정 페이지 접근 시 사용자 권한 확인 설정
+                  .sessionManagement(session -> session // session 기반이 아닌 jwt token 기반일 경우 stateless 설정
+                          .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                  .addFilterBefore(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // UsernamePasswordAuthenticationFilter 실행 전 순서에 커스텀 필터 추가
+                  .addFilterBefore(jwtAuthorizationFilter(), BasicAuthenticationFilter.class) // JWT 필터 추가
+                  .exceptionHandling(it->{
+                      it.authenticationEntryPoint(customAuthenticationEntryPoint); // 인증 되지 않은 사용자 접근 처리
+                      it.accessDeniedHandler(customAccessDeniedHandler()); // 인가 예외 처리
+                  })
+                  .build();
+      }
+  
+  
+  
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>결과</summary>
+
+![img.png](image/img_7.png)
 
 </details>
