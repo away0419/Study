@@ -983,7 +983,7 @@
 </details>
 
 </details>
-<br/>
+
 
 <details>
   <summary>JWT</summary>
@@ -1410,7 +1410,7 @@
 
 ## 3. RefreshToken
   - http-only 전략 적용.
-  - RTR 전략 적용. 단, Redis가 없으므로 DB 조회 검증은 스킵.
+  - 로그인 시 RefreshToken 발급 구현. (인증 인가 처리는 따로 빼서 구현 함.)
   
 <details>
   <summary>AuthConstants</summary>
@@ -1771,24 +1771,41 @@
   ```
 </details>
 
+<br/>
+
+## 기타
+
 <details>
-  <summary></summary>
+  <summary>ResponseCookie</summary>
+
+- 서버에서 Cookie를 보낼 때 헤더에 저장하는데, 쿠키가 원래 헤더에 있음.
+- 클라이언트는 헤더에 Set-Cookie 가 있을 때, 해당 value를 이용하여 자동으로 쿠키를 저장하는 형식임.
+- 따라서 ResponseCookie는 Header에 추가하는 것임.
+- header 형식은 다음과 같음.
+  - Set-Cookie : refresh_token=값; refresh_token2=값;
+</details>
+
 
 </details>
 
-</details>
+<details>
+  <summary>인증, 인가 예외 처리</summary>
 
-## 인증, 인가 예외 처리
+## 0. 들어가기 앞서
 
 - 기본적으로 Security에서 제공하고 있는 [인증,인가] 예외는 RuntimeException을 상속 받고 있음. 따라서, try-catch 구문 없어도 컴파일 가능.
 - 기존 [인증, 인가] 예외는 security에 있는 예외 처리 filter가 처리함. 따라서, ControllerAdvice를 사용하려면 추가 설정이 필요함.(filter는 dispatcherServlet 보다 먼저 작동하기 때문.)  
 - JWT의 경우 기존 [인증, 인가] 예외가 아니므로 따로 처리해야함.
 
+<br/>
+
+## 1. 기본적인 인증, 인가 예외 처리
+
 <details>
   <summary>CustomAuthenticationEntryPoint</summary>
 
 - 사용자가 인증이 필요한 페이지에 접근 했을 때, 요청으로 보낸 사용자 정보가 인증이 안된 혹은 인증 실패한 경우.
-- 주로 Session 방식에서 인증 예외 발생하면 실행됨. (JWT도 실행 될 수 있음.)  
+- 주로 Session 방식에서 인증 예외 발생하면 실행됨.   
 
   ```java
   package com.security.springboot.Security.handler;
@@ -2450,20 +2467,18 @@
 
 <details>
   <summary>결과</summary>
+
 ![img.png](image/img_5.png)
 ![img_1.png](image/img_6.png)
+</details>
 
 </details>
 
-
-## 기타
+## 2. ControllerAdvice 예외 처리
 
 <details>
-  <summary>ResponseCookie</summary>
+  <summary></summary>
 
-- 서버에서 Cookie를 보낼 때 헤더에 저장하는데, 쿠키가 원래 헤더에 있음.
-- 클라이언트는 헤더에 Set-Cookie 가 있을 때, 해당 value를 이용하여 자동으로 쿠키를 저장하는 형식임.
-- 따라서 ResponseCookie는 Header에 추가하는 것임.
-- header 형식은 다음과 같음.
-  - Set-Cookie : refresh_token=값; refresh_token2=값;
+
+
 </details>
