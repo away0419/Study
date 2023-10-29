@@ -68,27 +68,29 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             // [STEP.07] context에 저장하여 나머지 필터에서 해당 객체를 통해 검사할 수 있도록 함. stateless 설정을 하면 로직 종료 후 저장된 객체는 삭제가 된다.
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // [STEP.08] 다음 필터로 넘기기
-            filterChain.doFilter(request, response);
-
 
             // 만약 CustomException이 발생할 경우 여기서 바로 처리할 것인지 또는 필터를 거친 뒤 RestControllerAdvice가 처리하게 할지 정하면 됨.
             // 또한 CustomException이 아닌 [인증, 인가] 예외의 경우  [CustomAuthenticationEntryPoint, CustomAccessDeniedHandler] 만들고 이를 SecurityConfig에 등록하여 처리.
             // 여기서 주의할 점은 JWT는 Security의 AuthenticationException를 상속 받지 않으므로 이 부분에서 처리해야함. 즉, CsutomException 처럼 만들어서 처리해야한다.
         } catch (CustomException e) {
-            response.setCharacterEncoding("UTF-8");
-            response.setContentType("application/json");
-            PrintWriter printWriter = response.getWriter();
-
-            HashMap<String, Object> jsonMap = new HashMap<>();
-            jsonMap.put("status", e.getCustomErrorCode().getState());
-            jsonMap.put("code", e.getCustomErrorCode().getState());
-            jsonMap.put("message", e.getCustomErrorCode().getMessage());
-            JSONObject jsonObject = new JSONObject(jsonMap);
-
-            printWriter.println(jsonObject);
-            printWriter.flush();
-            printWriter.close();
+            request.setAttribute("exception", e); // controlleradvice 용으로 저장
+//            response.setCharacterEncoding("UTF-8");
+//            response.setContentType("application/json");
+//            PrintWriter printWriter = response.getWriter();
+//
+//            HashMap<String, Object> jsonMap = new HashMap<>();
+//            jsonMap.put("status", e.getCustomErrorCode().getState());
+//            jsonMap.put("code", e.getCustomErrorCode().getState());
+//            jsonMap.put("message", e.getCustomErrorCode().getMessage());
+//            JSONObject jsonObject = new JSONObject(jsonMap);
+//
+//            printWriter.println(jsonObject);
+//            printWriter.flush();
+//            printWriter.close();
         }
+
+        // [STEP.08] 다음 필터로 넘기기
+        filterChain.doFilter(request, response); // controllerAdvice 용
+
     }
 }
