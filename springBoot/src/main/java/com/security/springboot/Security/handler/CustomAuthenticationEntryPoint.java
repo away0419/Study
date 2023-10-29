@@ -1,5 +1,6 @@
 package com.security.springboot.Security.handler;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +22,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint{
 
         JSONObject jsonObject; // response로 내보려는 정보를 담은 Json 객체
         HashMap<String, Object> responseMap = new HashMap<>(); // response 할 데이터를 담기 위한 맵
-        responseMap.put("msg", "로그인이 필요한 서비스 입니다.");
+        responseMap.put("msg", "인증 실패.");
         jsonObject = new JSONObject(responseMap);
 
         response.setCharacterEncoding("UTF-8");

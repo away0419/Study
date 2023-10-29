@@ -1,5 +1,7 @@
 package com.security.springboot.jwt;
 
+import com.security.springboot.Security.exception.CustomErrorCode;
+import com.security.springboot.Security.exception.CustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,21 +48,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         try {
             // [STEP.01] http header에서 AuthConstants.AUTH_HEADER를 가져오고 null 이면 에러
-            String header = Optional.ofNullable(request.getHeader(AuthConstants.AUTH_HEADER)).orElseThrow(() -> new Exception("Token is null"));
+            String header = Optional.ofNullable(request.getHeader(AuthConstants.AUTH_HEADER)).orElseThrow(() -> new CustomException(CustomErrorCode.AUTH_HEADER_NULL));
 
             // [STEP.02] Header에서 Token 추출하는데 null 이면 에러
-            String token = Optional.ofNullable(JWTProvider.getTokenFromHeader(header)).orElseThrow(() -> new Exception("Token type is invalid"));
+            String token = Optional.ofNullable(JWTProvider.getTokenFromHeader(header)).orElseThrow(() -> new CustomException(CustomErrorCode.TOKEN_NULL));
 
-            // [STEP.03] Token 유효성 검사
-            if (!JWTProvider.isValidToken(token)) {
-                throw new Exception("Token is invalid");
-            }
+            // [STEP.03] Token 유효성 검사.
+            JWTProvider.isValidToken(token);
 
             // [STEP.04] Token에서 Email 추출
-            String userEmail = Optional.ofNullable(JWTProvider.getUserEmailFromToken(token)).orElseThrow(() -> new Exception("Token isn't userEmail"));
+            String userEmail = Optional.ofNullable(JWTProvider.getUserEmailFromToken(token)).orElseThrow(() -> new CustomException(CustomErrorCode.USER_INFO_NULL));
 
             // [STEP.05] Token에서 Role 추출
-            String userRole = Optional.ofNullable(JWTProvider.getUserRoleFromToken(token)).orElseThrow(() -> new Exception("Token isn't userRole"));
+            String userRole = Optional.ofNullable(JWTProvider.getUserRoleFromToken(token)).orElseThrow(() -> new CustomException(CustomErrorCode.USER_INFO_NULL));
 
             // [STEP.06] JWT에서 가져온 정보로 인증 완료된 객체 만들기
             Authentication authentication = new UsernamePasswordAuthenticationToken(userEmail, null, Collections.singleton(new SimpleGrantedAuthority(userRole)));
@@ -72,15 +72,18 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
 
-        } catch (Exception e) {
+            // 만약 CustomException이 발생할 경우 여기서 바로 처리할 것인지 또는 필터를 거친 뒤 RestControllerAdvice가 처리하게 할지 정하면 됨.
+            // 또한 CustomException이 아닌 [인증, 인가] 예외의 경우  [CustomAuthenticationEntryPoint, CustomAccessDeniedHandler] 만들고 이를 SecurityConfig에 등록하여 처리.
+            // 여기서 주의할 점은 JWT는 Security의 AuthenticationException를 상속 받지 않으므로 이 부분에서 처리해야함. 즉, CsutomException 처럼 만들어서 처리해야한다.
+        } catch (CustomException e) {
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json");
             PrintWriter printWriter = response.getWriter();
 
             HashMap<String, Object> jsonMap = new HashMap<>();
-            jsonMap.put("status", 403);
-            jsonMap.put("code", "9999");
-            jsonMap.put("message", e.getMessage());
+            jsonMap.put("status", e.getCustomErrorCode().getState());
+            jsonMap.put("code", e.getCustomErrorCode().getState());
+            jsonMap.put("message", e.getCustomErrorCode().getMessage());
             JSONObject jsonObject = new JSONObject(jsonMap);
 
             printWriter.println(jsonObject);

@@ -1,5 +1,7 @@
 package com.security.springboot.jwt;
 
+import com.security.springboot.Security.exception.CustomErrorCode;
+import com.security.springboot.Security.exception.CustomException;
 import com.security.springboot.domain.User.Model.UserDetailsVO;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.Cookie;
@@ -117,30 +119,33 @@ public class JWTProvider {
 
 
     /**
-     * 토큰 유효성 검사 후 반환
-     *
+     * 토큰 유효성 검사 후 반환.
+     *  runtimeException이 발생하므로 JWT 구현할 때 놓치지 않도록 주의.
      * @param token
      * @return
      */
     public static boolean isValidToken(String token) {
-        try {
-            Claims claims = getClaimsFormToken(token);
-            log.info("userEmail : {}", claims.get("userEmail"));
-            log.info("userRole : {}", claims.get("userRole"));
-            log.info("토큰 발급자 : {}", claims.getSubject());
-            log.info("토큰 만료 시간 : {}", claims.getExpiration());
-            log.info("토큰 발급 시간 : {}", claims.getIssuedAt());
-            return true;
-        } catch (ExpiredJwtException e) {
-            log.error("Token Expired");
-            return false;
-        } catch (JwtException e) {
-            log.error("Token Tampered");
-            return false;
-        } catch (NullPointerException e) {
-            log.error("Token is null");
-            return false;
+        try{
+
+        Claims claims = getClaimsFormToken(token);
+        log.info("userEmail : {}", claims.get("userEmail"));
+        log.info("userRole : {}", claims.get("userRole"));
+        log.info("토큰 발급자 : {}", claims.getSubject());
+        log.info("토큰 만료 시간 : {}", claims.getExpiration());
+        log.info("토큰 발급 시간 : {}", claims.getIssuedAt());
+        }catch(SignatureException e){
+            throw new CustomException(CustomErrorCode.TOKEN_SIGNATURE);
+        }catch(MalformedJwtException e){
+            throw new CustomException(CustomErrorCode.TOKEN_MALFORMED);
+        }catch(ExpiredJwtException e){
+            throw new CustomException(CustomErrorCode.TOKEN_EXPIRED);
+        }catch(UnsupportedJwtException e){
+            throw new CustomException(CustomErrorCode.TOKEN_UNSUPPORTED);
+        }catch (IllegalArgumentException e){
+            throw new CustomException(CustomErrorCode.TOKEN_ILLEGALARGUMENT);
         }
+
+        return true;
     }
 
 
