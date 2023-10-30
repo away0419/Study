@@ -8,6 +8,8 @@ import com.security.springboot.Security.handler.CustomLoginFailureHandler;
 import com.security.springboot.Security.handler.CustomLoginSuccessHandler;
 import com.security.springboot.jwt.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,11 +24,16 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    // [STEP.08] CustomAuthenticationEntryPoint Bean 에서 가져오기
+    @Autowired
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     // 패스워드 인코더
     @Bean
@@ -82,11 +89,11 @@ public class SecurityConfig {
     }
 
 
-    // [STEP.08] CustomAuthenticationEntryPoint 생성
-    @Bean
-    public CustomAuthenticationEntryPoint customAuthenticationEntryPoint(){
-        return new CustomAuthenticationEntryPoint();
-    }
+    // [STEP.08] CustomAuthenticationEntryPoint 생성@Bean
+    //    public CustomAuthenticationEntryPoint customAuthenticationEntryPoint(){
+    //        return new CustomAuthenticationEntryPoint(resolver);
+    //    }
+
 
     // [STEP.09] filterChain 생성
     @Bean
@@ -109,7 +116,7 @@ public class SecurityConfig {
                 .addFilterBefore(customAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // UsernamePasswordAuthenticationFilter 실행 전 순서에 커스텀 필터 추가
                 .addFilterBefore(jwtAuthorizationFilter(), BasicAuthenticationFilter.class) // JWT 필터 추가
                 .exceptionHandling(it->{
-                    it.authenticationEntryPoint(customAuthenticationEntryPoint()); // 인증 되지 않은 사용자 접근 처리
+                    it.authenticationEntryPoint(customAuthenticationEntryPoint); // 인증 되지 않은 사용자 접근 처리
                     it.accessDeniedHandler(customAccessDeniedHandler()); // 인가 예외 처리
                 })
                 .build();
