@@ -64,6 +64,7 @@ GrantedAuthority 객체는 UserDetailsService로 불러올 수 있고, 특정 �
 
 - Security에서 사용하는 인증 인가 예외 처리 방법은 여러가지 존재함.
 - 이는 인증 후 성공 및 실패 처리와는 별개로 로직에서 예외가 발생한 경우 이를 처리하는 로직임.
+- JWT의 경우 JWT 인가 필터에서 try-catch를 이용하여 바로 처리할 수도 있음.
 
 #### [AuthenticationFailureHandler]
 
@@ -89,14 +90,16 @@ GrantedAuthority 객체는 UserDetailsService로 불러올 수 있고, 특정 �
 
 - 사용자가 직접 예외를 만들고, 이를 처리하는 로직을 따로 구현하여 예외를 직접 처리.
 - @ControllerAdvice 또는 @RestControllerAdvice를 작성하고 @ExceptionHandler를 통해 예외 처리.
-- AuthenticationException, AccessDeniedException은 위에 핸들러가 처리하기 때문에 핸들링 하려면 추가 설정이 필요함.
+- 인증, 인가에서 예외가 발생하면 EntryPoint가 작동하고 발생하지 않으면 작동 안함.
+- 발생한 에외를 request에 저장하고, 이를 EntryPoint에서 받아 확인한 뒤 예외 처리를 EntryPoint가 아닌 Spring Boot에 있는 예외 핸들러에 위임함.
+- 위임 받은 예외 핸들러는 @CotrollerAdvice에 등록 된 로직을 실행하게 되며 예외가 처리되는 구조임.
 - 장점
   - 위 방식들과 다르게 어디든 사용이 가능함.
   - 사용자가 만든 에러 처리 틀을 이욯할 수 있어 security 에러 뿐만 아니라 다른 에러와도 형식(반환 값 등)을 맞출 수 있음. (일관성)
   - 에러 코드를 한 곳에 모와 관리할 수 있음. (중앙 집중화)
   - 프로젝트에 맞는 보안 설계를 따를 수 있음.
 - 단점
-  - security exception에서 제공하는 기능을 활용하기 힘듬.
+  - @ControolerAdvice 사용법을 숙지해야함.
   - 디버깅이 어려움.
   - 보안 설계를 신중하게 설계 해야 함.
 
