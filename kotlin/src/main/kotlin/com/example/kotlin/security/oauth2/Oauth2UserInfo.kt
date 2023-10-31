@@ -10,6 +10,6 @@ class Oauth2UserInfo(
     val picture: String?
 ){
     fun toEntity(): Member {
-        return Member(id=null, name=name, email=email, picture=picture, role = Role.USER)
+        return Member(id=null, name=name, email=email, picture=picture, role = Role.ROLE_USER)
     }
 }

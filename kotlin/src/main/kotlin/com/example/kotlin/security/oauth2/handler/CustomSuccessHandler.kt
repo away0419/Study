@@ -25,7 +25,7 @@ class CustomSuccessHandler() :AuthenticationSuccessHandler  {
         val authorities = defaultOAuth2User?.attributes // DefaultOAuth2User에 있는 attributes 즉, Oauth2 로그인 시 받아온 유저 정보
 
         log.info("========CustomSuccessHandelr=========")
-        log.info("authentication : {}",authentication)
+        log.info("authentication : {}", authentication)
         log.info("principal : {} ",principal)
         log.info("details : {} ",details)
         log.info("name : {} ",name)

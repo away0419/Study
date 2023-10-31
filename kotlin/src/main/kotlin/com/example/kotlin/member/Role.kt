@@ -4,6 +4,6 @@ enum class Role(
     val key: String,
     val title: String
 ) {
-    ADMIN("ROLE_ADMIN", "관리자"),
-    USER("ROLE_USER", "사용자")
+    ROLE_ADMIN("ROLE_ADMIN", "관리자"),
+    ROLE_USER("ROLE_USER", "사용자")
 }
