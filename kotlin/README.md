@@ -60,22 +60,22 @@ Callback URL: http://localhost:8080/login/ouath2/code/naver
     <summary>kakao</summary>
 
 [kakao](https://developers.kakao.com/)
-![img.png](img.png)
-![img_1.png](img_1.png)
-![img_2.png](img_2.png)
-![img_3.png](img_3.png)
-![img_4.png](img_4.png)
-![img_5.png](img_5.png)
-![img_6.png](img_6.png)
-![img_7.png](img_7.png)
-![img_8.png](img_8.png)
-![img_9.png](img_9.png)
-![img_10.png](img_10.png)
-![img_11.png](img_11.png)
+![img.png](image/kakao/img.png)
+![img_1.png](image/kakao/img_1.png)
+![img_2.png](image/kakao/img_2.png)
+![img_3.png](image/kakao/img_3.png)
+![img_4.png](image/kakao/img_4.png)
+![img_5.png](image/kakao/img_5.png)
+![img_6.png](image/kakao/img_6.png)
+![img_7.png](image/kakao/img_7.png)
+![img_8.png](image/kakao/img_8.png)
+![img_9.png](image/kakao/img_9.png)
+![img_10.png](image/kakao/img_10.png)
+![img_11.png](image/kakao/img_11.png)
 ```text
 http://localhost:8080/login/oauth2/code/kakao
 ```
-![img_12.png](img_12.png)
+![img_12.png](image/kakao/img_12.png)
 
 </details>
 
