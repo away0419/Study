@@ -2,6 +2,8 @@ package com.example.kotlin.security.oauth2.service
 
 import com.example.kotlin.member.Member
 import com.example.kotlin.member.repository.MemberRepository
+import com.example.kotlin.security.jwt.MemberPrincipal
+import com.example.kotlin.security.oauth2.CustomOAuth2User
 import com.example.kotlin.security.oauth2.OAuth2Attributes
 import com.example.kotlin.security.oauth2.Oauth2UserInfo
 import jakarta.servlet.http.HttpSession
@@ -10,7 +12,6 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Service
 
@@ -19,7 +20,7 @@ class CustomOAuth2MemberService(
     private val memberRepository: MemberRepository,
     private val httpSession: HttpSession
 ): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-    override fun loadUser(userRequest: OAuth2UserRequest?): OAuth2User {
+    override fun loadUser(userRequest: OAuth2UserRequest?): CustomOAuth2User? {
         if (userRequest == null) throw OAuth2AuthenticationException("Oauth2 UserRequest Error")
 
         // userRequest에서 user 정보 가져오기
@@ -38,14 +39,20 @@ class CustomOAuth2MemberService(
         // 전달받은 OAuth2User의 attribute를 이용하여 회원가입 및 수정의 역할을 한다.
         val member = oauth2UserInfo?.let { saveOrUpdate(it) }
 
+        // 만들어낸 member entity로 principal 생성
+        val memberPrincipal = member?.let { MemberPrincipal(it) }
+
         // session에 SessionUser(user의 정보를 담는 객체)를 담아 저장한다.
 //        httpSession.setAttribute("user", SessionUser(user))
 
-        return DefaultOAuth2User(
-            setOf(SimpleGrantedAuthority(member?.role?.key)),
-            attributes,
-            userNameAttributeName
-        )
+        return memberPrincipal?.let {
+            CustomOAuth2User(
+                setOf(SimpleGrantedAuthority(member.role?.key)),
+                attributes,
+                userNameAttributeName,
+                it
+            )
+        }
     }
 
     fun saveOrUpdate(oauth2UserInfo: Oauth2UserInfo): Member {
