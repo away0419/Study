@@ -144,7 +144,7 @@ spring:
         naver:
           clientId: ${oauth2.client.naver.id}
           clientSecret: ${oauth2.client.naver.secret}
-          clientAuthenticationMethod: post
+          clientAuthenticationMethod: client_secret_post
           authorizationGrantType: authorization_code
           # application이 가지고 있는 기본 변수를 불러옴.
           redirectUri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
@@ -156,7 +156,7 @@ spring:
         kakao:
           clientId: ${oauth2.client.kakao.id}
           clientSecret: ${oauth2.client.kakao.secret}
-          clientAuthenticationMethod: post
+          clientAuthenticationMethod: client_secret_post
           authorizationGrantType: authorization_code
           redirectUri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
           scope:
@@ -170,7 +170,7 @@ spring:
           token_uri: https://kauth.kakao.com/oauth/token
           user-info-uri: https://kapi.kakao.com/v2/user/me
           # 해당 서비스에 요청하여 받은 데이터 안에는 user 정보가 있는데 이 정보를 담음 필드 명이 무엇인지 설정하는 것.
-          user_name_attribute: id
+          user_name_attribute: properties
         naver:
           authorization_uri: https://nid.naver.com/oauth2.0/authorize
           token_uri: https://nid.naver.com/oauth2.0/token
