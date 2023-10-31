@@ -1,6 +1,7 @@
 package com.example.kotlin.security.config
 
-import com.example.kotlin.security.oauth2.CustomOAuth2MemberService
+import com.example.kotlin.security.oauth2.handler.CustomSuccessHandler
+import com.example.kotlin.security.oauth2.service.CustomOAuth2MemberService
 import lombok.RequiredArgsConstructor
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -12,7 +13,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 @Configuration
 @RequiredArgsConstructor
 class SecurityConfig(
-    private val customOAuth2MemberService: CustomOAuth2MemberService
+    private val customOAuth2MemberService: CustomOAuth2MemberService,
+    private val customSuccessHandler: CustomSuccessHandler
 ) {
     private val urls = arrayOf(AntPathRequestMatcher("/h2-console/**"), AntPathRequestMatcher("/api/member/signup"), AntPathRequestMatcher("/api/member/login"), AntPathRequestMatcher("/api/member/oauth2/**"))
 
@@ -29,7 +31,8 @@ class SecurityConfig(
         } // 나머지 api 호출은 인증 받아야함
         .oauth2Login {
             it.userInfoEndpoint { point -> point.userService(customOAuth2MemberService) } // oauth2Login는 loadUser라는 함수를 호출하는게 기본임. 이를 custom하여 사용하는 것.
-            it.defaultSuccessUrl("/myspace") // 성공시
+            it.successHandler(customSuccessHandler) // 성공 시 핸들러
+            // it.defaultSuccessUrl("/myspace") // 성공시 이동 페이지
             it.failureUrl("/fail") // 실패시
         }
         .exceptionHandling { it.authenticationEntryPoint(LoginUrlAuthenticationEntryPoint("/login")) } // 인증 되지 않은 사용자가 접근시 login으로 이동

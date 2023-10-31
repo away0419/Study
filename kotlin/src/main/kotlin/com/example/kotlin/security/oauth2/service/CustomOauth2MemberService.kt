@@ -1,7 +1,9 @@
-package com.example.kotlin.security.oauth2
+package com.example.kotlin.security.oauth2.service
 
 import com.example.kotlin.member.Member
 import com.example.kotlin.member.repository.MemberRepository
+import com.example.kotlin.security.oauth2.OAuth2Attributes
+import com.example.kotlin.security.oauth2.Oauth2UserInfo
 import jakarta.servlet.http.HttpSession
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
@@ -26,12 +28,12 @@ class CustomOAuth2MemberService(
 
         // registrationId는 Oauth2 서비스 이름 (구글, 네이버, 카카오 등)
         val registrationId = userRequest.clientRegistration.registrationId
-        // OAuth2 로그인 진행시 키가 되는 필드값
+        // OAuth2 로그인 하면 서비스 별 유저가 가지는 고유 키가 있는 듯. 그 키의 필드 값.
         val userNameAttributeName = userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
         // OAuth2 서비스의 유저 정보들
         val attributes = oAuth2User.attributes;
-        // userInfo 추출
-        val oauth2UserInfo = OAuth2Attributes.extract(registrationId,attributes)
+        // 서비스의 유저 정보를 개발자가 만든 객체 형태로 매핑
+        val oauth2UserInfo = OAuth2Attributes.extract(registrationId, attributes)
 
         // 전달받은 OAuth2User의 attribute를 이용하여 회원가입 및 수정의 역할을 한다.
         val member = oauth2UserInfo?.let { saveOrUpdate(it) }
