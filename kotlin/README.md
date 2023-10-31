@@ -219,68 +219,99 @@ oauth2.client:
 
 - 사용자 권한
 
-```kotlin
-package com.example.kotlin.member
-
-enum class Role(
-    val key: String,
-    val title: String
-) {
-    ADMIN("ROLE_ADMIN", "관리자"),
-    USER("ROLE_USER", "사용자")
-}
-```
+    ```kotlin
+    package com.example.kotlin.member
+    
+    enum class Role(
+        val key: String,
+        val title: String
+    ) {
+        ROLE_ADMIN("ROLE_ADMIN", "관리자"),
+        ROLE_USER("ROLE_USER", "사용자")
+    }
+    ```
 </details>
 
 <details>
     <summary>Member</summary>
 
-```kotlin
-package com.example.kotlin.member
+- db 저장 할 멤버 정보
 
-import jakarta.persistence.*
-import java.util.*
-
-@Entity
-@Table(name = "MEMBER_TABLE")
-class Member(
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "member_id", nullable = false)
-    var id: UUID?,
-
-    @Column(name = "name", nullable = false)
-    var name: String?,
-
-    @Column(name = "email")
-    var email: String?,
-
-    @Column(name = "picture")
-    var picture: String?,
-
-    @Enumerated(EnumType.STRING)
-    var role: Role?
-
-)
-```
+    ```kotlin
+    package com.example.kotlin.member
+    
+    import jakarta.persistence.*
+    import java.util.*
+    
+    @Entity
+    @Table(name = "MEMBER_TABLE")
+    class Member(
+        @Id
+        @GeneratedValue(strategy = GenerationType.UUID)
+        @Column(name = "member_id", nullable = false)
+        var id: UUID?,
+    
+        @Column(name = "name", nullable = false)
+        var name: String?,
+    
+        @Column(name = "email")
+        var email: String?,
+    
+        @Column(name = "picture")
+        var picture: String?,
+    
+        @Enumerated(EnumType.STRING)
+        var role: Role?
+    
+    )
+    ```
 </details>
 
 <details>
     <summary>MemberRepository</summary>
 
+- JPA를 이용한 멤버 등록
+
+    ```kotlin
+    package com.example.kotlin.member.repository
+    
+    import com.example.kotlin.member.Member
+    import org.springframework.data.jpa.repository.JpaRepository
+    
+    interface MemberRepository : JpaRepository<Member, Long> {
+        fun findByEmail(email: String): Member?
+    }
+    ```
+</details>
+<details>
+    <summary>MemberController</summary>
+
+- 멤버 컨트롤러
+
 ```kotlin
-package com.example.kotlin.member.repository
+package com.example.kotlin.member.controller
 
-import com.example.kotlin.member.Member
-import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
-interface MemberRepository : JpaRepository<Member, Long> {
-    fun findByEmail(email: String): Member?
+@RestController
+@RequestMapping("/api/v1/member")
+class MemberController {
+
+    @GetMapping("/login/success")
+    fun login() : String?{
+        return "login success"
+    }
+
 }
 ```
+
 </details>
 
-### Security
+
+### OAuth2
 
 - security의 OAuth2를 사용하기 위한 설정 및 로직 구현
 
@@ -288,25 +319,26 @@ interface MemberRepository : JpaRepository<Member, Long> {
     <summary>Oauth2UserInfo</summary>
 
 - OAuth2에서 가져온 사용자 정보를 담을 클래스.
-- 첫 로그인의 경우 관리자는 아닐 것이라 판단하여 user로 줌
-
-```kotlin
-package com.example.kotlin.security.oauth2
-
-import com.example.kotlin.member.Member
-import com.example.kotlin.member.Role
-
-class Oauth2UserInfo(
-    val id: String?,
-    val name: String?,
-    val email: String?,
-    val picture: String?
-){
-    fun toEntity(): Member {
-        return Member(id=null, name=name, email=email, picture=picture, role = Role.USER)
+- 가져온 사용자 정보를 토대로 Member Entity 생성
+- 첫 로그인의 경우 관리자는 아닐 것이라 판단하여 ROLE_USER로 줌
+    
+    ```kotlin
+    package com.example.kotlin.security.oauth2
+    
+    import com.example.kotlin.member.Member
+    import com.example.kotlin.member.Role
+    
+    class Oauth2UserInfo(
+        val id: String?,
+        val name: String?,
+        val email: String?,
+        val picture: String?
+    ){
+        fun toEntity(): Member {
+            return Member(id=null, name=name, email=email, picture=picture, role = Role.ROLE_USER)
+        }
     }
-}
-```
+    ```
 </details>
 
 <details>
@@ -373,107 +405,165 @@ enum class OAuth2Attributes(
 <details>
     <summary>CustomOAuth2MemberService</summary>
 
+- 사용자가 OAuth2 로그인 할 때 수행되는 비즈니스 로직
+- 서비스 별 가져온 사용자의 필드가 다르므로 개발자가 구현한 OAut2UserInfo 형식으로 매핑 후 반환.
+- 반환된 DefaultOAuth2User는 Authentication가 됨.
 
-- 사용자가 로그인 할 때 수행할 비즈니스 로직
-```kotlin
-package com.example.kotlin.security.oauth2
-
-import com.example.kotlin.member.Member
-import com.example.kotlin.member.repository.MemberRepository
-import jakarta.servlet.http.HttpSession
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User
-import org.springframework.security.oauth2.core.user.OAuth2User
-import org.springframework.stereotype.Service
-
-@Service
-class CustomOAuth2MemberService(
-    private val memberRepository: MemberRepository,
-    private val httpSession: HttpSession
-): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-    override fun loadUser(userRequest: OAuth2UserRequest?): OAuth2User {
-        if (userRequest == null) throw OAuth2AuthenticationException("Oauth2 UserRequest Error")
-
-        // userRequest에서 user 정보 가져오기
-        val delegate = DefaultOAuth2UserService()
-        val oAuth2User = delegate.loadUser(userRequest)
-
-        // registrationId는 Oauth2 서비스 이름 (구글, 네이버, 카카오 등)
-        val registrationId = userRequest.clientRegistration.registrationId
-        // OAuth2 로그인 진행시 키가 되는 필드값
-        val userNameAttributeName = userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
-        // OAuth2 서비스의 유저 정보들
-        val attributes = oAuth2User.attributes;
-        // userInfo 추출
-        val oauth2UserInfo = OAuth2Attributes.extract(registrationId,attributes)
-
-        // 전달받은 OAuth2User의 attribute를 이용하여 회원가입 및 수정의 역할을 한다.
-        val member = oauth2UserInfo?.let { saveOrUpdate(it) }
-
-        // session에 SessionUser(user의 정보를 담는 객체)를 담아 저장한다.
-//        httpSession.setAttribute("user", SessionUser(user))
-
-        return DefaultOAuth2User(
-            setOf(SimpleGrantedAuthority(member?.role?.key)),
-            attributes,
-            userNameAttributeName
-        )
+    ```kotlin
+    package com.example.kotlin.security.oauth2.service
+    
+    import com.example.kotlin.member.Member
+    import com.example.kotlin.member.repository.MemberRepository
+    import com.example.kotlin.security.oauth2.OAuth2Attributes
+    import com.example.kotlin.security.oauth2.Oauth2UserInfo
+    import jakarta.servlet.http.HttpSession
+    import org.springframework.security.core.authority.SimpleGrantedAuthority
+    import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
+    import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
+    import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
+    import org.springframework.security.oauth2.core.OAuth2AuthenticationException
+    import org.springframework.security.oauth2.core.user.DefaultOAuth2User
+    import org.springframework.security.oauth2.core.user.OAuth2User
+    import org.springframework.stereotype.Service
+    
+    @Service
+    class CustomOAuth2MemberService(
+        private val memberRepository: MemberRepository,
+        private val httpSession: HttpSession
+    ): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+        override fun loadUser(userRequest: OAuth2UserRequest?): OAuth2User {
+            if (userRequest == null) throw OAuth2AuthenticationException("Oauth2 UserRequest Error")
+    
+            // userRequest에서 user 정보 가져오기
+            val delegate = DefaultOAuth2UserService()
+            val oAuth2User = delegate.loadUser(userRequest)
+    
+            // registrationId는 Oauth2 서비스 이름 (구글, 네이버, 카카오 등)
+            val registrationId = userRequest.clientRegistration.registrationId
+            // OAuth2 로그인 하면 서비스 별 유저가 가지는 고유 키가 있는 듯. 그 키의 필드 값.
+            val userNameAttributeName = userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
+            // OAuth2 서비스의 유저 정보들
+            val attributes = oAuth2User.attributes;
+            // 서비스의 유저 정보를 개발자가 만든 객체 형태로 매핑
+            val oauth2UserInfo = OAuth2Attributes.extract(registrationId, attributes)
+    
+            // 전달받은 OAuth2User의 attribute를 이용하여 회원가입 및 수정의 역할을 한다.
+            val member = oauth2UserInfo?.let { saveOrUpdate(it) }
+    
+            // session에 SessionUser(user의 정보를 담는 객체)를 담아 저장한다.
+    //        httpSession.setAttribute("user", SessionUser(user))
+    
+            return DefaultOAuth2User(
+                setOf(SimpleGrantedAuthority(member?.role?.key)),
+                attributes,
+                userNameAttributeName
+            )
+        }
+    
+        fun saveOrUpdate(oauth2UserInfo: Oauth2UserInfo): Member {
+            val member = memberRepository.findByEmail(oauth2UserInfo.email?:"")
+                ?: oauth2UserInfo.toEntity()
+    
+            return memberRepository.save(member)
+        }
     }
+    ```
+</details>
 
-    fun saveOrUpdate(oauth2UserInfo: Oauth2UserInfo): Member {
-        val member = memberRepository.findByEmail(oauth2UserInfo.email?:"")
-            ?: oauth2UserInfo.toEntity()
+<details>
+    <summary>CustomSuccessHandler</summary>
 
-        return memberRepository.save(member)
+- OAuth2 로그인 성공 시 실행 되는 로직.
+
+    ```kotlin
+    package com.example.kotlin.security.oauth2.handler
+    
+    import jakarta.servlet.http.HttpServletRequest
+    import jakarta.servlet.http.HttpServletResponse
+    import org.slf4j.LoggerFactory
+    import org.springframework.security.core.Authentication
+    import org.springframework.security.oauth2.core.user.DefaultOAuth2User
+    import org.springframework.security.web.authentication.AuthenticationSuccessHandler
+    import org.springframework.stereotype.Component
+    
+    @Component
+    class CustomSuccessHandler() :AuthenticationSuccessHandler  {
+        private val log = LoggerFactory.getLogger(this.javaClass)!!
+        override fun onAuthenticationSuccess(
+            request: HttpServletRequest?,
+            response: HttpServletResponse?,
+            authentication: Authentication?
+        ) {
+    
+            val principal = authentication?.principal // 인증 완료한 객체의 principal을 가져옴. 이때 OAuth2의 principal에는 DefaultOAuth2User가 들어간다.
+            val authorization = authentication?.authorities // 권한 목록
+            val details = authentication?.details // 기타 정보
+            val name = authentication?.name // DefaultOAuth2User 에 있는 userNameAttributeName 인듯
+            val defaultOAuth2User = principal as? DefaultOAuth2User // 일단 DefaultOAuth2User로 형변환
+            val authorities = defaultOAuth2User?.attributes // DefaultOAuth2User에 있는 attributes 즉, Oauth2 로그인 시 받아온 유저 정보
+    
+            log.info("========CustomSuccessHandelr=========")
+            log.info("authentication : {}",authentication)
+            log.info("principal : {} ",principal)
+            log.info("details : {} ",details)
+            log.info("name : {} ",name)
+            log.info("authorization : {} ",authorization)
+            log.info ("authorities : {}", authorities)
+    
+            
+    
+            response?.sendRedirect("/page")
+        }
     }
-}
-```
+    ```
+
 </details>
 
 <details>
     <summary>SecurityConfig</summary>
 
-```kotlin
-package com.example.kotlin.security.config
+- OAuth2를 적용하기 위한 설정 추가.
 
-import com.example.kotlin.security.oauth2.CustomOAuth2MemberService
-import lombok.RequiredArgsConstructor
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
-
-@Configuration
-@RequiredArgsConstructor
-class SecurityConfig(
-    private val customOAuth2MemberService: CustomOAuth2MemberService
-) {
-    private val urls = arrayOf(AntPathRequestMatcher("/h2-console/**"), AntPathRequestMatcher("/api/member/signup"), AntPathRequestMatcher("/api/member/login"), AntPathRequestMatcher("/api/member/oauth2/**"))
-
-    @Bean
-    fun filterChain(http: HttpSecurity) = http
-        .headers {it.frameOptions{it.disable()}}
-        .csrf { it.disable() } // csrf off
-        .cors { it.disable() } // cors off
-        .formLogin { it.disable() } // security login page off
-        .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.NEVER) } //필요하다면 세션 생성. (API는 session이 필요 없지만 google 계정 정보를 가져오기 위해 session이 필요함)
-        .authorizeHttpRequests {
-            it.requestMatchers(*urls).anonymous() // [signup, login] 누구나 접근 가능
-                .anyRequest().authenticated()
-        } // 나머지 api 호출은 인증 받아야함
-        .oauth2Login {
-            it.userInfoEndpoint { point -> point.userService(customOAuth2MemberService) } // oauth2Login는 loadUser라는 함수를 호출하는게 기본임. 이를 custom하여 사용하는 것.
-            it.defaultSuccessUrl("/myspace") // 성공시
-            it.failureUrl("/fail") // 실패시
-        }
-        .exceptionHandling { it.authenticationEntryPoint(LoginUrlAuthenticationEntryPoint("/login")) } // 인증 되지 않은 사용자가 접근시 login으로 이동
-        .build()!!
-}
-```
+    ```kotlin
+    package com.example.kotlin.security.config
+    
+    import com.example.kotlin.security.oauth2.handler.CustomSuccessHandler
+    import com.example.kotlin.security.oauth2.service.CustomOAuth2MemberService
+    import lombok.RequiredArgsConstructor
+    import org.springframework.context.annotation.Bean
+    import org.springframework.context.annotation.Configuration
+    import org.springframework.security.config.annotation.web.builders.HttpSecurity
+    import org.springframework.security.config.http.SessionCreationPolicy
+    import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint
+    import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+    
+    @Configuration
+    @RequiredArgsConstructor
+    class SecurityConfig(
+        private val customOAuth2MemberService: CustomOAuth2MemberService,
+        private val customSuccessHandler: CustomSuccessHandler
+    ) {
+        private val urls = arrayOf(AntPathRequestMatcher("/h2-console/**"), AntPathRequestMatcher("/api/member/signup"), AntPathRequestMatcher("/api/member/login"), AntPathRequestMatcher("/api/member/oauth2/**"))
+    
+        @Bean
+        fun filterChain(http: HttpSecurity) = http
+            .headers {it.frameOptions{it.disable()}}
+            .csrf { it.disable() } // csrf off
+            .cors { it.disable() } // cors off
+            .formLogin { it.disable() } // security login page off
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.NEVER) } //필요하다면 세션 생성. (API는 session이 필요 없지만 google 계정 정보를 가져오기 위해 session이 필요함)
+            .authorizeHttpRequests {
+                it.requestMatchers(*urls).anonymous() // [signup, login] 누구나 접근 가능
+                    .anyRequest().authenticated()
+            } // 나머지 api 호출은 인증 받아야함
+            .oauth2Login {
+                it.userInfoEndpoint { point -> point.userService(customOAuth2MemberService) } // oauth2Login는 loadUser라는 함수를 호출하는게 기본임. 이를 custom하여 사용하는 것.
+                it.successHandler(customSuccessHandler) // 성공 시 핸들러
+                // it.defaultSuccessUrl("/myspace") // 성공시 이동 페이지
+                it.failureUrl("/fail") // 실패시
+            }
+            .exceptionHandling { it.authenticationEntryPoint(LoginUrlAuthenticationEntryPoint("/login")) } // 인증 되지 않은 사용자가 접근시 login으로 이동
+            .build()!!
+    }
+    ```
 </details>
