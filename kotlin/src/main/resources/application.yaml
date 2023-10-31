@@ -37,7 +37,7 @@ spring:
         naver:
           clientId: ${oauth2.client.naver.id}
           clientSecret: ${oauth2.client.naver.secret}
-          clientAuthenticationMethod: post
+          clientAuthenticationMethod: client_secret_post
           authorizationGrantType: authorization_code
           # application이 가지고 있는 기본 변수를 불러옴.
           redirectUri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
@@ -49,7 +49,7 @@ spring:
         kakao:
           clientId: ${oauth2.client.kakao.id}
           clientSecret: ${oauth2.client.kakao.secret}
-          clientAuthenticationMethod: post
+          clientAuthenticationMethod: client_secret_post
           authorizationGrantType: authorization_code
           redirectUri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
           scope:
