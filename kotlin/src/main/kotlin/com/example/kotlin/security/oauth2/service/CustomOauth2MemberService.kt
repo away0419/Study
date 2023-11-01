@@ -20,7 +20,7 @@ class CustomOAuth2MemberService(
     private val memberRepository: MemberRepository,
     private val httpSession: HttpSession
 ): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-    override fun loadUser(userRequest: OAuth2UserRequest?): CustomOAuth2User? {
+    override fun loadUser(userRequest: OAuth2UserRequest?): CustomOAuth2User {
         if (userRequest == null) throw OAuth2AuthenticationException("Oauth2 UserRequest Error")
 
         // userRequest에서 user 정보 가져오기
@@ -34,25 +34,23 @@ class CustomOAuth2MemberService(
         // OAuth2 서비스의 유저 정보들
         val attributes = oAuth2User.attributes;
         // 서비스의 유저 정보를 개발자가 만든 객체 형태로 매핑
-        val oauth2UserInfo = OAuth2Attributes.extract(registrationId, attributes)
+        val oauth2UserInfo = OAuth2Attributes.extract(registrationId, attributes) ?: throw  Exception("")
 
         // 전달받은 OAuth2User의 attribute를 이용하여 회원가입 및 수정의 역할을 한다.
-        val member = oauth2UserInfo?.let { saveOrUpdate(it) }
+        val member = saveOrUpdate(oauth2UserInfo)
 
         // 만들어낸 member entity로 principal 생성
-        val memberPrincipal = member?.let { MemberPrincipal(it) }
+        val memberPrincipal = MemberPrincipal(member)
 
         // session에 SessionUser(user의 정보를 담는 객체)를 담아 저장한다.
 //        httpSession.setAttribute("user", SessionUser(user))
 
-        return memberPrincipal?.let {
-            CustomOAuth2User(
-                setOf(SimpleGrantedAuthority(member.role?.key)),
-                attributes,
-                userNameAttributeName,
-                it
-            )
-        }
+        return CustomOAuth2User(
+            setOf(SimpleGrantedAuthority(member.role?.key)),
+            attributes,
+            userNameAttributeName,
+            memberPrincipal
+        )
     }
 
     fun saveOrUpdate(oauth2UserInfo: Oauth2UserInfo): Member {
