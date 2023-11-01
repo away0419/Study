@@ -159,3 +159,13 @@ B
 random/B23059.java,b\a\ba4557693e8541ac95b5528db564d7aac3465db9
 A
 review/B6443.java,d\d\dd2d1308b313282f6028831f4f19cce157802a0a
+B
+random/B20040.java,6\8\6810a847bebabca2507c6e6c137602a480ee8752
+S
+#.idea/sonarlint/issuestore/index.pb,9\f\9fe84ebb15faf917b7def6236dba604453cc61e0
+]
+-.idea/sonarlint/securityhotspotstore/index.pb,8\8\88a9255124c95bdc913197c120a8d560edc59c8e
+B
+random/B14462.java,e\3\e3043e0a338b9b0f3bdaac14c8f2e2ae96400bc1
+B
+random/B12107.java,b\1\b1507075a06796164f42f35f9234ed58422242f1
