@@ -53,10 +53,9 @@ class CustomOAuth2MemberService(
         )
     }
 
-    fun saveOrUpdate(oauth2UserInfo: Oauth2UserInfo): Member {
-        val member = memberRepository.findByEmail(oauth2UserInfo.email?:"")
-            ?: oauth2UserInfo.toEntity()
+    fun saveOrUpdate(oauth2UserInfo: OAuth2UserInfo): Member {
+        return memberRepository.findByEmail(oauth2UserInfo.email ?: "")
+            ?: memberRepository.save(oauth2UserInfo.toEntity())
 
-        return memberRepository.save(member)
     }
 }
