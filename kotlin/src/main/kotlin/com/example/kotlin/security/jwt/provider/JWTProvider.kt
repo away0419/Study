@@ -15,6 +15,7 @@ import org.springframework.security.oauth2.jwt.JwtException
 import org.springframework.stereotype.Component
 import java.security.Key
 import java.util.*
+import javax.crypto.spec.SecretKeySpec
 
 @Component
 class JWTProvider {
@@ -38,7 +39,7 @@ class JWTProvider {
 
     private fun createSignature(): Key {
         val apiKeySecretBytes = DatatypeConverter.parseBase64Binary(jwtSecretKey)
-        return Keys.hmacShaKeyFor(apiKeySecretBytes)
+        return SecretKeySpec(apiKeySecretBytes, SignatureAlgorithm.HS256.jcaName)
     }
 
     private fun createExpiredDate(): Date {
@@ -58,9 +59,9 @@ class JWTProvider {
             .compact()
     }
 
-    fun getTokenFromHeader(header: String): String? {
+    fun getTokenFromHeader(header: String): String {
         if (!header.startsWith(AuthConstants.TOKEN_TYPE)) {
-            return null
+            throw Exception("${AuthConstants.TOKEN_TYPE} is not match")
         }
         return header.split(" ")[1]
     }
@@ -75,20 +76,17 @@ class JWTProvider {
             log.info("토큰 발급 시간 : {}", claims.issuedAt)
             true
         } catch (e: ExpiredJwtException) {
-            log.error("Token Expired")
-            false
+            throw Exception("Token Expired")
         } catch (e: JwtException) {
-            log.error("Token Tampered or Invalid")
-            false
+            throw Exception("Token Tampered or Invalid")
         } catch (e: NullPointerException) {
-            log.error("Token is null")
-            false
+            throw Exception("Token is null")
         }
     }
 
     private fun getClaimsFromToken(token: String): Claims {
         return Jwts.parserBuilder()
-            .setSigningKey(createSignature())
+            .setSigningKey(DatatypeConverter.parseBase64Binary(jwtSecretKey))
             .build()
             .parseClaimsJws(token)
             .body

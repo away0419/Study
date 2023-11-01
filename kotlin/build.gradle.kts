@@ -44,6 +44,9 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
     implementation("com.sun.xml.bind:jaxb-impl:4.0.1")
     implementation("com.sun.xml.bind:jaxb-core:4.0.1")
+    implementation ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")	// LocalDateTime 역직렬화 해결 패키지
+    implementation ("com.googlecode.json-simple:json-simple:1.1.1")	// Google Simple JSON
+    implementation ("com.fasterxml.jackson.core:jackson-databind")	// Jackson Databind
     compileOnly("org.projectlombok:lombok:1.18.24")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("com.h2database:h2")
