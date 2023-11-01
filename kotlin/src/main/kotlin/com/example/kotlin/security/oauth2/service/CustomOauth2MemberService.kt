@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service
 class CustomOAuth2MemberService(
     private val memberRepository: MemberRepository,
     private val httpSession: HttpSession
-): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+) : OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     override fun loadUser(userRequest: OAuth2UserRequest?): CustomOAuth2User {
         if (userRequest == null) throw OAuth2AuthenticationException("Oauth2 UserRequest Error")
 
@@ -30,11 +30,12 @@ class CustomOAuth2MemberService(
         // registrationId는 Oauth2 서비스 이름 (구글, 네이버, 카카오 등)
         val registrationId = userRequest.clientRegistration.registrationId
         // OAuth2 로그인 하면 서비스 별 유저가 가지는 고유 키가 있는 듯. 그 키의 필드 값.
-        val userNameAttributeName = userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
+        val userNameAttributeName =
+            userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
         // OAuth2 서비스의 유저 정보들
         val attributes = oAuth2User.attributes;
         // 서비스의 유저 정보를 개발자가 만든 객체 형태로 매핑
-        val oauth2UserInfo = OAuth2Attributes.extract(registrationId, attributes) ?: throw  Exception("")
+        val oauth2UserInfo = OAuth2Attributes.extract(registrationId, attributes) ?: throw Exception("")
 
         // 전달받은 OAuth2User의 attribute를 이용하여 회원가입 및 수정의 역할을 한다.
         val member = saveOrUpdate(oauth2UserInfo)
@@ -53,9 +54,8 @@ class CustomOAuth2MemberService(
         )
     }
 
-    fun saveOrUpdate(oauth2UserInfo: OAuth2UserInfo): Member {
+    fun saveOrUpdate(oauth2UserInfo: Oauth2UserInfo): Member {
         return memberRepository.findByEmail(oauth2UserInfo.email ?: "")
             ?: memberRepository.save(oauth2UserInfo.toEntity())
-
     }
 }
