@@ -4,32 +4,32 @@
     <summary>인스턴스 생성</summary>
 
 1. [리소스 실행] VM 인스턴스 생성 클릭
-![Alt text](image/1.png)
+   ![Alt text](image/1.png)
 
 <br/>
 
 2. [이미지 및 구성] 이미지 변경 클릭
-![Alt text](image/2.png)
+   ![Alt text](image/2.png)
 
 <br/>
 
 3. [이미지 선택] 서버 운영체제 고른 후 이미지 선택
-![Alt text](image/3.png)
+   ![Alt text](image/3.png)
 
 <br/>
 
 4. [SSH키 추가] 서버에 접속할때 사용하기 위한 키 다운로드 (다시 발급받을 수 없으므로 파일을 관리해야함.)
-![Alt text](image/4.png)
+   ![Alt text](image/4.png)
 
 <br/>
 
 5. [생성] 인스턴스 생성
-![Alt text](image/5.png)
+   ![Alt text](image/5.png)
 
 <br/>
 
 6. [인스턴스] 기다리면 초록색으로 변경되고 구성이 완료됨.
-![Alt text](image/6.png)
+   ![Alt text](image/6.png)
 
 </details>
 
@@ -38,17 +38,17 @@
 
 1. [모바엑스텀 설치](https://mobaxterm.mobatek.net/)
 2. [세션] 새로운 세션 만들기 위해 세션 클릭
-![Alt text](image2/1.png)
+   ![Alt text](image2/1.png)
 
 <br/>
 
 3. [SSH] Remote host : 인스턴스 공용 IPv4 주소를 넣어주고, 인스턴스 생성하며 발급 받은 키 파일을 등록.
-![Alt text](image2/2.png)
+   ![Alt text](image2/2.png)
 
 <br/>
 
-4. [접속] 기본 로그인은 ubuntu. 
-![Alt text](image2/3.png)
+4. [접속] 기본 로그인은 ubuntu.
+   ![Alt text](image2/3.png)
 
 </details>
 
@@ -56,65 +56,68 @@
     <summary>방화벽 설정</summary>
 
 1. 먼저 ubuntu에서 업데이트를 해줌.
-    ```ubuntu
-    sudo apt update
-    ```
+   ```ubuntu
+   sudo apt update
+   ```
 
 <br/>
 
 2. ubuntu에서 특정 포트 방화벽 해제
-    ```ubuntu
-    ## firewall을 이용한 포트 열기
-    # firewall 설치
-    sudo apt install firewalld
 
-    # 특정 포트 열기 규칙 추가
-    sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
+   ```ubuntu
+   ## firewall을 이용한 포트 열기
+   # firewall 설치
+   sudo apt install firewalld
 
-    # 추가한 규칙 적용 하는 초기화
-    sudo firewall-cmd --reload
+   # 특정 포트 열기 규칙 추가
+   sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
+
+   # 추가한 규칙 적용 하는 초기화
+   sudo firewall-cmd --reload
 
 
-    ## iptables를 이용한 포트 열기
-    # 특정 포트 규칙 추가
-    sudo iptables -I INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
+   ## iptables를 이용한 포트 열기
+   # 특정 포트 규칙 추가
+   sudo iptables -I INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
 
-    # 특정 포트 규칙 삭제
-    sudo iptables -D INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
+   # 특정 포트 규칙 삭제
+   sudo iptables -D INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
 
-    # 특정 IP로만 특정 포트 규칙 추가
-    sudo iptables -I INPUT -p tcp -s 123.123.123.123 --dport 8009 -j ACCEPT
+   # 특정 IP로만 특정 포트 규칙 추가
+   sudo iptables -I INPUT -p tcp -s 123.123.123.123 --dport 8009 -j ACCEPT
 
-    # 위의 규칙 삭제
-    iptables -D INPUT -p tcp -s 123.123.123.123 --dport 8009 -j ACCEPT
+   # 위의 규칙 삭제
+   iptables -D INPUT -p tcp -s 123.123.123.123 --dport 8009 -j ACCEPT
 
-    # 변경 사항 저장
-    sudo netfilter-persistent save
+   # 변경 사항 저장
+   sudo netfilter-persistent save
 
-    # 추가한 규칙 초기화
-    sudo iptables -F
 
-    ```
+   ## 공통
+   # 추가한 규칙 초기화
+   sudo iptables -F
+
+   ```
 
 <br/>
 
 3. 서브넷 방화벽 해제를 위해 서브넷 접속
-![Alt text](image3/1.png)
+   ![Alt text](image3/1.png)
 
 <br/>
 
 4. 보안 목록 선택
-![Alt text](image3/2.png)
+   ![Alt text](image3/2.png)
 
 <br/>
 
 4. 신규 규칙 추가
-![Alt text](image3/3.png)
+   ![Alt text](image3/3.png)
 
 <br/>
 
 5. 서버간 라우팅 허용 규칙 추가
-![Alt text](image3/4.png)
+   ![Alt text](image3/4.png)
 
 </details>
 
@@ -124,6 +127,7 @@
 ```ubuntu
 sudo timedatectl set-timezone Asia/Seoul
 ```
+
 </details>
 
 <details>
@@ -184,7 +188,7 @@ sudo chmod 666 /var/run/docker.sock
 sudo usermod -aG docker $USER
 sudo service docker restart
 
-# 버전 확인 
+# 버전 확인
 docker --version
 
 # 현재 실행중인 도커 확인
@@ -201,6 +205,7 @@ sudo rm /etc/apparmor.d/docker
 sudo groupdel docker
 sudo rm -rf /var/run/docker.sock
 ```
+
 </details>
 
 <details>
@@ -230,14 +235,11 @@ docker run -m 512m --name jenkins-docker -d -p 8000:8080 -p 8888:50000 -v /home/
 
 - `p`: 서버의 9090포트와 컨테이너 내부 8080포트를 연결한다.
 
-- `v`: 서버의 `/home/jenkins`경로와 컨테이너 내부 `/var/jenkins_home`경로를 마운트한다.  이것을 하는 이유는, Jenkins 설치 시 ssh 키값 생성, 저장소 참조 등을 용이하게 하기 위함입니다.
-
+- `v`: 서버의 `/home/jenkins`경로와 컨테이너 내부 `/var/jenkins_home`경로를 마운트한다. 이것을 하는 이유는, Jenkins 설치 시 ssh 키값 생성, 저장소 참조 등을 용이하게 하기 위함입니다.
 
 - `u`: 실행할 사용자를 root으로 설정한다.
 
 - 포트는 ec2 인스턴스의 8000, 8888번 포트를 도커 컨테이너의 8080, 50000번 포트에 대응시킨다.
-
-
 
 </details>
 
@@ -254,13 +256,14 @@ docker run -m 512m --name jenkins-docker -d -p 8000:8080 -p 8888:50000 -v /home/
 
 - docker image를 만들기 위한 파일임.
 - 확장자 명은 따로 없으며 Dockerfile 이라는 이름을 가짐.
+
 ```Dockerfile
 # 해당 Dockerfile은 front 배포 시 사용한 예시
 
 FROM node:14.21.3 as build-stage
 WORKDIR /app
 COPY package*.json ./
-RUN npm install 
+RUN npm install
 COPY . .
 RUN npm run build
 
@@ -269,7 +272,6 @@ COPY --from=build-stage /app/dist /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
-
 
 </details>
 
@@ -296,7 +298,6 @@ docker-compose --version
 2. [간단 문법](https://darrengwon.tistory.com/793)
 
 </details>
-
 
 <details>
     <summary>nginx 설치</summary>
@@ -325,6 +326,7 @@ docker pull nginx
 # docker로 실행하기
 docker run -i -d --name 도커별칭 -p 클라우드포트번호:도커포트번호 -v 공유하려는 클라우드 폴더 경로:공유받으려는 도커의 폴더 경로
 ```
+
 </details>
 
 <details>
@@ -450,7 +452,7 @@ server {
     proxy_set_header Connection "Upgrade";
     proxy_set_header Host $host;
     proxy_set_header X-Forwarded-For $remote_addr;
-    proxy_set_header X-Forwarded-Proto $scheme;		
+    proxy_set_header X-Forwarded-Proto $scheme;
  	}
   location /keyword-server{
     proxy_pass http://13.125.39.100:8092;
@@ -458,11 +460,11 @@ server {
  	location @router{
        	    rewrite ^(.+)$ /index.html last;
  	}
-    
+
  	ssl_certificate /etc/letsencrypt/live/beanzido.com/fullchain.pem; # managed by Certbot
  	ssl_certificate_key /etc/letsencrypt/live/beanzido.com/privkey.pem; # managed by Certbot
   listen 443 ssl; # managed by Certbot
-    
+
 }
 
 server {
@@ -480,7 +482,7 @@ server {
     proxy_set_header Connection "Upgrade";
     proxy_set_header Host $host;
     proxy_set_header X-Forwarded-For $remote_addr;
-    proxy_set_header X-Forwarded-Proto $scheme;		
+    proxy_set_header X-Forwarded-Proto $scheme;
  	}
   location /keyword-server{
     proxy_pass http://13.125.39.100:8062;
@@ -488,18 +490,18 @@ server {
  	location @router{
        	    rewrite ^(.+)$ /index.html last;
  	}
-    
+
  	ssl_certificate /etc/letsencrypt/live/k7a206.p.ssafy.io/fullchain.pem; # managed by Certbot
  	ssl_certificate_key /etc/letsencrypt/live/k7a206.p.ssafy.io/privkey.pem; # managed by Certbot
   listen 443 ssl; # managed by Certbot
-    
-    
+
+
 }
 ...
 
 
 
-# nginx 제대로 실행 되는지 테스트 확인  
+# nginx 제대로 실행 되는지 테스트 확인
 sudo nginx -t
 
 # nginx 재시작
@@ -508,7 +510,7 @@ sudo service nginx restart
 # ubuntu일 때, 도메인 접속 시 500 에러가 난다면 해당 파일 열어서 맨 윗줄의 user 변경
 sudo vim /etc/nginx/nginx.conf
 '''
-user ubuntu; 
+user ubuntu;
 '''
 
 ```
@@ -627,72 +629,204 @@ sudo apt-get install -y nodejs
 </details>
 
 <details>
+    <summary>메모리 관리</summary>
+
+- 프리티어 사용 시 메모리가 부족할 수 있음.
+- 따라서, 하드디스크를 이용하여 가상메모리를 늘리면 좋음.
+- 또한, Jar 실행 시 메모리 제한을 두는 것도 하나의 방법.
+
+  #### 스와핑
+
+  ```linux
+  ## 스왑 파일 생성.
+  ## bs = 블록 크키, count = 블록 수. 블록 크기는 인스턴스에서 사용 가능한 메모리보다 작아야함.
+  sudo dd if=/dev/zero of=/swapfile bs=128M count=16
+
+  ##읽기 및 쓰기 권한 업데이트
+  sudo chmod 600 /swapfile
+
+  ## 스왑 영역 설정
+  sudo mkswap /swapfile
+
+  ## 스왑 공간에 스왑 파일 추가하여 스왑 파일 즉시 사용할 수 있도록 설정
+  sudo swapon /swapfile
+
+  ## 성공 여부 확인
+  sudo swapon -s
+
+  ## 파일 편집하여 부팅 시 스왑 파일 활성화
+  sudo vi /etc/fstab
+  ## 맨 아래에 추가
+  /swapfile swap swap defaults 0 0
+  ```
+
+  #### jar 메모리 제한
+
+  ```linux
+  java -jar -Xms512M -Xmx512M fast-automl-0.0.1-SNAPSHOT.jar
+  ```
+
+</details>
+
+<details>
+    <summary>백그라운드 실행(로그 포함)</summary>
+
+- 백그라운드 실행 명령어 &
+- &만 사용 할 경우 사용자 세션 만료 시 백그라운드 종료(현재는 유지됨.) 로그x
+- nohup 사용 시 로그 관리 가능하며 세션 만료해도 유지됨.
+
+```linux
+## 백그라운드 nohup 실행. (실행 후 문구가 뜸. 그냥 1 엔터 치고 실행 됐는지 확인. default는 표준 출력 로그 쌓임.)
+nohup java -jar my-app.jar &
+
+## 확인 방법 2개
+ps auxf | grep java
+bg
+
+## 로그 조회 (nohup.out은 명령어 입력한 경로에 생성되어 있음.)
+cat nohup.out
+
+## 로그 테일링
+tail -f nohup.out
+
+## 백그라운드 종료 (ps auxf로 조회하여 나온 PID 필요함.)
+kill -9 PID
+
+## 로그를 내가 원하는 곳에 쌓고 싶은 경우
+nohup java -jar my-app.jar > 경로/파일명.out &
+
+## 표준 출력과 표준 에러를 다른 파일에 쌓고 싶은 경우
+nohup java -jar my-app.jar 1 > 경로/출력_파일명.out 2 > 경로/에러_파일명.out &
+
+## 하나의 파일에 출력과 에러를 둘 다 하나의 파일에 쌓고 싶은 경우
+nohup java -jar my-app.jar > 경로/통합_파일명.out 2>&1 &
+
+```
+
+</details>
+
+<details>
     <summary>CI/CD</summary>
 
 - <details>
     <summary>github action</summary>
 
-    1. github 프로젝트 세팅
-    ![Alt text](image4/image.png)
+  1. github 프로젝트 세팅
+     ![Alt text](image4/image.png)
 
-    2. action에 들어가서 기본 파일 선택 (프로젝트랑 비슷한 것 고르면 됨. 아무거나 하고 수정해도 됨)
-    ![Alt text](image4/image-1.png)
+  2. action에 들어가서 기본 파일 선택 (프로젝트랑 비슷한 것 고르면 됨. 아무거나 하고 수정해도 됨)
+     ![Alt text](image4/image-1.png)
 
-    3. 선택한 파일 안의 코드를 다음과 같이 수정
-    ![Alt text](image4/image-2.png)
-        - name: 파일 설명이라 보면 됨.
-        - on: yml을 실행하는 시점, 실행 경로 등 기본 세팅을 설정함.
-            - branches: 어떤 브랜치에 적용할 것인지 선택(다중 가능).
-            - paths: test/** -> 해당 경로에 있는 모든 파일을 대상으로 하나라도 변경 된다면 yml 실행.
-        - jobs: 어떤 작업을 할지 정하는 단계.
-            - build: 빌드를 할때의 설정.
-                - runs-on: 뭐로 할지 정하는 것.
-                - defaults: build 안의 작업에 전역으로 세팅. 
-                - steps: 실제 작업을 작성하는 단계.
-                    - name: 별칭
-                      uses: 다른 사람이 만들어 놓은 것을 사용
-                      run: 명령어
+  3. 선택한 파일 안의 코드를 다음과 같이 수정
+     ![Alt text](image4/image-2.png) - name: 파일 설명이라 보면 됨. - on: yml을 실행하는 시점, 실행 경로 등 기본 세팅을 설정함. - branches: 어떤 브랜치에 적용할 것인지 선택(다중 가능). - paths: test/\*\* -> 해당 경로에 있는 모든 파일을 대상으로 하나라도 변경 된다면 yml 실행. - jobs: 어떤 작업을 할지 정하는 단계. - build: 빌드를 할때의 설정. - runs-on: 뭐로 할지 정하는 것. - defaults: build 안의 작업에 전역으로 세팅. - steps: 실제 작업을 작성하는 단계. - name: 별칭
+     uses: 다른 사람이 만들어 놓은 것을 사용
+     run: 명령어
 
     <br/>                
     
     4. yml의 소스에 맞춰 레파지토리에 변화가 생기면 action 실행 됨.
     ![Alt text](image4/image-3.png)
 
-    5. 인스턴스 서버에 git 설치 및 github clone.
-        ```
-        # git 설치 및 확인
-        sudo apt install git
-        git --version
+  5.  인스턴스 서버에 git 설치 및 github clone.
 
-        # git 구성 및 확인
-        git config --global user.name "Your Name"
-        git config --global user.email "youremail@yourdomain.com"
-        git config --list
+      ```linux
+      # git 설치 및 확인
+      sudo apt install git
+      git --version
 
-        # 원하는 경로에서 git clone할 폴더 생성 및 clone. 
-        cd /usr
-        sudo mkdir github
-        cd github
-        sudo git clone repository주소
-        ```
+      # git 구성 및 확인
+      git config --global user.name "Your Name"
+      git config --global user.email "youremail@yourdomain.com"
+      git config --list
+
+      # 원하는 경로에서 git clone할 폴더 생성 및 clone.
+      cd /usr
+      sudo mkdir github
+      cd github
+      git clone repository_주소
+
+      # 만약 repository가 private 경우 여러 방법
+      # github에서 personal access token 생성하고 이를 이용하여 clone (선택1)
+      git clone https://access_token@repository_주소
+      # Credential 정보 저장 (선택2)
+      git config credential.helper store --global
+      # Credential 캐시 저장 (선택3)
+      git config credential.helper 'cache --timeout=3600'
+
+      ```
+
+      <br/>
+
+  6.  repository > settings > Secrets and variables > Actions > new repository secret 을 통해 yml에서 사용할 변수 등록.
+      ![Alt text](image4/image-5.png) - 해당 변수에 들어갈 값들은 7번 참조.
+
     <br/>
 
-    6. repository > settings > Secrets and variables > Actions > new repository secret 을 통해 yml에서 사용할 변수 등록.
-    ![Alt text](image4/image-5.png)
-        - 해당 변수에 들어갈 값들은 7번 참조.
-        
-    <br/>
+  7. 배포를 위해 oracle cloud에 접속해야함. appleboy/ssh-action@master 라이브러리를 이용하여 ssh 접속.
+     ![Alt text](image4/image-4.png) - host: oracle cloud ip - username: 오라클 클라우드 홈페이지 인스턴스 정보에 들어가면 사용자 이름이 있음. - key: 인스턴스 생성할 때 만든 key 파일을 메모장으로 열면 값이 나옴. 전체 복사해야함. (맨위, 맨아래 ---- 부분도 복사 다해야함)
+     - port: 인스턴스 접속 포트 (기본 22) - script : 인스턴스 접속한 뒤 실행할 명령어.
 
-    7. 배포를 위해 oracle cloud에 접속해야함. appleboy/ssh-action@master 라이브러리를 이용하여 ssh 접속.
-    ![Alt text](image4/image-4.png)
-        - host: oracle cloud ip
-        - username: 오라클 클라우드 홈페이지 인스턴스 정보에 들어가면 사용자 이름이 있음.
-        - key: 인스턴스 생성할 때 만든 key 파일을 메모장으로 열면 값이 나옴. 전체 복사해야함. (맨위, 맨아래 ---- 부분도 복사 다해야함)  
-        - port: 인스턴스 접속 포트 (기본 22)
-        - script : 인스턴스 접속한 뒤 실행할 명령어. 
+  #### yaml 예시
 
-        
-     
+  ```yaml
+  name: develop build
+  on:
+  push:
+      branches: ["develop"]
+
+  jobs:
+  # Build job (github 서버 설정)
+  build:
+      # 우분투 설치
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: Checkout
+          uses: actions/checkout@v3
+
+      # 자바 설치
+      - name: Set up JDK 17
+          uses: actions/setup-java@v3
+          with:
+          java-version: 17
+          distribution: 'temurin'
+
+      # jar에서 사용하는 시크릿 설정 파일
+      - name: application-env.yaml create
+          run: echo "${{ secrets.APPLICATION_ENV }}" > application-env.yaml
+          working-directory: src/main/resources/
+
+      # 빌드 시작 전 권한 설정
+      - name: Grant execute permission for gradlew
+          run: sudo chmod +x ./gradlew
+
+      # 빌드 버전 설치
+      - name: Setup Gradle
+          uses: gradle/gradle-build-action@v2
+          with:
+          gradle-version: 8.2.1
+
+      # 빌드
+      - name: Build
+          run: ./gradlew build
+
+      # 실제 사용중인 서버에 원격 접속
+      - name: execute remote ssh
+          uses: appleboy/ssh-action@master
+          with:
+          host: ${{ secrets.REMOTE_SSH_HOST }}
+          username: ${{ secrets.REMOTE_SSH_USERNAME }}
+          key: ${{ secrets.REMOTE_SSH_KEY }}
+          port: ${{ secrets.REMOTE_SSH_PORT }}
+          script: |
+              cd /home/ubuntu/github/fast-automl-api/
+              sudo git pull origin develop
+              sudo chmod +x ./gradlew
+              ./gradlew build
+              cd  build/libs
+              sudo chmod 777 fast-automl-0.0.1-SNAPSHOT.jar
+              nohup java -jar -Xms512M -Xmx512M fast-automl-0.0.1-SNAPSHOT.jar &
+  ```
 
 </details>
 
