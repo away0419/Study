@@ -169,3 +169,5 @@ B
 -.idea/sonarlint/securityhotspotstore/index.pb,8\8\88a9255124c95bdc913197c120a8d560edc59c8e
 B
 random/B12107.java,b\1\b1507075a06796164f42f35f9234ed58422242f1
+B
+random/B12892.java,f\a\fa296fe7a0593d6d1f1d34c9bb365fe7f5898889
