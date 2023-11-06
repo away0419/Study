@@ -5,7 +5,7 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2User
 
-class CustomOAuth2User(
+class OAuth2CustomUser(
     authorities: Collection<GrantedAuthority>,
     attributes: Map<String, Any>,
     userNameAttributeName: String,
