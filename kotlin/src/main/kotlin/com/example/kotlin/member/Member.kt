@@ -8,19 +8,24 @@ import java.util.*
 class Member(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "member_id", nullable = false)
+    @Column(name = "id", nullable = false)
     var id: UUID?,
 
     @Column(name = "name", nullable = false)
-    var name: String?,
+    var name: String,
 
-    @Column(name = "email")
-    var email: String?,
+    @Column(name = "email", nullable = false)
+    var email: String,
 
     @Column(name = "picture")
     var picture: String?,
 
     @Enumerated(EnumType.STRING)
-    var role: Role?
+    var role: Role,
 
+    @Column(name = "oauth2_key")
+    var oAuth2Key: String?,
+
+    @Column(name = "oauth2_provider")
+    var oAuth2Provider: String?
 )
