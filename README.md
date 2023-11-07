@@ -1,3 +1,9 @@
+```
+최근 수정 날짜 : 23.11.07
+Java : 자체 로그인, JWT 구현
+Kotlin : OAuth2 로그인, JWT 구현
+```
+
 <details>
   <summary>Spring-Security</summary>
 
@@ -510,3 +516,47 @@
   </details>
 
 ---
+
+<details>
+  <summary>OAuth2</summary>
+
+#### 간단 개념
+
+- 인증을 위한 개방형 표준 프로토콜.
+- 사용자 인증 확인을 다른 서비스에 위임하는 것.
+- 다른 서비스에 저장 된 사용자 정보를 받아올 수 있음.
+
+#### Security OAuth2 제공 서비스
+
+- Spring Security에서 지원하는 OAuth2 제공 서비스들은 구글, 페이스북, 깃허브 등이 있음.
+- Naver와 Kakao의 경우 지원하지 않으므로 추가 설정이 필요함.
+- 사용자 정보는 Json 형태이며, 서비스 별 제공해주는 사용자 정보가 다름. 또한, Json 필드 명도 다르기 때문에 해당 서비스에 가서 확인 해야 함.
+  - 서비스1 ={"nickname" : "사용자"}, 서비스2 = {"name" : "사용자"} 처럼 다를 수 있음.
+
+#### 많이 사용되는 OAuth2 Flow
+
+![Alt text](image/image-7.png)
+
+- 사용자가 우리 서버에 간편 로그인 요청.
+- 우리 서버는 OAuth2 제공 서비스의 로그인 창으로 사용자를 보냄.
+- 사용자가 OAuth2 제공 서비스 로그인 창에서 로그인.
+  - 사용자 인증 확인 처리는 해당 OAuth2 제공 서비스에서 진행. (자동)
+  - 만약, 로그인 성공 시 Authorization code 사용자에게 응답. (자동)
+  - 사용자는 Authorization code 우리 서버에 전달. (자동)
+  - 우리 서버는 전달 받은 Authorization code를 OAuth2 제공 서비스에 전달. (자동)
+  - OAuth2 제공 서비스가 전달 받은 Authorization code 확인 후 Access Token 우리 서버에 발급. (자동)
+  - 우리 서버는 발급 받은 Access Token으로 OAuth2 제공 서비스에게 유저 정보 요청.
+  - OAuth2 제공 서비스에서 이를 확인 후 요청한 유저 정보 우리 서버에 전달. (자동)
+- 우리 서버는 해당 정보를 가지고 우리 DB에 가입한 유저 있는지 확인.
+  - 우리 서비스에 회원가입이 따로 있을 경우, 회원가입으로 이동.
+  - 없는 경우 로그인 성골 로직으로 이동.
+- 로그인 성공 핸들러에서 우리 서버가 만든 Access Token, Refresh Token 발급. OR Session 저장.
+- 이후 사용자의 요청은 JWT 방식과 동일.
+
+#### Authorization code 있는 이유
+
+- 사용자가 OAuth2 제공 서비스에서 로그인 성공 한 경우 Redirect로 이동함.
+- Redirect 이동의 경우 데이터를 URL에 담아서 보낼 수 밖에 없음.
+- 따라서, Access Token이 노출될 수 있기 때문에 사용함.
+
+</details>
