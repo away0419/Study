@@ -2,6 +2,7 @@
 최근 수정 날짜 : 23.11.07
 Java : 자체 로그인, JWT 구현
 Kotlin : OAuth2 로그인, JWT 구현
+React : OAuth2 로그인 구현
 ```
 
 <details>
