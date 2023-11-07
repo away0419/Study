@@ -984,6 +984,7 @@
 
 </details>
 
+---
 
 <details>
   <summary>JWT</summary>
@@ -1785,8 +1786,9 @@
   - Set-Cookie : refresh_token=값; refresh_token2=값;
 </details>
 
-
 </details>
+
+---
 
 <details>
   <summary>인증, 인가 예외 처리</summary>
@@ -2472,8 +2474,6 @@
 ![img_1.png](image/img_6.png)
 </details>
 
-
-
 ## 2. ControllerAdvice 예외 처리
 
 <details>
@@ -2825,6 +2825,8 @@
 </details>
 
 </details>
+
+---
 
 <details>
   <summary>token 재발급</summary>
