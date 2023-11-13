@@ -706,6 +706,39 @@ nohup java -jar my-app.jar > 경로/통합_파일명.out 2>&1 &
 </details>
 
 <details>
+    <summary>GITHUB</summary>
+
+- 인스턴스 서버에 git 설치 및 github clone.
+
+  ```linux
+  # git 설치 및 확인
+  sudo apt install git
+  git --version
+
+  # git 구성 및 확인
+  git config --global user.name "Your Name"
+  git config --global user.email "youremail@yourdomain.com"
+  git config --list
+
+  # 원하는 경로에서 git clone할 폴더 생성 및 clone.
+  cd /usr
+  sudo mkdir github
+  cd github
+  git clone repository_주소
+
+  # 만약 repository가 private 경우 여러 방법
+  # github에서 personal access token 생성하고 이를 이용하여 clone (선택1)
+  git clone https://access_token@repository_주소
+  # Credential 정보 저장 (선택2)
+  git config credential.helper store --global
+  # Credential 캐시 저장 (선택3)
+  git config credential.helper 'cache --timeout=3600'
+
+  ```
+
+</details>
+
+<details>
     <summary>CI/CD</summary>
 
 - [CI/CD 정리](https://github.com/away0419/CI-CD)
