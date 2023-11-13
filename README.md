@@ -9,9 +9,24 @@
 <br/>
 
 ### 가장 많이 사용 되는 도구
+- Jenkins
+- CircleCI
+- TravisCI
+- Github Actions
 
-1. Jenkins
-2. CircleCI
-3. TravisCI
-4. Github Actions
+<br/>
+
+### CI/CD 과정 (feat. GitHub Action)
+1. GitHub 소스 Push. (CI)
+2. GitHub Action Server 실행. (CI)
+3. Build Test 진행. (CI)
+4. Build 완료 된 파일 실제 서버에 (AWS or Oracle Cloud) 전송. (CD) 
+5. 해당 서버에서 프로젝트 실행. (CD)
+
+<br/>
+
+### 실제 서버에 Build 완료 된 파일 전송하는 방법
+- 실제 서버에 직접 전송 : SSH-SCP-SSH
+- 중간 서버를 거쳐 전송 : AWS S3, Oracle Cloud Bucket
+- Docker 이용한 전송 : Docker Compose, Docker Hub, Docker image, Dokcerfile  
 
