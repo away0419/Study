@@ -741,6 +741,6 @@ nohup java -jar my-app.jar > 경로/통합_파일명.out 2>&1 &
 <details>
     <summary>CI/CD</summary>
 
-- [CI/CD 정리](https://github.com/away0419/CI-CD)
+- [CI/CD 정리](https://github.com/away0419/Study-2023/tree/main/CI-CD)
 
 </details>
