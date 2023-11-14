@@ -1,0 +1,10 @@
+
+g
+java:S3008"LRename this field "S" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¢Åùğûÿÿÿÿ
+h
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 22 to the 15 allowed.(œû¿Ø
+R
+java:S18549"7Remove this useless assignment to local variable "cnt".(Ø³øÿÿÿÿ
+S	java:S106"9Replace this use of System.out or System.err by a logger.(¡ò†şÿÿÿÿ
+S	java:S106-"9Replace this use of System.out or System.err by a logger.(¡ò†şÿÿÿÿ
+S	java:S106<"9Replace this use of System.out or System.err by a logger.(­ËÖşÿÿÿÿ
