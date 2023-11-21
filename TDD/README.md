@@ -9,9 +9,7 @@
 
 ## 일반 설계와의 TDD 차이
 
-![일반 설계](image/tdd1.png) ![TDD](image/tdd2.png)
-
-<br/>
+![일반 설계](image/tdd1.png)
 
 일반 설계
 
@@ -20,6 +18,8 @@
 - 자체 테스트 비용 증가.
 
 <br/>
+
+![TDD](image/tdd2.png)
 
 TDD
 
