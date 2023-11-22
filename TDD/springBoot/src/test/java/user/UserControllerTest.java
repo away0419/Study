@@ -26,14 +26,15 @@ class UserControllerTest {
     @Mock
     private UserService userService;
 
-    // 가짜 객체 주입
+    // @Mock으로 만든 가짜 객체를 주입 받은 객체 생성. (@Mock userService 주입된 userController)
     @InjectMocks
     private UserController userController;
 
-    // 테스트용 HTTP 호출
+    // 테스트용 HTTP 호출 (가짜 객체를 주입 받은 userController 등록 하기 위한 테스트용 MVC)
     private MockMvc mockMvc;
 
     // 각 @Test, @RepeatedTest, @ParameterizedTest 또는 @TestFactory 메소드보다 먼저 메소드가 실행되어야 함을 의미
+    // 가짜 객체 userService가 주입 된 UserController를 적용 하겠다는 뜻이다.
     @BeforeEach
     public void init() {
         mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
@@ -46,12 +47,12 @@ class UserControllerTest {
         UserDTO userRequest = signRequest();
         UserDTO userResponse = signResponse();
 
-        //userService의 signUp 메서드에 매개변수로 UserDTO.class를 넣었을 때, 리턴 값으로 userResponse와 동일한 값을 반환해야 한다는 뜻.
-        // 여기서 any는
+        // userService는 가짜 객체이므로 반환 값이 무엇인지 설정해야한다.
+        // 즉, 가짜 객체 userService의 메소드 signUp()에 UserDTO.class로 변환 가능한 객체 any를 매개변수로 주었을 경우 userResponse를 반환하도록 설정하는 것이다.
         doReturn(userResponse).when(userService).signUp(any(UserDTO.class));
-//        doReturn(userResponse).when(userService).signUp(userRequest);
 
         //when
+        // userRequest를 콘텐트 내용으로 보냈을 때, 결과 값이 resultActions 에 저장된다.
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post("/user/signup")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -59,6 +60,7 @@ class UserControllerTest {
         );
 
         //then
+        // 현재는 값이 존재 하는지만 확인 했지만 결과 값이 내가 예상하는 결과 값이랑 같은지 확인하면 된다.
         resultActions.andExpect(status().isCreated()) // 상태 결과 값이 created인지 확인
             .andExpect(jsonPath("id", userResponse.getId()).exists()) // id 값이 존재 하는지 확인
             .andExpect(jsonPath("name", userResponse.getName()).exists()) // name 값이 존재 하는지 확인
