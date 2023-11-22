@@ -204,6 +204,20 @@ class MyRepositoryTests {
 - 개발자가 동작을 직접 제어할 수 있는 가짜 객체를 지원하는 프레임워크.
 - Spring 웹 개발 시, 객체들 간의 의존성이 생겨 단위 테스트 작성을 어렵게 함. 이를 가짜 객체로 주입하여 편하게 작성 가능.
 - 필요 없다면 안쓰는게 가장 좋음.
+- 크게 3가지 어노테이션을 사용함.
+  - @Mock : 가짜 객체를 만들어 반환. (Stub)
+  - @Spy : Stub 하지 않은 메소드들은 원본 메소드 그대로 사용. (특정 테스트에서만 stub 하고 싶은 경우 사용)
+  - @InjectMocks : @Mock 또는 @Spy로 생성된 가짜 객체를 자동으로 주입.
+  - @MockBean : 애플리케이션 컨텍스트로 동작할 때, 기존 Bean에 가짜 객체를 주입 하고 싶을 경우 사용.
+  - @SpyBean : 애플리케이션 컨텍스트로 동작할 때, 기존 Bean에서 특정 테스트에서만 가짜 객체를 주입 하고 싶을 경우 사용.
+- Stub 결과 처리를 위한 메소드를 제공함.
+  - doReturn() : 가짜 객체가 특정한 값을 반환해야 하는 경우.
+  - doNoting() : 가짜 객체가 아무 것도 반환하지 않는 경우. 
+  - doThrow() : 가짜 객체가 예외를 발생시키는 경우.
+- Junit과 결합하여 사용하기 위해선 @ExtendWith(MockitoExtension.class) 적용해야 함.
+  - SpringBoot 2.2.0 전에는 @RunWith(MockitoJUnitRunner.class)
+
+<br/>
 
 ## 의존성 추가 및 설정
 
@@ -303,3 +317,104 @@ h2:
 </details>
 
 <br/>
+
+## Controller 테스트
+- 앞서 설명한 것처럼 통합 테스트 설정을 한다면 모든 Bean을 불러오기 때문에 느려짐.
+- 추가 설정을 통해 단위 테스트 진행 하면 됨.
+
+<details>
+  <summary>MockMvc</summary>
+
+- 단위 테스트를 위해 MockMvc를 이용하여 controller 등록 하는 것이 포인트.
+
+  ```java
+  package user;
+  
+  import static org.mockito.ArgumentMatchers.any;
+  import static org.mockito.Mockito.doReturn;
+  import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+  import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+  
+  import com.google.gson.Gson;
+  import org.junit.jupiter.api.BeforeEach;
+  import org.junit.jupiter.api.DisplayName;
+  import org.junit.jupiter.api.Test;
+  import org.junit.jupiter.api.extension.ExtendWith;
+  import org.mockito.InjectMocks;
+  import org.mockito.Mock;
+  import org.mockito.junit.jupiter.MockitoExtension;
+  import org.springframework.http.MediaType;
+  import org.springframework.test.web.servlet.MockMvc;
+  import org.springframework.test.web.servlet.ResultActions;
+  import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+  import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+  
+  @ExtendWith(MockitoExtension.class)
+  class UserControllerTest {
+  
+      // 가짜 객체(Mock) 생성
+      @Mock
+      private UserService userService;
+  
+      // @Mock으로 만든 가짜 객체를 주입 받은 객체 생성. (@Mock userService 주입된 userController)
+      @InjectMocks
+      private UserController userController;
+  
+      // 테스트용 HTTP 호출 (가짜 객체를 주입 받은 userController 등록 하기 위한 테스트용 MVC)
+      private MockMvc mockMvc;
+  
+      // 각 @Test, @RepeatedTest, @ParameterizedTest 또는 @TestFactory 메소드보다 먼저 메소드가 실행되어야 함을 의미
+      // 가짜 객체 userService가 주입 된 UserController를 적용 하겠다는 뜻이다.
+      @BeforeEach
+      public void init() {
+          mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+      }
+  
+      @DisplayName("회원 가입 성공")
+      @Test
+      void signUpSuccess() throws Exception {
+          //given
+          UserDTO userRequest = signRequest();
+          UserDTO userResponse = signResponse();
+  
+          // userService는 가짜 객체이므로 반환 값이 무엇인지 설정해야한다.
+          // 즉, 가짜 객체 userService의 메소드 signUp()에 UserDTO.class로 변환 가능한 객체 any를 매개변수로 주었을 경우 userResponse를 반환하도록 설정하는 것이다.
+          doReturn(userResponse).when(userService).signUp(any(UserDTO.class));
+  
+          //when
+          // userRequest를 콘텐트 내용으로 보냈을 때, 결과 값이 resultActions 에 저장된다.
+          ResultActions resultActions = mockMvc.perform(
+                  MockMvcRequestBuilders.post("/user/signup")
+                          .contentType(MediaType.APPLICATION_JSON)
+                          .content(new Gson().toJson(userRequest)) // request를 Gson 라이브러리를 통해 Json으로 변환하여 넘긴다.
+          );
+  
+          //then
+          // 현재는 값이 존재 하는지만 확인 했지만 결과 값이 내가 예상하는 결과 값이랑 같은지 확인하면 된다.
+          resultActions.andExpect(status().isCreated()) // 상태 결과 값이 created인지 확인
+              .andExpect(jsonPath("id", userResponse.getId()).exists()) // id 값이 존재 하는지 확인
+              .andExpect(jsonPath("name", userResponse.getName()).exists()) // name 값이 존재 하는지 확인
+              .andExpect(jsonPath("age", userResponse.getAge()).exists()); // age 값이 존재 하는지 확인
+  
+      }
+  
+      // 테스트할 입력 값
+      private UserDTO signRequest() {
+          return UserDTO.builder()
+                  .id(null)
+                  .name("홍길동")
+                  .age(32)
+                  .build();
+      }
+  
+      // 정해진 결과 값
+      private UserDTO signResponse() {
+          return UserDTO.builder()
+                  .id(0L)
+                  .name("홍길동")
+                  .age(32)
+                  .build();
+      }
+  }
+  ```
+</details>
