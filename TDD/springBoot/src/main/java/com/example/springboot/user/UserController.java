@@ -1,4 +1,4 @@
-package user;
+package com.example.springboot.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
 
     @PostMapping("/signup")
     public ResponseEntity<UserDTO> signUp(@RequestBody UserDTO userDTO){
