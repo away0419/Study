@@ -1,4 +1,4 @@
-package user;
+package com.example.springboot.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private UserRepository userRep;
+    private final UserRepository userRep;
 
     @Override
     public UserDTO signUp(UserDTO userDTO) {
