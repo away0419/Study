@@ -2,7 +2,7 @@
 - spring-boot-starter-test 안에 포함 되어 있음.
   - JUnit : Java 단위 테스트 프레임워크
   - AssertJ : 유연한 검증 라이브러리
-  - Spring Boot Test & Spring Test : 스프링 부트에 대한 유틸리티 및 통합 테스트 지원
+  - Spring Boot Test & Spring Test : 스프링 부트에 대한 유틸리티 및 통합 테스트 지원 (여러 테스트 도구를 포함 하고 있음)
   - Hamcrest : 객체 Matcher를 위한 라이브러리
   - Mockito : 자바 모킹 프레임워크
   - JSONassert : JSON 검증 도구
@@ -13,6 +13,7 @@
 ## 통합 테스트 설정 어노테이션
 - 해당 클래스가 테스트 코드를 위한 클래스라는 것을 알리고, 설정한다고 생각하면 됨.
 - 여러 형태가 있는데 대표적으로 사용되는 어노테이션은 아래와 같음.
+- 슬라이드 테스트 클래스의 위치는 Spring 실행 클래스(@SpringBootApplication)와 동일한 경로 혹은, 하위 경로에 포함되어 있어야 함.
 
 <details>
   <summary>@SpringBootTest</summary>
@@ -169,9 +170,9 @@ class MyRepositoryTests {
 
 ## 애플리케이션 컨텍스트 캐싱
 
-- 통합 테스트는 모두 애플리케이션 컨텍스트를 구성해주어야 함. 
+- 통합 테스트는 모두 애플리케이션 컨텍스트를 구성해 주어야 함.
 - 모든 테스트마다 이를 구성하려면 비용이 커짐. 이 때문에 내부적으로 스프링 컨텍스트를 캐싱해두고 동일한 설정이라면 재사용함.
-- 따라서, 설정에 변경이 생기면 새로운 컨텍스트를 생성해야 함. 만약 테스트 속도가 느릴 경우 확인해 보는 것이 좋음.
+- 따라서, 설정에 변경이 생기면 새로운 컨텍스트를 생성해야 함. 만약 테스트 속도가 느릴 경우 확인해 보는 것이 좋음. 아래는 사용시 컨텍스트를 새로 생성하는 것들임.
   - @MockBean, @SpyBean
   - @TestPropertySource
   - @ConditionalOnX
@@ -182,17 +183,17 @@ class MyRepositoryTests {
 <br/>
 
 ## 통합 테스트 작성시 주의사항
-- 테스트는 조건에 맞는 어노테이션만 찾아 빈에 등록함. 따라서 무분별한 설정은 불필요한 빈을 등록하게 됨.
-- @SpringBootApplication에 특정 기능을 위한 어노테이션 설정이 있는 경우 해당 기능도 활성화 됨. 아래 예제는 Batch가 활성화 되어버림.
-  ```java
-  @SpringBootApplication
-  @EnableBatchProcessing
-  public class MyApplication {
-      public static void main(String[] args) {
-          SpringApplication.run(MyApplication.class, args);
-      }
-  }
-  ```
+- 무분별한 어노테이션 설정은 불필요한 빈을 등록하게 됨.
+  - 아래 예제에서 @EnableBatchProcessing를 적용 하였기 때문에 Test에서 배치가 필요 없더라도 배치와 관련된 bean이 함께 등록됨. 
+    ```java
+    @SpringBootApplication
+    @EnableBatchProcessing
+    public class MyApplication {
+        public static void main(String[] args) {
+            SpringApplication.run(MyApplication.class, args);
+        }
+    }
+    ```
 - @ComponentScan을 추가할 경우 해당 컴포넌트 스캔에 의하여 필요 없는 빈이 등록 될 수 있음.
 - 해당 컴포넌트 스캔을 별도의 설정 클래스로 빼거나 테스트 패키지에 별도의 @SpringBootConfiguration을 만들거나 테스트에 대한 소스 위치를 지정하여 기본 설정을 비활성화 할 수 있음.
 - 애플리케이션 컨텍스트 캐싱을 주의 해야 함.
@@ -319,11 +320,8 @@ h2:
 <br/>
 
 ## Controller 테스트
-- 앞서 설명한 것처럼 통합 테스트 설정을 한다면 모든 Bean을 불러오기 때문에 느려짐.
-- 추가 설정을 통해 단위 테스트 진행 하면 됨.
-
 <details>
-  <summary>MockMvc</summary>
+  <summary>단위 테스트</summary>
 
 - 단위 테스트를 위해 MockMvc를 이용하여 controller 등록 하는 것이 포인트.
 
@@ -415,6 +413,92 @@ h2:
                   .age(32)
                   .build();
       }
+  }
+  ```
+</details>
+
+<details>
+  <summary>부분 테스트</summary>
+
+- @WebMvcTest 적용하기.
+- 만약 userController에 bean을 여러개 주입받고 있을 경우, 해당 빈들을 모두 가져 오고 다시 mockbean 확인 후 만들어 바꾸기 때문에 단위 테스트 보다 느리다.
+
+  ```java
+  package com.example.springboot.user;
+  
+  import com.google.gson.Gson;
+  import org.junit.jupiter.api.DisplayName;
+  import org.junit.jupiter.api.Test;
+  import org.springframework.beans.factory.annotation.Autowired;
+  import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+  import org.springframework.boot.test.mock.mockito.MockBean;
+  import org.springframework.http.MediaType;
+  import org.springframework.test.web.servlet.MockMvc;
+  import org.springframework.test.web.servlet.ResultActions;
+  import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+  
+  import static org.mockito.ArgumentMatchers.any;
+  import static org.mockito.Mockito.doReturn;
+  import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+  import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+  
+  
+  @WebMvcTest(UserController.class)
+  class UserControllerTest2 {
+  
+      // 서버를 실행 하지 않고도 api 요청을 보낼 수 있는 객체
+      @Autowired
+      private MockMvc mockMvc;
+  
+      // bean에 등록 된 userService를 가짜 객체로 교체 한다.
+      @MockBean
+      private UserService userService;
+  
+      @Test
+      @DisplayName("회원 가입 성공")
+      void signUpSuccess() throws Exception {
+          //given
+          UserDTO userRequest = signRequest();
+          UserDTO userResponse = signResponse();
+  
+          // userService는 가짜 객체이므로 반환 값이 무엇인지 설정해야한다.
+          // 즉, 가짜 객체 userService의 메소드 signUp()에 UserDTO.class로 변환 가능한 객체 any를 매개변수로 주었을 경우 userResponse를 반환하도록 설정하는 것이다.
+          doReturn(userResponse).when(userService).signUp(any(UserDTO.class));
+  
+          //when
+          ResultActions resultActions = mockMvc.perform(
+                  MockMvcRequestBuilders.post("/user/signup")
+                          .contentType(MediaType.APPLICATION_JSON)
+                          .content(new Gson().toJson(userRequest)) // request를 Gson 라이브러리를 통해 Json으로 변환하여 넘긴다.
+          );
+  
+          //then
+          // 현재는 값이 존재 하는지만 확인 했지만 결과 값이 내가 예상하는 결과 값이랑 같은지 확인하면 된다.
+          resultActions.andExpect(status().isCreated()) // 상태 결과 값이 created인지 확인
+                  .andExpect(jsonPath("id", userResponse.getId()).exists()) // id 값이 존재 하는지 확인
+                  .andExpect(jsonPath("name", userResponse.getName()).exists()) // name 값이 존재 하는지 확인
+                  .andExpect(jsonPath("age", userResponse.getAge()).exists()); // age 값이 존재 하는지 확인
+  
+      }
+  
+      // 테스트할 입력 값
+      private UserDTO signRequest() {
+          return UserDTO.builder()
+                  .id(null)
+                  .name("홍길동")
+                  .age(32)
+                  .build();
+      }
+  
+      // 정해진 결과 값
+      private UserDTO signResponse() {
+          return UserDTO.builder()
+                  .id(0L)
+                  .name("홍길동")
+                  .age(32)
+                  .build();
+      }
+  
   }
   ```
 </details>
