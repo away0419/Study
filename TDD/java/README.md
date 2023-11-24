@@ -253,8 +253,8 @@ dependencies {
 
 
 
-<br>
-<br>
+<br/>
+<br/>
 
 > ## Assumptions
 - 개발자가 인자 값을 정확히 모를 때 if와 같은 용로도 사용
@@ -269,7 +269,8 @@ dependencies {
     assumingThat(boolean, executable)|첫 번째 인자가 True면 두 번째 인자로 들어온 함수 실행. 첫 번째 인자 값이 false 인 경우에도 테스트를 스킵하지 않고 다음 코드를 진행합니다.
 </details>
 
-
+<br/>
+<br/>
 
 > ## Hamcrest
 - assertions, assumptions 를 좀 더 가독성있고 편하게 쓸 수 있도록 도와주는 라이브러리 
