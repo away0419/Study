@@ -1,4 +1,6 @@
-## 테스트 도구
+
+
+> ## 테스트 도구
 - spring-boot-starter-test 안에 포함 되어 있음.
   - JUnit : Java 단위 테스트 프레임워크
   - AssertJ : 유연한 검증 라이브러리
@@ -10,7 +12,7 @@
 
 <br/>
 
-## 통합 테스트 설정 어노테이션
+> ## 통합 테스트 설정 어노테이션
 - 해당 클래스가 테스트 코드를 위한 클래스라는 것을 알리고, 설정한다고 생각하면 됨.
 - 여러 형태가 있는데 대표적으로 사용되는 어노테이션은 아래와 같음.
 - 슬라이드 테스트 클래스의 위치는 Spring 실행 클래스(@SpringBootApplication)와 동일한 경로 혹은, 하위 경로에 포함되어 있어야 함.
@@ -169,7 +171,7 @@ class MyRepositoryTests {
 
 <br/>
 
-## 애플리케이션 컨텍스트 캐싱
+> ## 애플리케이션 컨텍스트 캐싱
 
 - 통합 테스트는 모두 애플리케이션 컨텍스트를 구성해 주어야 함.
 - 모든 테스트마다 이를 구성하려면 비용이 커짐. 이 때문에 내부적으로 스프링 컨텍스트를 캐싱해두고 동일한 설정이라면 재사용함.
@@ -183,7 +185,7 @@ class MyRepositoryTests {
 
 <br/>
 
-## 통합 테스트 작성시 주의사항
+> ## 통합 테스트 작성시 주의사항
 - 무분별한 어노테이션 설정은 불필요한 빈을 등록하게 됨.
   - 아래 예제에서 @EnableBatchProcessing를 적용 하였기 때문에 Test에서 배치가 필요 없더라도 배치와 관련된 bean이 함께 등록됨. 
     ```java
@@ -202,7 +204,7 @@ class MyRepositoryTests {
 <br/>
 
 
-## Mockito
+> ## Mockito
 - 개발자가 동작을 직접 제어할 수 있는 가짜 객체를 지원하는 프레임워크.
 - Spring 웹 개발 시, 객체들 간의 의존성이 생겨 단위 테스트 작성을 어렵게 함. 이를 가짜 객체로 주입하여 편하게 작성 가능.
 - 필요 없다면 안쓰는게 가장 좋음.
@@ -221,7 +223,7 @@ class MyRepositoryTests {
 
 <br/>
 
-## 의존성 추가 및 설정
+> ## 의존성 추가 및 설정
 
 <details>
   <summary>maven</summary>
@@ -320,7 +322,7 @@ h2:
 
 <br/>
 
-## Controller 테스트
+> ## Controller 테스트
 <details>
   <summary>단위 테스트</summary>
 
@@ -504,8 +506,9 @@ h2:
   ```
 </details>
 
+<br/>
 
-## Service 테스트
+> ## Service 테스트
 
 <details>
   <summary>단위 테스트</summary>
@@ -614,3 +617,46 @@ h2:
   ```
 </details>
 
+<br/>
+
+> ## Repository 테스트
+
+<details>
+  <summary>부분 테스트</summary>
+
+- JPA 테스트의 경우 DB 연결을 해줘야 의미가 있기 때문에 부분 테스트로 진행함.
+
+  ```java
+  package com.example.springboot.user;
+  
+  import org.junit.jupiter.api.DisplayName;
+  import org.junit.jupiter.api.Test;
+  import org.springframework.beans.factory.annotation.Autowired;
+  import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+  
+  import static org.assertj.core.api.Assertions.assertThat;
+  
+  @DataJpaTest
+  class UserRepositoryTest {
+  
+      // bean에 등록 된 객체를 그대로 가져와 쓰겠다.
+      @Autowired
+      private UserRepository userRepository;
+  
+      @Test
+      @DisplayName("회원가입")
+      void signUp(){
+          //given
+          UserDTO request = UserDTO.builder().name("홍길동").age(13).build();
+  
+          //when
+          UserEntity result = userRepository.save(request.transforUser());
+  
+          //then
+          assertThat(result.getAge()).isEqualTo(request.getAge());
+          assertThat(result.getName()).isEqualTo(request.getName());
+      }
+  
+  }
+  ```
+</details>
