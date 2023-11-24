@@ -1,6 +1,6 @@
 
 
-> ## 테스트 도구
+>  테스트 도구
 - spring-boot-starter-test 안에 포함 되어 있음.
   - JUnit : Java 단위 테스트 프레임워크
   - AssertJ : 유연한 검증 라이브러리
@@ -10,6 +10,7 @@
   - JSONassert : JSON 검증 도구
   - JsonPath : Json용 xPath
 
+<br/>
 <br/>
 
 > ## 통합 테스트 설정 어노테이션
@@ -170,6 +171,7 @@ class MyRepositoryTests {
 </details>
 
 <br/>
+<br/>
 
 > ## 애플리케이션 컨텍스트 캐싱
 
@@ -183,6 +185,7 @@ class MyRepositoryTests {
   - @Import
   - 기타 등등
 
+<br/>
 <br/>
 
 > ## 통합 테스트 작성시 주의사항
@@ -202,7 +205,7 @@ class MyRepositoryTests {
 - 애플리케이션 컨텍스트 캐싱을 주의 해야 함.
 
 <br/>
-
+<br/>
 
 > ## Mockito
 - 개발자가 동작을 직접 제어할 수 있는 가짜 객체를 지원하는 프레임워크.
@@ -221,6 +224,7 @@ class MyRepositoryTests {
 - Junit과 결합하여 사용하기 위해선 @ExtendWith(MockitoExtension.class) 적용해야 함.
   - SpringBoot 2.2.0 전에는 @RunWith(MockitoJUnitRunner.class)
 
+<br/>
 <br/>
 
 > ## 의존성 추가 및 설정
@@ -320,6 +324,175 @@ h2:
 ```
 </details>
 
+<br/>
+<br/>
+
+> ## Member 도메인
+<details>
+  <summary>UserEntity</summary>
+
+```java
+package com.example.springboot.user;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name ="MEMBER")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Builder
+public class UserEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @Column(name = "NAME")
+    private String name;
+
+    @Column(name = "AGE")
+    private int age;
+
+}
+```
+
+</details>
+
+<details>
+  <summary>UserDTO</summary>
+
+```java
+package com.example.springboot.user;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserDTO {
+    private Long id;
+    private String name;
+    private int age;
+
+    public UserEntity transforUser(){
+        return new UserEntity(id, name, age);
+    }
+    public static UserDTO of(UserEntity userEntity){
+        return  new UserDTO(userEntity.getId(), userEntity.getName(), userEntity.getAge());
+    }
+}
+```
+
+</details>
+
+<details>
+  <summary>UserRepository</summary>
+
+```java
+package com.example.springboot.user;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
+    public UserEntity save(UserEntity UserEntity);
+
+}
+```
+
+</details>
+
+<details>
+  <summary>UserService</summary>
+
+```java
+package com.example.springboot.user;
+
+public interface UserService {
+    public UserDTO signUp(UserDTO userDTO);
+
+    public UserDTO select(Long ID);
+
+    public UserDTO updateUser(UserDTO userDTO);
+}
+```
+
+</details>
+
+<details>
+  <summary>UserServiceImpl</summary>
+
+```java
+package com.example.springboot.user;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
+
+    @Override
+    public UserDTO signUp(UserDTO userDTO) {
+        return (UserDTO.of(userRepository.save(userDTO.transforUser())));
+    }
+
+    @Override
+    public UserDTO select(Long ID) {
+        return null;
+    }
+
+    @Override
+    public UserDTO updateUser(UserDTO userDTO) {
+        return null;
+    }
+
+}
+```
+
+</details>
+
+<details>
+  <summary>UserController</summary>
+
+```java
+package com.example.springboot.user;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/user")
+@RequiredArgsConstructor
+public class UserController {
+    private final UserService userService;
+
+    @PostMapping("/signup")
+    public ResponseEntity<UserDTO> signUp(@RequestBody UserDTO userDTO){
+        UserDTO result = userService.signUp(userDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+    }
+
+    @GetMapping("/find/{id}")
+    public ResponseEntity<UserDTO> find(@PathVariable("id") long id){
+        return ResponseEntity.ok(userService.select(id));
+    }
+}
+```
+
+</details>
+
+<br/>
 <br/>
 
 > ## Controller 테스트
@@ -507,6 +680,7 @@ h2:
 </details>
 
 <br/>
+<br/>
 
 > ## Service 테스트
 
@@ -617,6 +791,7 @@ h2:
   ```
 </details>
 
+<br/>
 <br/>
 
 > ## Repository 테스트
