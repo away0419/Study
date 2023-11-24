@@ -1,39 +1,52 @@
-최종 작성일 : 23.04.13
+> ## BDD
+ - given, when, then 순으로 작성하는 방법임.
+   - given : 테스트에 필요한 데이터 또는 동작을 준비하는 단계.
+   - when : 테스트 하려는 기능을 실행 시키는 단계.
+   - then : 실행 후 나온 결과 값을 확인하는 단계.
 
-JUnit5 테스트
+<br/>
+<br/>
 
-## 의존성 추가
+> ## 의존성 추가
+- Junit, AssertJ 라이브러리 추가
 
-- gradle
-    ```
-    dependencies {
-        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-    }
-    ```
+<details>
+  <summary>gradle</summary>
 
-- maven
+```
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+```
+</details>
 
-    ```
-    <dependencies>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.8.1</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    ```
+<details>
+  <summary>maven</summary>
+
+```
+<dependencies>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>5.8.1</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>5.8.1</version>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+```
+
+</details>
+
 <br>
 <br>
 
-## 자주 사용하는 어노테이션
+> ## 자주 사용하는 어노테이션
 
 어노테이션|설명
 ---|---
@@ -48,7 +61,10 @@ JUnit5 테스트
 <br>
 <br>
 
-## 기타 어노 테이션
+> ## 기타 어노 테이션
+<details>
+  <summary>자주 사용 하지 않음.</summary>
+
 ### @DisplayNameGeneration
 - 기존 클래스, 메서드명에서 변형한 테스트명으로 설정
 - DisplayNameGenerator 내부 클래스를 이용
@@ -65,10 +81,10 @@ JUnit5 테스트
 ### @IndicativeSentencesGeneration
 - IndicativeSentences의 구분자를 커스텀하게 사용할 수 있게해줍니다.
 
-    파라미터명|설명
-    --|--
-    separator|구분자 (기본값 : ", ")
-    generator|정의된 DisplayNameGenerator 중 하나 사용
+  파라미터명|설명
+  --|--
+  separator|구분자 (기본값 : ", ")
+  generator|정의된 DisplayNameGenerator 중 하나 사용
 
 <br>
 
@@ -76,10 +92,9 @@ JUnit5 테스트
 - 테스트 코드를 구분지어 태깅하고 원하는 태그만 필터링해서 테스트할 수 있게해줌.
 - 필터링을 하려면 추가 설정이 필요.
 
-
-    파라미터명|설명
-    --|--
-    value|태그명
+  파라미터명|설명
+  --|--
+  value|태그명
     
 <br>
 
@@ -106,9 +121,6 @@ JUnit5 테스트
     ARGUMENTS_WITH_NAMES_PLACEHOLDER|현재 실행된 파라미터명 + "=" + 값
     DEFAULT_DISPLAY_NAME|"[" + INDEX_PLACEHOLDER + "] " + ARGUMENTS_WITH_NAMES_PLACEHOLDER
 
-<br>
-
-
 - 단독으로 사용되지 않으며 어떤 파라미터를 사용하는지에 관한 어노테이션을 추가로 선언해야함.
 
 - @valueSource
@@ -131,11 +143,11 @@ JUnit5 테스트
 - @EnumSource
     - enum에 정의된 상수들을 테스트하기 위한 어노테이션
     
-    파라미터|설명
-    --|--
-    value|테스트할 Enum 클래스 (기본값 : NullEnum.class)
-    names|문자열(정규식)
-    mode|names를 이용하여 검색 
+       파라미터|설명
+       --|--
+       value|테스트할 Enum 클래스 (기본값 : NullEnum.class)
+       names|문자열(정규식)
+       mode|names를 이용하여 검색 
 
 - @MethodSource
     - factory 메서드가 리턴해주는 값을 가지고 반복 테스트하는 어노테이션
@@ -143,43 +155,42 @@ JUnit5 테스트
     - 인자 없어야함.
     - Stream 타입으로 리턴해야함.
     
-    파라미터|설명
-    --|--
-    value|factory 메소드 명
+       파라미터|설명
+       --|--
+       value|factory 메소드 명
 
 - @CvsSource
     - CSV 현식의 데이터로 반복 테스트
 
-    파라미터|설명
-    --|--
-    value|CVS 형식의 데이터
-    delimiter|delimiter를 변경 (char 형)
-    delimiterString|delimiter를 변경 (String 형)
-    emptyValue|CVS 데이터 중 빈 값인 경우 대체되는 값
-    nullValues|CVS 데이터 중 null 값으로 대체할 값
+       파라미터|설명
+       --|--
+       value|CVS 형식의 데이터
+       delimiter|delimiter를 변경 (char 형)
+       delimiterString|delimiter를 변경 (String 형)
+       emptyValue|CVS 데이터 중 빈 값인 경우 대체되는 값
+       nullValues|CVS 데이터 중 null 값으로 대체할 값
 
 - @CvsFileSource
     - cvs 파일을 읽어서 테스트할 수 있게 해주는 어노테이션
 
-    파라미터|설명
-    --|--
-    resources|.cvs 파일 경로
-    files|.cvs 파일 경로
-    encoding|파일 인코딩 값
-    lineSeparator|줄 바꿈 구분자
-    delimiter|delimiter를 변경 (char 형)
-    delimiterString|delimiter를 변경 (String 형)
-    numLinesToSkip|cvs 파일 라인 스킵 수
-    emptyValue|CVS 데이터 중 빈 값인 경우 대체되는 값
-    nullValues|CVS 데이터 중 null 값으로 대체할 값
+       파라미터|설명
+       --|--
+       resources|.cvs 파일 경로
+       files|.cvs 파일 경로
+       encoding|파일 인코딩 값
+       lineSeparator|줄 바꿈 구분자
+       delimiter|delimiter를 변경 (char 형)
+       delimiterString|delimiter를 변경 (String 형)
+       numLinesToSkip|cvs 파일 라인 스킵 수
+       emptyValue|CVS 데이터 중 빈 값인 경우 대체되는 값
+       nullValues|CVS 데이터 중 null 값으로 대체할 값
 
 - @ArgumentSource
     - 정해진 데이터 주입 방법말고 커스텀하게 주입 데이터 값을 정할 수 있음.
 
-    파라미터|설명
-    --|--
-    value|데이터 주입 방법을 정의한 클래스
-
+       파라미터|설명
+       --|--
+       value|데이터 주입 방법을 정의한 클래스
 
 <br>
 
@@ -210,45 +221,57 @@ JUnit5 테스트
 - 개발자가 원하는 형태의 정렬로 구현하는 방법
 - MethodOrder를 implements해서 구현
 - 이후 해당 클래스를 value에 넣어서 사용
+</details>
+ 
 
 
 <br>
 <br> 
 
 
-## Assertions
+> ## Assertions
 - 개발자가 테스트 하고 싶은 인자 값을 넣었을 때 예상한 결과가 나오는 지 테스트 할 때 사용
 
-    메서드|설명
-    ---|---
-    assertEquals(expected, actual, message)|expected 값과 actual 값이 동일한지 확인합니다. 동일하지 않은 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
-    assertNotEquals(unexpected, actual, message)|unexpected 값과 actual 값이 다른지 확인합니다. 동일한 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
-    assertTrue(condition, message)|주어진 condition이 true인지 확인합니다. false인 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
-    assertFalse(condition, message)|주어진 condition이 false인지 확인합니다. true인 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
-    assertNull(object, message)|주어진 object가 null인지 확인합니다. null이 아닌 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
-    assertNotNull(object, message)|주어진 object가 null이 아닌지 확인합니다. null인 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
-    assertSame(expected, actual, message)|expected와 actual이 동일한 객체를 참조하는지 확인합니다. 참조가 다른 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
-    assertNotSame(unexpected, actual, message)|unexpected와 actual이 서로 다른 객체를 참조하는지 확인합니다. 동일한 객체를 참조하는 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
-    assertArrayEquals(expected, actual, message)|두 배열이 동일한 순서와 값을 가지고 있는지 확인합니다. 배열의 내용이 다른 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
-    assertThrows(expectedExceptionType, executable, message)|주어진 executable이 실행되었을 때 expectedExceptionType의 예외가 발생하는지 확인합니다. 예외가 발생하지 않거나 다른 종류의 예외가 발생한 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
-    assertTimeout(duration, executable, message)|주어진 executable이 지정된 duration 내에 완료되는지 확인합니다. 지정된 시간 내에 완료되지 않은 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
-    assertTimeoutPreemptively(duration, executable, message)|주어진 executable이 지정된 duration 내에 완료되는지 확인합니다. 지정된 시간 내에 완료되지 않은 경우, executable이 즉시 중단되고 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
+- <details>
+    <summary>자주 사용 안함</summary>
+
+  메서드|설명
+  ---|---
+  assertEquals(expected, actual, message)|expected 값과 actual 값이 동일한지 확인합니다. 동일하지 않은 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
+  assertNotEquals(unexpected, actual, message)|unexpected 값과 actual 값이 다른지 확인합니다. 동일한 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
+  assertTrue(condition, message)|주어진 condition이 true인지 확인합니다. false인 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
+  assertFalse(condition, message)|주어진 condition이 false인지 확인합니다. true인 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
+  assertNull(object, message)|주어진 object가 null인지 확인합니다. null이 아닌 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
+  assertNotNull(object, message)|주어진 object가 null이 아닌지 확인합니다. null인 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
+  assertSame(expected, actual, message)|expected와 actual이 동일한 객체를 참조하는지 확인합니다. 참조가 다른 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
+  assertNotSame(unexpected, actual, message)|unexpected와 actual이 서로 다른 객체를 참조하는지 확인합니다. 동일한 객체를 참조하는 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
+  assertArrayEquals(expected, actual, message)|두 배열이 동일한 순서와 값을 가지고 있는지 확인합니다. 배열의 내용이 다른 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
+  assertThrows(expectedExceptionType, executable, message)|주어진 executable이 실행되었을 때 expectedExceptionType의 예외가 발생하는지 확인합니다. 예외가 발생하지 않거나 다른 종류의 예외가 발생한 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
+  assertTimeout(duration, executable, message)|주어진 executable이 지정된 duration 내에 완료되는지 확인합니다. 지정된 시간 내에 완료되지 않은 경우, 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
+  assertTimeoutPreemptively(duration, executable, message)|주어진 executable이 지정된 duration 내에 완료되는지 확인합니다. 지정된 시간 내에 완료되지 않은 경우, executable이 즉시 중단되고 선택적으로 제공하는 message가 테스트 실패 메시지로 표시됩니다.
+</details>
+
 
 
 <br>
 <br>
 
-## Assumptions
+> ## Assumptions
 - 개발자가 인자 값을 정확히 모를 때 if와 같은 용로도 사용
+
+- <details>
+    <summary>자주 사용하지 않음</summary>
 
     메소드명|설명
     --|--
     assumeTrue|테스트가 실패하면 에러 발생
     assumeFalse|테스트가 성공하면 에러 발생
     assumingThat(boolean, executable)|첫 번째 인자가 True면 두 번째 인자로 들어온 함수 실행. 첫 번째 인자 값이 false 인 경우에도 테스트를 스킵하지 않고 다음 코드를 진행합니다.
+</details>
 
 
-## Hamcrest
+
+> ## Hamcrest
 - assertions, assumptions 를 좀 더 가독성있고 편하게 쓸 수 있도록 도와주는 라이브러리 
 - Matcher 클래스를 이용하여 첫 번째 인자로 들어온 값을 검증.
 
@@ -289,9 +312,10 @@ JUnit5 테스트
 <br>
 <br>
 
-## AssertJ
-- Hamcrest와 거의 비슷
-- 메서드 체이닝 방식 사용 (Hamcrest 보다 편하게 사용 가능)
+> ## AssertJ
+- Hamcrest와 거의 비슷.
+- 메서드 체이닝 방식 사용. (Hamcrest 보다 편하게 사용 가능)
+- 가장 많이 사용하는 방식.
 
      메소드명|설명
     --|--
