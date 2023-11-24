@@ -164,6 +164,7 @@ class MyRepositoryTests {
 
 - 슬라이드 테스트. (통합 테스트이며 부분 테스트임.)
 - Datasource와 JdbcTemplate만 필요한 경우 사용.
+- mybatis 사용할 경우 적용.
 </details>
 
 <br/>
@@ -502,3 +503,114 @@ h2:
   }
   ```
 </details>
+
+
+## Service 테스트
+
+<details>
+  <summary>단위 테스트</summary>
+
+- 많이 사용 하는 방법.
+
+  ```java
+  package com.example.springboot.user;
+  
+  import org.junit.jupiter.api.DisplayName;
+  import org.junit.jupiter.api.Test;
+  import org.junit.jupiter.api.extension.ExtendWith;
+  import org.mockito.InjectMocks;
+  import org.mockito.Mock;
+  import org.mockito.junit.jupiter.MockitoExtension;
+  
+  import static org.assertj.core.api.Assertions.assertThat;
+  import static org.mockito.ArgumentMatchers.any;
+  import static org.mockito.Mockito.*;
+  
+  @ExtendWith(MockitoExtension.class)
+  class UserServiceTest {
+  
+      // 가짜 객체 생성
+      @Mock
+      private UserRepository userRepository;
+  
+      // 가짜 객체 주입
+      @InjectMocks
+      private UserServiceImpl userService;
+  
+      @Test
+      @DisplayName("회원가입")
+      void signup() {
+          //given (입력 값, 예상 되는 출력값, 가짜 객체 실행 시 내보낼 값 설정)
+          UserEntity userEntity = UserEntity.builder().name("홍길동").age(13).build();
+          UserDTO request = UserDTO.builder().name("홍길동").age(13).build();
+          UserDTO response = UserDTO.of(userEntity);
+          doReturn(userEntity).when(userRepository).save(any(UserEntity.class));
+  
+          // when (서비스 실행 시 결과 값)
+          UserDTO result = userService.signUp(request);
+  
+          // then (예상 값과 결과 값 비교)
+          assertThat(result.getName()).isEqualTo(response.getName());
+          assertThat(result.getAge()).isEqualTo(response.getAge());
+  
+          // verity (실제 해당 메소드가 1번 실행 되었는지 검증)
+          verify(userRepository, times(1)).save(any(UserEntity.class));
+      }
+  }
+  ```
+</details>
+
+<details>
+  <summary>통합 테스트</summary>
+
+- service는 controller에서 쓰는 부분 테스트 어노테이션이(@WebMvcTest) 없음.
+- 거의 사용 하지 않는다.
+
+  ```java
+  package com.example.springboot.user;
+  
+  
+  import org.junit.jupiter.api.DisplayName;
+  import org.junit.jupiter.api.Test;
+  import org.springframework.boot.test.context.SpringBootTest;
+  import org.springframework.boot.test.mock.mockito.MockBean;
+  import org.springframework.boot.test.mock.mockito.SpyBean;
+  
+  import static org.assertj.core.api.Assertions.assertThat;
+  import static org.mockito.ArgumentMatchers.any;
+  import static org.mockito.Mockito.*;
+  
+  @SpringBootTest
+  public class UserServiceTest2 {
+  
+      // 등록 된 bean을 바꿔 치기 할 가짜 객체
+      @MockBean
+      private UserRepository userRepository;
+  
+      // 기본적으로 등록된 bean을 가져온다. 만약 가짜 객체로 만들고 싶어진다면 given 작업에서 수행하면 그 메소드에서만 적용됨.
+      @SpyBean
+      private UserService userService;
+  
+      @Test
+      @DisplayName("회원가입")
+      void signup() {
+          //given (입력 값, 예상 되는 출력값, 가짜 객체 실행 시 내보낼 값 설정)
+          UserEntity userEntity = UserEntity.builder().name("홍길동").age(13).build();
+          UserDTO request = UserDTO.builder().name("홍길동").age(13).build();
+          UserDTO response = UserDTO.of(userEntity);
+          doReturn(userEntity).when(userRepository).save(any(UserEntity.class));
+  
+          // when (서비스 실행 시 결과 값)
+          UserDTO result = userService.signUp(request);
+  
+          // then (예상 값과 결과 값 비교)
+          assertThat(result.getName()).isEqualTo(response.getName());
+          assertThat(result.getAge()).isEqualTo(response.getAge());
+  
+          // verity (실제 해당 메소드가 1번 실행 되었는지 검증)
+          verify(userRepository, times(1)).save(any(UserEntity.class));
+      }
+  }
+  ```
+</details>
+
