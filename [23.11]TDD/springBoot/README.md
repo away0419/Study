@@ -1,6 +1,7 @@
 [선행 학습: Java](https://github.com/away0419/Study-2023/tree/main/TDD/java)
 
 > ## 테스트 도구
+
 - spring-boot-starter-test 안에 포함 되어 있음.
   - JUnit : Java 단위 테스트 프레임워크
   - AssertJ : 유연한 검증 라이브러리
@@ -14,6 +15,7 @@
 <br/>
 
 > ## 통합 테스트 설정 어노테이션
+
 - 해당 클래스가 테스트 코드를 위한 클래스라는 것을 알리고, 설정한다고 생각하면 됨.
 - 여러 형태가 있는데 대표적으로 사용되는 어노테이션은 아래와 같음.
 - 슬라이드 테스트 클래스의 위치는 Spring 실행 클래스(@SpringBootApplication)와 동일한 경로 혹은, 하위 경로에 포함되어 있어야 함.
@@ -24,6 +26,7 @@
 ```java
 @SpringBootTest(properties = { "mangkyu.blog=tistory" })
 ```
+
 - 통합 테스트 환경 설정.
 - 모든 빈을 스캔하고 애플리케이션 컨텍스트 생성.
   - 특정 계층만 테스트할 경우 불필요한 빈 스캔으로 시간이 오래 걸림.
@@ -103,7 +106,7 @@
           }
           ``` 
           </details>
-  
+
 </details>
 
 <details>
@@ -114,8 +117,9 @@
 class UserControllerTest {
 }
 ```
+
 - 슬라이드 테스트. (통합 테스트이며 부분 테스트임.)
-- 컨트롤러 테스트용. 
+- 컨트롤러 테스트용.
 - 컨트롤러와 연관된 빈들만 제한적으로 찾아서 등록. (@Component, @ConfigurationProperties 스캔 안함)
   - @Controller, @RestController
   - @ControllerAdvice, @RestControllerAdvice
@@ -126,9 +130,9 @@ class UserControllerTest {
   - 기타 등등
 - 내장된 서블릿 컨테이너가 랜덤 포트로 실행.
 - 내부에 @AutoConfigureMockMvc가 있기에 @Autowired로 MockMvc 주입 받을 수 있음.
-- 컨트롤러가 의존하는 Bean이 있다면 @MockBean, @SpyBean을 사용해 주어야 함. 
+- 컨트롤러가 의존하는 Bean이 있다면 @MockBean, @SpyBean을 사용해 주어야 함.
   - 이 경우 새로운 애플리케이션 컨택스트를 필요로 하므로 주의 해야 함.
-</details>
+  </details>
 
 <details>
   <summary>@DataJpaTest</summary>
@@ -138,6 +142,7 @@ class UserControllerTest {
 class MyRepositoryTests {
 }
 ```
+
 - 슬라이드 테스트. (통합 테스트이며 부분 테스트임.)
 - JPA repository 테스트용.
 - @Entity 스캔하고 테스트를 위한 TestEntityManager를 사용해 JPA repository 설정함. (@Component, @ConfigurationProperties 스캔 안함.)
@@ -189,8 +194,9 @@ class MyRepositoryTests {
 <br/>
 
 > ## 통합 테스트 작성시 주의사항
+
 - 무분별한 어노테이션 설정은 불필요한 빈을 등록하게 됨.
-  - 아래 예제에서 @EnableBatchProcessing를 적용 하였기 때문에 Test에서 배치가 필요 없더라도 배치와 관련된 bean이 함께 등록됨. 
+  - 아래 예제에서 @EnableBatchProcessing를 적용 하였기 때문에 Test에서 배치가 필요 없더라도 배치와 관련된 bean이 함께 등록됨.
     ```java
     @SpringBootApplication
     @EnableBatchProcessing
@@ -208,6 +214,7 @@ class MyRepositoryTests {
 <br/>
 
 > ## Mockito
+
 - 개발자가 동작을 직접 제어할 수 있는 가짜 객체를 지원하는 프레임워크.
 - Spring 웹 개발 시, 객체들 간의 의존성이 생겨 단위 테스트 작성을 어렵게 함. 이를 가짜 객체로 주입하여 편하게 작성 가능.
 - 필요 없다면 안쓰는게 가장 좋음.
@@ -219,8 +226,11 @@ class MyRepositoryTests {
   - @SpyBean : 애플리케이션 컨텍스트로 동작할 때, 기존 Bean에서 특정 테스트에서만 가짜 객체를 주입 하고 싶을 경우 사용.
 - Stub 결과 처리를 위한 메소드를 제공함.
   - doReturn() : 가짜 객체가 특정한 값을 반환해야 하는 경우.
-  - doNoting() : 가짜 객체가 아무 것도 반환하지 않는 경우. 
+  - doNoting() : 가짜 객체가 아무 것도 반환하지 않는 경우.
   - doThrow() : 가짜 객체가 예외를 발생시키는 경우.
+    - 추가적으로 when() 으로 시작하는 메서드도 있음.
+    - 차이점은 when()의 경우 실제 메소드를 호출하기 때문에 대상 메소드에 문제점이 있을 경우 발견 가능.
+    - 그러나 시간이 더 걸릴 수 있으므로 상황에 따라 사용하면 됨.
 - Junit과 결합하여 사용하기 위해선 @ExtendWith(MockitoExtension.class) 적용해야 함.
   - SpringBoot 2.2.0 전에는 @RunWith(MockitoJUnitRunner.class)
 
@@ -246,7 +256,7 @@ class MyRepositoryTests {
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
   </dependency>
-  
+
   <!-- MOCKITO -->
   <dependency>
       <groupId>org.mockito</groupId>
@@ -254,7 +264,7 @@ class MyRepositoryTests {
       <version>4.1.0</version>
       <scope>test</scope>
   </dependency>
-  
+
   <!-- GSON -->
   <dependency>
       <groupId>com.google.code.gson</groupId>
@@ -263,6 +273,7 @@ class MyRepositoryTests {
   </dependency>
 </dependencies>
 ```
+
 </details>
 
 <details>
@@ -275,14 +286,15 @@ dependencies {
 
     // Spring Data JPA
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    
-    // Mockito 
+
+    // Mockito
     testImplementation 'org.mockito:mockito-core:4.1.0'
 
     // Gson
     implementation 'com.google.code.gson:gson:2.8.9'
 }
 ```
+
 </details>
 
 <details>
@@ -299,6 +311,7 @@ spring.jpa.hibernate.ddl-auto=update
 spring.h2.console.enabled=true
 spring.h2.console.path=/h2-console
 ```
+
 </details>
 
 <details>
@@ -322,12 +335,14 @@ h2:
     enabled: true
     path: /h2-console
 ```
+
 </details>
 
 <br/>
 <br/>
 
 > ## Member 도메인
+
 <details>
   <summary>UserEntity</summary>
 
@@ -496,6 +511,7 @@ public class UserController {
 <br/>
 
 > ## Controller 테스트
+
 <details>
   <summary>단위 테스트</summary>
 
@@ -503,12 +519,12 @@ public class UserController {
 
   ```java
   package user;
-  
+
   import static org.mockito.ArgumentMatchers.any;
   import static org.mockito.Mockito.doReturn;
   import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
   import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-  
+
   import com.google.gson.Gson;
   import org.junit.jupiter.api.BeforeEach;
   import org.junit.jupiter.api.DisplayName;
@@ -522,39 +538,39 @@ public class UserController {
   import org.springframework.test.web.servlet.ResultActions;
   import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
   import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-  
+
   @ExtendWith(MockitoExtension.class)
   class UserControllerTest {
-  
+
       // 가짜 객체(Mock) 생성
       @Mock
       private UserService userService;
-  
+
       // @Mock으로 만든 가짜 객체를 주입 받은 객체 생성. (@Mock userService 주입된 userController)
       @InjectMocks
       private UserController userController;
-  
+
       // 테스트용 HTTP 호출 (가짜 객체를 주입 받은 userController 등록 하기 위한 테스트용 MVC)
       private MockMvc mockMvc;
-  
+
       // 각 @Test, @RepeatedTest, @ParameterizedTest 또는 @TestFactory 메소드보다 먼저 메소드가 실행되어야 함을 의미
       // 가짜 객체 userService가 주입 된 UserController를 적용 하겠다는 뜻이다.
       @BeforeEach
       public void init() {
           mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
       }
-  
+
       @DisplayName("회원 가입 성공")
       @Test
       void signUpSuccess() throws Exception {
           //given
           UserDTO userRequest = signRequest();
           UserDTO userResponse = signResponse();
-  
+
           // userService는 가짜 객체이므로 반환 값이 무엇인지 설정해야한다.
           // 즉, 가짜 객체 userService의 메소드 signUp()에 UserDTO.class로 변환 가능한 객체 any를 매개변수로 주었을 경우 userResponse를 반환하도록 설정하는 것이다.
           doReturn(userResponse).when(userService).signUp(any(UserDTO.class));
-  
+
           //when
           // userRequest를 콘텐트 내용으로 보냈을 때, 결과 값이 resultActions 에 저장된다.
           ResultActions resultActions = mockMvc.perform(
@@ -562,16 +578,16 @@ public class UserController {
                           .contentType(MediaType.APPLICATION_JSON)
                           .content(new Gson().toJson(userRequest)) // request를 Gson 라이브러리를 통해 Json으로 변환하여 넘긴다.
           );
-  
+
           //then
           // 현재는 값이 존재 하는지만 확인 했지만 결과 값이 내가 예상하는 결과 값이랑 같은지 확인하면 된다.
           resultActions.andExpect(status().isCreated()) // 상태 결과 값이 created인지 확인
               .andExpect(jsonPath("id", userResponse.getId()).exists()) // id 값이 존재 하는지 확인
               .andExpect(jsonPath("name", userResponse.getName()).exists()) // name 값이 존재 하는지 확인
               .andExpect(jsonPath("age", userResponse.getAge()).exists()); // age 값이 존재 하는지 확인
-  
+
       }
-  
+
       // 테스트할 입력 값
       private UserDTO signRequest() {
           return UserDTO.builder()
@@ -580,7 +596,7 @@ public class UserController {
                   .age(32)
                   .build();
       }
-  
+
       // 정해진 결과 값
       private UserDTO signResponse() {
           return UserDTO.builder()
@@ -591,7 +607,8 @@ public class UserController {
       }
   }
   ```
-</details>
+
+  </details>
 
 <details>
   <summary>부분 테스트</summary>
@@ -601,7 +618,7 @@ public class UserController {
 
   ```java
   package com.example.springboot.user;
-  
+
   import com.google.gson.Gson;
   import org.junit.jupiter.api.DisplayName;
   import org.junit.jupiter.api.Test;
@@ -612,51 +629,51 @@ public class UserController {
   import org.springframework.test.web.servlet.MockMvc;
   import org.springframework.test.web.servlet.ResultActions;
   import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-  
+
   import static org.mockito.ArgumentMatchers.any;
   import static org.mockito.Mockito.doReturn;
   import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
   import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-  
-  
+
+
   @WebMvcTest(UserController.class)
   class UserControllerTest2 {
-  
+
       // 서버를 실행 하지 않고도 api 요청을 보낼 수 있는 객체
       @Autowired
       private MockMvc mockMvc;
-  
+
       // bean에 등록 된 userService를 가짜 객체로 교체 한다.
       @MockBean
       private UserService userService;
-  
+
       @Test
       @DisplayName("회원 가입 성공")
       void signUpSuccess() throws Exception {
           //given
           UserDTO userRequest = signRequest();
           UserDTO userResponse = signResponse();
-  
+
           // userService는 가짜 객체이므로 반환 값이 무엇인지 설정해야한다.
           // 즉, 가짜 객체 userService의 메소드 signUp()에 UserDTO.class로 변환 가능한 객체 any를 매개변수로 주었을 경우 userResponse를 반환하도록 설정하는 것이다.
           doReturn(userResponse).when(userService).signUp(any(UserDTO.class));
-  
+
           //when
           ResultActions resultActions = mockMvc.perform(
                   MockMvcRequestBuilders.post("/user/signup")
                           .contentType(MediaType.APPLICATION_JSON)
                           .content(new Gson().toJson(userRequest)) // request를 Gson 라이브러리를 통해 Json으로 변환하여 넘긴다.
           );
-  
+
           //then
           // 현재는 값이 존재 하는지만 확인 했지만 결과 값이 내가 예상하는 결과 값이랑 같은지 확인하면 된다.
           resultActions.andExpect(status().isCreated()) // 상태 결과 값이 created인지 확인
                   .andExpect(jsonPath("id", userResponse.getId()).exists()) // id 값이 존재 하는지 확인
                   .andExpect(jsonPath("name", userResponse.getName()).exists()) // name 값이 존재 하는지 확인
                   .andExpect(jsonPath("age", userResponse.getAge()).exists()); // age 값이 존재 하는지 확인
-  
+
       }
-  
+
       // 테스트할 입력 값
       private UserDTO signRequest() {
           return UserDTO.builder()
@@ -665,7 +682,7 @@ public class UserController {
                   .age(32)
                   .build();
       }
-  
+
       // 정해진 결과 값
       private UserDTO signResponse() {
           return UserDTO.builder()
@@ -674,10 +691,11 @@ public class UserController {
                   .age(32)
                   .build();
       }
-  
+
   }
   ```
-</details>
+
+  </details>
 
 <br/>
 <br/>
@@ -691,29 +709,29 @@ public class UserController {
 
   ```java
   package com.example.springboot.user;
-  
+
   import org.junit.jupiter.api.DisplayName;
   import org.junit.jupiter.api.Test;
   import org.junit.jupiter.api.extension.ExtendWith;
   import org.mockito.InjectMocks;
   import org.mockito.Mock;
   import org.mockito.junit.jupiter.MockitoExtension;
-  
+
   import static org.assertj.core.api.Assertions.assertThat;
   import static org.mockito.ArgumentMatchers.any;
   import static org.mockito.Mockito.*;
-  
+
   @ExtendWith(MockitoExtension.class)
   class UserServiceTest {
-  
+
       // 가짜 객체 생성
       @Mock
       private UserRepository userRepository;
-  
+
       // 가짜 객체 주입
       @InjectMocks
       private UserServiceImpl userService;
-  
+
       @Test
       @DisplayName("회원가입")
       void signup() {
@@ -722,20 +740,21 @@ public class UserController {
           UserDTO request = UserDTO.builder().name("홍길동").age(13).build();
           UserDTO response = UserDTO.of(userEntity);
           doReturn(userEntity).when(userRepository).save(any(UserEntity.class));
-  
+
           // when (서비스 실행 시 결과 값)
           UserDTO result = userService.signUp(request);
-  
+
           // then (예상 값과 결과 값 비교)
           assertThat(result.getName()).isEqualTo(response.getName());
           assertThat(result.getAge()).isEqualTo(response.getAge());
-  
+
           // verity (실제 해당 메소드가 1번 실행 되었는지 검증)
           verify(userRepository, times(1)).save(any(UserEntity.class));
       }
   }
   ```
-</details>
+
+  </details>
 
 <details>
   <summary>통합 테스트</summary>
@@ -745,29 +764,29 @@ public class UserController {
 
   ```java
   package com.example.springboot.user;
-  
-  
+
+
   import org.junit.jupiter.api.DisplayName;
   import org.junit.jupiter.api.Test;
   import org.springframework.boot.test.context.SpringBootTest;
   import org.springframework.boot.test.mock.mockito.MockBean;
   import org.springframework.boot.test.mock.mockito.SpyBean;
-  
+
   import static org.assertj.core.api.Assertions.assertThat;
   import static org.mockito.ArgumentMatchers.any;
   import static org.mockito.Mockito.*;
-  
+
   @SpringBootTest
   public class UserServiceTest2 {
-  
+
       // 등록 된 bean을 바꿔 치기 할 가짜 객체
       @MockBean
       private UserRepository userRepository;
-  
+
       // 기본적으로 등록된 bean을 가져온다. 만약 가짜 객체로 만들고 싶어진다면 given 작업에서 수행하면 그 메소드에서만 적용됨.
       @SpyBean
       private UserService userService;
-  
+
       @Test
       @DisplayName("회원가입")
       void signup() {
@@ -776,20 +795,21 @@ public class UserController {
           UserDTO request = UserDTO.builder().name("홍길동").age(13).build();
           UserDTO response = UserDTO.of(userEntity);
           doReturn(userEntity).when(userRepository).save(any(UserEntity.class));
-  
+
           // when (서비스 실행 시 결과 값)
           UserDTO result = userService.signUp(request);
-  
+
           // then (예상 값과 결과 값 비교)
           assertThat(result.getName()).isEqualTo(response.getName());
           assertThat(result.getAge()).isEqualTo(response.getAge());
-  
+
           // verity (실제 해당 메소드가 1번 실행 되었는지 검증)
           verify(userRepository, times(1)).save(any(UserEntity.class));
       }
   }
   ```
-</details>
+
+  </details>
 
 <br/>
 <br/>
@@ -803,35 +823,36 @@ public class UserController {
 
   ```java
   package com.example.springboot.user;
-  
+
   import org.junit.jupiter.api.DisplayName;
   import org.junit.jupiter.api.Test;
   import org.springframework.beans.factory.annotation.Autowired;
   import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-  
+
   import static org.assertj.core.api.Assertions.assertThat;
-  
+
   @DataJpaTest
   class UserRepositoryTest {
-  
+
       // bean에 등록 된 객체를 그대로 가져와 쓰겠다.
       @Autowired
       private UserRepository userRepository;
-  
+
       @Test
       @DisplayName("회원가입")
       void signUp(){
           //given
           UserDTO request = UserDTO.builder().name("홍길동").age(13).build();
-  
+
           //when
           UserEntity result = userRepository.save(request.transforUser());
-  
+
           //then
           assertThat(result.getAge()).isEqualTo(request.getAge());
           assertThat(result.getName()).isEqualTo(request.getName());
       }
-  
+
   }
   ```
-</details>
+
+  </details>
