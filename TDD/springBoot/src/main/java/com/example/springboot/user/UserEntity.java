@@ -1,16 +1,14 @@
 package com.example.springboot.user;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name ="MEMBER")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Builder
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

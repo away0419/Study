@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserRepository userRep;
+    private final UserRepository userRepository;
 
     @Override
     public UserDTO signUp(UserDTO userDTO) {
-        return (UserDTO.of(userRep.save(userDTO.transforUser())));
+        return (UserDTO.of(userRepository.save(userDTO.transforUser())));
     }
 
     @Override

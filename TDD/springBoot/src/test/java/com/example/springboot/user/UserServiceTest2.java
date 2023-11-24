@@ -1,26 +1,26 @@
 package com.example.springboot.user;
 
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+@SpringBootTest
+public class UserServiceTest2 {
 
-    // 가짜 객체 생성
-    @Mock
+    // 등록 된 bean을 바꿔 치기 할 가짜 객체
+    @MockBean
     private UserRepository userRepository;
 
-    // 가짜 객체 주입
-    @InjectMocks
-    private UserServiceImpl userService;
+    // 기본적으로 등록된 bean을 가져온다. 만약 가짜 객체로 만들고 싶어진다면 given 작업에서 수행하면 그 메소드에서만 적용됨.
+    @SpyBean
+    private UserService userService;
 
     @Test
     @DisplayName("회원가입")
@@ -41,4 +41,6 @@ class UserServiceTest {
         // verity (실제 해당 메소드가 1번 실행 되었는지 검증)
         verify(userRepository, times(1)).save(any(UserEntity.class));
     }
+
+
 }
