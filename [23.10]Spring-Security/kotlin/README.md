@@ -68,6 +68,7 @@ spring security : 6.1.4
         <summary>kakao</summary>
 
   [kakao](https://developers.kakao.com/)
+
   ![img.png](image/kakao/img.png)
   ![img_1.png](image/kakao/img_1.png)
   ![img_2.png](image/kakao/img_2.png)
@@ -117,87 +118,87 @@ spring security : 6.1.4
 
   ```yaml
   spring:
-    profiles:
+      profiles:
       active:
-        - local
-    # h2 설정
-    h2:
+          - local
+      # h2 설정
+      h2:
       console:
-        enabled: true
-        path: /h2-console
-    datasource:
+          enabled: true
+          path: /h2-console
+      datasource:
       driver-class-name: org.h2.Driver
       url: jdbc:h2:mem:test
       username: admin
       password: admin
-    # JPA 설정
-    jpa:
+      # JPA 설정
+      jpa:
       properties:
-        hibernate:
+          hibernate:
           format_sql: true
           show_sql: true
-    # H2에서 JPA 사용하기 위한 설정
-    sql:
+      # H2에서 JPA 사용하기 위한 설정
+      sql:
       init:
-        mode: always
-    # security 설정
-    # 구글, 페북, 깃헙 등은 spring security에서 지원함.
-    # 네이버, 카카오는 지원하지 않음. 따라서 추가 설정 필요함.
-    security:
+          mode: always
+      # security 설정
+      # 구글, 페북, 깃헙 등은 spring security에서 지원함.
+      # 네이버, 카카오는 지원하지 않음. 따라서 추가 설정 필요함.
+      security:
       oauth2.client:
-        registration:
+          registration:
           google:
-            clientId: ${oauth2.client.google.id}
-            clientSecret: ${oauth2.client.google.secret}
-            scope:
+              clientId: ${oauth2.client.google.id}
+              clientSecret: ${oauth2.client.google.secret}
+              scope:
               - email
               - profile
           naver:
-            clientId: ${oauth2.client.naver.id}
-            clientSecret: ${oauth2.client.naver.secret}
-            clientAuthenticationMethod: client_secret_post
-            authorizationGrantType: authorization_code
-            # application이 가지고 있는 기본 변수를 불러옴.
-            redirectUri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
-            scope:
+              clientId: ${oauth2.client.naver.id}
+              clientSecret: ${oauth2.client.naver.secret}
+              clientAuthenticationMethod: client_secret_post
+              authorizationGrantType: authorization_code
+              # application이 가지고 있는 기본 변수를 불러옴.
+              redirectUri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+              scope:
               - nickname
               - email
               - profile_image
-            clientName: Naver
+              clientName: Naver
           kakao:
-            clientId: ${oauth2.client.kakao.id}
-            clientSecret: ${oauth2.client.kakao.secret}
-            clientAuthenticationMethod: client_secret_post
-            authorizationGrantType: authorization_code
-            redirectUri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
-            scope:
+              clientId: ${oauth2.client.kakao.id}
+              clientSecret: ${oauth2.client.kakao.secret}
+              clientAuthenticationMethod: client_secret_post
+              authorizationGrantType: authorization_code
+              redirectUri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+              scope:
               - profile_nickname
               - profile_image
               - account_email
-            clientName: Kakao
-        provider:
+              clientName: Kakao
+          provider:
           kakao:
-            authorization_uri: https://kauth.kakao.com/oauth/authorize
-            token_uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            # 해당 서비스에 요청하여 받은 데이터 안에는 user 정보가 있는데 이 정보를 담음 필드 명이 무엇인지 설정하는 것.
-            user_name_attribute: properties
+              authorization_uri: https://kauth.kakao.com/oauth/authorize
+              token_uri: https://kauth.kakao.com/oauth/token
+              user-info-uri: https://kapi.kakao.com/v2/user/me
+              # 해당 서비스에 요청하여 받은 데이터 안에는 user 정보가 있는데 이 정보를 담음 필드 명이 무엇인지 설정하는 것.
+              user_name_attribute: properties
           naver:
-            authorization_uri: https://nid.naver.com/oauth2.0/authorize
-            token_uri: https://nid.naver.com/oauth2.0/token
-            user-info-uri: https://openapi.naver.com/v1/nid/me
-            user_name_attribute: response
+              authorization_uri: https://nid.naver.com/oauth2.0/authorize
+              token_uri: https://nid.naver.com/oauth2.0/token
+              user-info-uri: https://openapi.naver.com/v1/nid/me
+              user_name_attribute: response
 
   logging.level:
-    org.hibernate.SQL: debug
+      org.hibernate.SQL: debug
 
   --- #local
   jpa:
-    hibernate:
+      hibernate:
       ddl-auto: create-drop
   --- #env
   spring:
-    profiles.include:
+      profiles.include:
       - env
   ```
 
@@ -208,13 +209,13 @@ spring security : 6.1.4
 
   ```yaml
   oauth2.client:
-    google:
+      google:
       id: google에서 받은 ID
       secret: google에서 받은 KEY
-    naver:
+      naver:
       id: naver에서 받은 ID
       secret: naver에서 받은 KEY
-    kakao:
+      kakao:
       id: kakao에서 받은 ID
       secret: kakao에서 받은 KEY
   ```
@@ -228,99 +229,99 @@ spring security : 6.1.4
     <details>
         <summary>Role</summary>
 
-  - 사용자 권한
+    - 사용자 권한
 
-        ```kotlin
-        package com.example.kotlin.member
+    ```kotlin
+    package com.example.kotlin.member
 
-        enum class Role(
-            val key: String,
-            val title: String
-        ) {
-            ROLE_ADMIN("ROLE_ADMIN", "관리자"),
-            ROLE_USER("ROLE_USER", "사용자")
-        }
-        ```
+    enum class Role(
+        val key: String,
+        val title: String
+    ) {
+        ROLE_ADMIN("ROLE_ADMIN", "관리자"),
+        ROLE_USER("ROLE_USER", "사용자")
+    }
+    ```
 
     </details>
 
     <details>
         <summary>Member</summary>
 
-  - db 저장 할 멤버 정보
+    - db 저장 할 멤버 정보
 
-        ```kotlin
-        package com.example.kotlin.member
+    ```kotlin
+    package com.example.kotlin.member
 
-        import jakarta.persistence.*
-        import java.util.*
+    import jakarta.persistence.*
+    import java.util.*
 
-        @Entity
-        @Table(name = "MEMBER_TABLE")
-        class Member(
-            @Id
-            @GeneratedValue(strategy = GenerationType.UUID)
-            @Column(name = "member_id", nullable = false)
-            var id: UUID?,
+    @Entity
+    @Table(name = "MEMBER_TABLE")
+    class Member(
+        @Id
+        @GeneratedValue(strategy = GenerationType.UUID)
+        @Column(name = "member_id", nullable = false)
+        var id: UUID?,
 
-            @Column(name = "name", nullable = false)
-            var name: String?,
+        @Column(name = "name", nullable = false)
+        var name: String?,
 
-            @Column(name = "email")
-            var email: String?,
+        @Column(name = "email")
+        var email: String?,
 
-            @Column(name = "picture")
-            var picture: String?,
+        @Column(name = "picture")
+        var picture: String?,
 
-            @Enumerated(EnumType.STRING)
-            var role: Role?
+        @Enumerated(EnumType.STRING)
+        var role: Role?
 
-        )
-        ```
+    )
+    ```
 
     </details>
 
     <details>
         <summary>MemberRepository</summary>
 
-  - JPA를 이용한 멤버 등록
+    - JPA를 이용한 멤버 등록
 
-        ```kotlin
-        package com.example.kotlin.member.repository
+    ```kotlin
+    package com.example.kotlin.member.repository
 
-        import com.example.kotlin.member.Member
-        import org.springframework.data.jpa.repository.JpaRepository
+    import com.example.kotlin.member.Member
+    import org.springframework.data.jpa.repository.JpaRepository
 
-        interface MemberRepository : JpaRepository<Member, Long> {
-            fun findByEmail(email: String): Member?
-        }
-        ```
+    interface MemberRepository : JpaRepository<Member, Long> {
+        fun findByEmail(email: String): Member?
+    }
+    ```
 
     </details>
     <details>
         <summary>MemberController</summary>
 
-  - 멤버 컨트롤러
+    - 멤버 컨트롤러
 
-  ```kotlin
-  package com.example.kotlin.member.controller
+    ```kotlin
+    package com.example.kotlin.member.controller
 
-  import org.springframework.web.bind.annotation.GetMapping
-  import org.springframework.web.bind.annotation.PostMapping
-  import org.springframework.web.bind.annotation.RequestMapping
-  import org.springframework.web.bind.annotation.RestController
+    import org.springframework.web.bind.annotation.GetMapping
+    import org.springframework.web.bind.annotation.PostMapping
+    import org.springframework.web.bind.annotation.RequestMapping
+    import org.springframework.web.bind.annotation.RestController
 
-  @RestController
-  @RequestMapping("/api/v1/member")
-  class MemberController {
+    @RestController
+    @RequestMapping("/api/v1/member")
+    class MemberController {
 
-      @GetMapping("/login/success")
-      fun login() : String?{
-          return "login success"
-      }
+        @GetMapping("/login/success")
+        fun login() : String?{
+            return "login success"
+        }
 
-  }
-  ```
+    }
+    ```
 
     </details>
 
@@ -331,161 +332,161 @@ spring security : 6.1.4
     <details>
         <summary>Oauth2UserInfo</summary>
 
-  - OAuth2에서 가져온 사용자 정보를 담을 클래스. - 가져온 사용자 정보를 토대로 Member Entity 생성 - 첫 로그인의 경우 관리자는 아닐 것이라 판단하여 ROLE_USER로 줌
+    - OAuth2에서 가져온 사용자 정보를 담을 클래스. - 가져온 사용자 정보를 토대로 Member Entity 생성 - 첫 로그인의 경우 관리자는 아닐 것이라 판단하여 ROLE_USER로 줌
 
-            ```kotlin
-            package com.example.kotlin.security.oauth2
+    ```kotlin
+    package com.example.kotlin.security.oauth2
 
-            import com.example.kotlin.member.Member
-            import com.example.kotlin.member.Role
+    import com.example.kotlin.member.Member
+    import com.example.kotlin.member.Role
 
-            class Oauth2UserInfo(
-                val id: String?,
-                val name: String?,
-                val email: String?,
-                val picture: String?
-            ){
-                fun toEntity(): Member {
-                    return Member(id=null, name=name, email=email, picture=picture, role = Role.ROLE_USER)
-                }
-            }
-            ```
+    class Oauth2UserInfo(
+        val id: String?,
+        val name: String?,
+        val email: String?,
+        val picture: String?
+    ){
+        fun toEntity(): Member {
+            return Member(id=null, name=name, email=email, picture=picture, role = Role.ROLE_USER)
+        }
+    }
+    ```
 
     </details>
 
     <details>
         <summary>OAuth2Attribute</summary>
 
-  - 사용자가 이용한 OAuth2 서비스가 무엇인지 판단하고, 해당 서비스의 정보를 알맞게 가져오기 위한 클래스
+    - 사용자가 이용한 OAuth2 서비스가 무엇인지 판단하고, 해당 서비스의 정보를 알맞게 가져오기 위한 클래스
     - naver와 kakao는 Spring Security가 제공하지 않으므로 추가 설정이 필요함.
 
-  ```kotlin
-  package com.example.kotlin.security.oauth2
+    ```kotlin
+    package com.example.kotlin.security.oauth2
 
-  enum class OAuth2Attributes(
-      val nameAttributeKey: String?,
-      val oauth2UserInfo: (Map<String, Any>?) -> Oauth2UserInfo
-  ) {
-      GOOGLE("google", { map ->
-          Oauth2UserInfo(
-              map?.get("sub").toString(),
-              map?.get("name").toString(),
-              map?.get("email").toString(),
-              map?.get("picture").toString()
-          )
-      }),
+    enum class OAuth2Attributes(
+        val nameAttributeKey: String?,
+        val oauth2UserInfo: (Map<String, Any>?) -> Oauth2UserInfo
+    ) {
+        GOOGLE("google", { map ->
+            Oauth2UserInfo(
+                map?.get("sub").toString(),
+                map?.get("name").toString(),
+                map?.get("email").toString(),
+                map?.get("picture").toString()
+            )
+        }),
 
-      NAVER("naver", { attributes ->
-          val content = attributes?.get("response");
-          val map: Map<String, Any>? = if (content is Map<*, *>) {
-              content as? Map<String, Any>
-          } else {
-              emptyMap()
-          }
-          Oauth2UserInfo(
-              map?.get("id").toString(),
-              map?.get("nickname").toString(),
-              map?.get("email").toString(),
-              map?.get("profile_image").toString()
-          )
-      }),
+        NAVER("naver", { attributes ->
+            val content = attributes?.get("response");
+            val map: Map<String, Any>? = if (content is Map<*, *>) {
+                content as? Map<String, Any>
+            } else {
+                emptyMap()
+            }
+            Oauth2UserInfo(
+                map?.get("id").toString(),
+                map?.get("nickname").toString(),
+                map?.get("email").toString(),
+                map?.get("profile_image").toString()
+            )
+        }),
 
-      KAKAO("kakao", { attributes ->
-          val content = attributes?.get("properties");
-          val map: Map<String, Any>? = if (content is Map<*, *>) {
-              content as? Map<String, Any>
-          } else {
-              emptyMap()
-          }
-          Oauth2UserInfo(
-              map?.get("sub").toString(),
-              map?.get("name").toString(),
-              map?.get("account_email").toString(),
-              map?.get("thumbnail_image").toString()
-          )
-      });
+        KAKAO("kakao", { attributes ->
+            val content = attributes?.get("properties");
+            val map: Map<String, Any>? = if (content is Map<*, *>) {
+                content as? Map<String, Any>
+            } else {
+                emptyMap()
+            }
+            Oauth2UserInfo(
+                map?.get("sub").toString(),
+                map?.get("name").toString(),
+                map?.get("account_email").toString(),
+                map?.get("thumbnail_image").toString()
+            )
+        });
 
-      companion object {
-          fun extract(registrationId: String, attributes: Map<String, Any>?): Oauth2UserInfo? {
-              return values().find { it.nameAttributeKey == registrationId }?.oauth2UserInfo?.invoke(attributes)
-          }
-      }
-  }
-  ```
+        companion object {
+            fun extract(registrationId: String, attributes: Map<String, Any>?): Oauth2UserInfo? {
+                return values().find { it.nameAttributeKey == registrationId }?.oauth2UserInfo?.invoke(attributes)
+            }
+        }
+    }
+    ```
 
     </details>
 
     <details>
         <summary>CustomOAuth2MemberService</summary>
 
-  - 사용자가 OAuth2 로그인 할 때 수행되는 비즈니스 로직 - 서비스 별 가져온 사용자의 필드가 다르므로 개발자가 구현한 OAut2UserInfo 형식으로 매핑 후 반환. - 반환된 DefaultOAuth2User는 Authentication가 됨.
+    - 사용자가 OAuth2 로그인 할 때 수행되는 비즈니스 로직 - 서비스 별 가져온 사용자의 필드가 다르므로 개발자가 구현한 OAut2UserInfo 형식으로 매핑 후 반환. - 반환된 DefaultOAuth2User는 Authentication가 됨.
 
-            ```kotlin
-            package com.example.kotlin.security.oauth2.service
+    ```kotlin
+    package com.example.kotlin.security.oauth2.service
 
-            import com.example.kotlin.member.Member
-            import com.example.kotlin.member.repository.MemberRepository
-            import com.example.kotlin.security.oauth2.OAuth2Attributes
-            import com.example.kotlin.security.oauth2.Oauth2UserInfo
-            import jakarta.servlet.http.HttpSession
-            import org.springframework.security.core.authority.SimpleGrantedAuthority
-            import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
-            import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
-            import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
-            import org.springframework.security.oauth2.core.OAuth2AuthenticationException
-            import org.springframework.security.oauth2.core.user.DefaultOAuth2User
-            import org.springframework.security.oauth2.core.user.OAuth2User
-            import org.springframework.stereotype.Service
+    import com.example.kotlin.member.Member
+    import com.example.kotlin.member.repository.MemberRepository
+    import com.example.kotlin.security.oauth2.OAuth2Attributes
+    import com.example.kotlin.security.oauth2.Oauth2UserInfo
+    import jakarta.servlet.http.HttpSession
+    import org.springframework.security.core.authority.SimpleGrantedAuthority
+    import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
+    import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
+    import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
+    import org.springframework.security.oauth2.core.OAuth2AuthenticationException
+    import org.springframework.security.oauth2.core.user.DefaultOAuth2User
+    import org.springframework.security.oauth2.core.user.OAuth2User
+    import org.springframework.stereotype.Service
 
-            @Service
-            class CustomOAuth2MemberService(
-                private val memberRepository: MemberRepository,
-                private val httpSession: HttpSession
-            ): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-                override fun loadUser(userRequest: OAuth2UserRequest?): OAuth2User {
-                    if (userRequest == null) throw OAuth2AuthenticationException("Oauth2 UserRequest Error")
+    @Service
+    class CustomOAuth2MemberService(
+        private val memberRepository: MemberRepository,
+        private val httpSession: HttpSession
+    ): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+        override fun loadUser(userRequest: OAuth2UserRequest?): OAuth2User {
+            if (userRequest == null) throw OAuth2AuthenticationException("Oauth2 UserRequest Error")
 
-                    // userRequest에서 user 정보 가져오기
-                    val delegate = DefaultOAuth2UserService()
-                    val oAuth2User = delegate.loadUser(userRequest)
+            // userRequest에서 user 정보 가져오기
+            val delegate = DefaultOAuth2UserService()
+            val oAuth2User = delegate.loadUser(userRequest)
 
-                    // registrationId는 Oauth2 서비스 이름 (구글, 네이버, 카카오 등)
-                    val registrationId = userRequest.clientRegistration.registrationId
-                    // OAuth2 로그인 하면 서비스 별 유저가 가지는 고유 키가 있는 듯. 그 키의 필드 값.
-                    val userNameAttributeName = userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
-                    // OAuth2 서비스의 유저 정보들
-                    val attributes = oAuth2User.attributes;
-                    // 서비스의 유저 정보를 개발자가 만든 객체 형태로 매핑
-                    val oauth2UserInfo = OAuth2Attributes.extract(registrationId, attributes)
+            // registrationId는 Oauth2 서비스 이름 (구글, 네이버, 카카오 등)
+            val registrationId = userRequest.clientRegistration.registrationId
+            // OAuth2 로그인 하면 서비스 별 유저가 가지는 고유 키가 있는 듯. 그 키의 필드 값.
+            val userNameAttributeName = userRequest.clientRegistration.providerDetails.userInfoEndpoint.userNameAttributeName
+            // OAuth2 서비스의 유저 정보들
+            val attributes = oAuth2User.attributes;
+            // 서비스의 유저 정보를 개발자가 만든 객체 형태로 매핑
+            val oauth2UserInfo = OAuth2Attributes.extract(registrationId, attributes)
 
-                    // 전달받은 OAuth2User의 attribute를 이용하여 회원가입 및 수정의 역할을 한다.
-                    val member = oauth2UserInfo?.let { saveOrUpdate(it) }
+            // 전달받은 OAuth2User의 attribute를 이용하여 회원가입 및 수정의 역할을 한다.
+            val member = oauth2UserInfo?.let { saveOrUpdate(it) }
 
-                    // session에 SessionUser(user의 정보를 담는 객체)를 담아 저장한다.
-            //        httpSession.setAttribute("user", SessionUser(user))
+            // session에 SessionUser(user의 정보를 담는 객체)를 담아 저장한다.
+    //        httpSession.setAttribute("user", SessionUser(user))
 
-                    return DefaultOAuth2User(
-                        setOf(SimpleGrantedAuthority(member?.role?.key)),
-                        attributes,
-                        userNameAttributeName
-                    )
-                }
+            return DefaultOAuth2User(
+                setOf(SimpleGrantedAuthority(member?.role?.key)),
+                attributes,
+                userNameAttributeName
+            )
+        }
 
-                fun saveOrUpdate(oauth2UserInfo: Oauth2UserInfo): Member {
-                    val member = memberRepository.findByEmail(oauth2UserInfo.email?:"")
-                        ?: oauth2UserInfo.toEntity()
+        fun saveOrUpdate(oauth2UserInfo: Oauth2UserInfo): Member {
+            val member = memberRepository.findByEmail(oauth2UserInfo.email?:"")
+                ?: oauth2UserInfo.toEntity()
 
-                    return memberRepository.save(member)
-                }
-            }
-            ```
+            return memberRepository.save(member)
+        }
+    }
+    ```
 
     </details>
 
     <details>
         <summary>CustomSuccessHandler</summary>
 
-  - OAuth2 로그인 성공 시 실행 되는 로직.
+    - OAuth2 로그인 성공 시 실행 되는 로직.
 
     ```kotlin
     package com.example.kotlin.security.oauth2.handler
@@ -534,50 +535,50 @@ spring security : 6.1.4
     <details>
         <summary>SecurityConfig</summary>
 
-  - OAuth2를 적용하기 위한 설정 추가.
+    - OAuth2를 적용하기 위한 설정 추가.
 
-          ```kotlin
-          package com.example.kotlin.security.config
+    ```kotlin
+    package com.example.kotlin.security.config
 
-          import com.example.kotlin.security.oauth2.handler.CustomSuccessHandler
-          import com.example.kotlin.security.oauth2.service.CustomOAuth2MemberService
-          import lombok.RequiredArgsConstructor
-          import org.springframework.context.annotation.Bean
-          import org.springframework.context.annotation.Configuration
-          import org.springframework.security.config.annotation.web.builders.HttpSecurity
-          import org.springframework.security.config.http.SessionCreationPolicy
-          import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint
-          import org.springframework.security.web.util.matcher.AntPathRequestMatcher
+    import com.example.kotlin.security.oauth2.handler.CustomSuccessHandler
+    import com.example.kotlin.security.oauth2.service.CustomOAuth2MemberService
+    import lombok.RequiredArgsConstructor
+    import org.springframework.context.annotation.Bean
+    import org.springframework.context.annotation.Configuration
+    import org.springframework.security.config.annotation.web.builders.HttpSecurity
+    import org.springframework.security.config.http.SessionCreationPolicy
+    import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint
+    import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 
-          @Configuration
-          @RequiredArgsConstructor
-          class SecurityConfig(
-              private val customOAuth2MemberService: CustomOAuth2MemberService,
-              private val customSuccessHandler: CustomSuccessHandler
-          ) {
-              private val urls = arrayOf(AntPathRequestMatcher("/h2-console/**"), AntPathRequestMatcher("/api/member/signup"), AntPathRequestMatcher("/api/member/login"), AntPathRequestMatcher("/api/member/oauth2/**"))
+    @Configuration
+    @RequiredArgsConstructor
+    class SecurityConfig(
+        private val customOAuth2MemberService: CustomOAuth2MemberService,
+        private val customSuccessHandler: CustomSuccessHandler
+    ) {
+        private val urls = arrayOf(AntPathRequestMatcher("/h2-console/**"), AntPathRequestMatcher("/api/member/signup"), AntPathRequestMatcher("/api/member/login"), AntPathRequestMatcher("/api/member/oauth2/**"))
 
-              @Bean
-              fun filterChain(http: HttpSecurity) = http
-                  .headers {it.frameOptions{it.disable()}}
-                  .csrf { it.disable() } // csrf off
-                  .cors { it.disable() } // cors off
-                  .formLogin { it.disable() } // security login page off
-                  .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.NEVER) } //필요하다면 세션 생성. (API는 session이 필요 없지만 google 계정 정보를 가져오기 위해 session이 필요함)
-                  .authorizeHttpRequests {
-                      it.requestMatchers(*urls).anonymous() // [signup, login] 누구나 접근 가능
-                          .anyRequest().authenticated()
-                  } // 나머지 api 호출은 인증 받아야함
-                  .oauth2Login {
-                      it.userInfoEndpoint { point -> point.userService(customOAuth2MemberService) } // oauth2Login는 loadUser라는 함수를 호출하는게 기본임. 이를 custom하여 사용하는 것.
-                      it.successHandler(customSuccessHandler) // 성공 시 핸들러
-                      // it.defaultSuccessUrl("/myspace") // 성공시 이동 페이지
-                      it.failureUrl("/fail") // 실패시
-                  }
-                  .exceptionHandling { it.authenticationEntryPoint(LoginUrlAuthenticationEntryPoint("/login")) } // 인증 되지 않은 사용자가 접근시 login으로 이동
-                  .build()!!
-          }
-          ```
+        @Bean
+        fun filterChain(http: HttpSecurity) = http
+            .headers {it.frameOptions{it.disable()}}
+            .csrf { it.disable() } // csrf off
+            .cors { it.disable() } // cors off
+            .formLogin { it.disable() } // security login page off
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.NEVER) } //필요하다면 세션 생성. (API는 session이 필요 없지만 google 계정 정보를 가져오기 위해 session이 필요함)
+            .authorizeHttpRequests {
+                it.requestMatchers(*urls).anonymous() // [signup, login] 누구나 접근 가능
+                    .anyRequest().authenticated()
+            } // 나머지 api 호출은 인증 받아야함
+            .oauth2Login {
+                it.userInfoEndpoint { point -> point.userService(customOAuth2MemberService) } // oauth2Login는 loadUser라는 함수를 호출하는게 기본임. 이를 custom하여 사용하는 것.
+                it.successHandler(customSuccessHandler) // 성공 시 핸들러
+                // it.defaultSuccessUrl("/myspace") // 성공시 이동 페이지
+                it.failureUrl("/fail") // 실패시
+            }
+            .exceptionHandling { it.authenticationEntryPoint(LoginUrlAuthenticationEntryPoint("/login")) } // 인증 되지 않은 사용자가 접근시 login으로 이동
+            .build()!!
+    }
+    ```
 
       </details>
     </details>
@@ -1563,23 +1564,23 @@ spring security : 6.1.4
     <details>
         <summary>OAuth2CustomUser</summary>
 
-  - 클래스 이름 변경
+    - 클래스 이름 변경
 
-  ```kotlin
-  package com.example.kotlin.security.oauth2
+    ```kotlin
+    package com.example.kotlin.security.oauth2
 
-  import com.example.kotlin.security.jwt.MemberPrincipal
-  import org.springframework.security.core.GrantedAuthority
-  import org.springframework.security.oauth2.core.user.DefaultOAuth2User
-  import org.springframework.security.oauth2.core.user.OAuth2User
+    import com.example.kotlin.security.jwt.MemberPrincipal
+    import org.springframework.security.core.GrantedAuthority
+    import org.springframework.security.oauth2.core.user.DefaultOAuth2User
+    import org.springframework.security.oauth2.core.user.OAuth2User
 
-  class OAuth2CustomUser(
-      authorities: Collection<GrantedAuthority>,
-      attributes: Map<String, Any>,
-      userNameAttributeName: String,
-      val memberPrincipal: MemberPrincipal // MemberVO 추가
-  ) : DefaultOAuth2User(authorities, attributes, userNameAttributeName), OAuth2User
-  ```
+    class OAuth2CustomUser(
+        authorities: Collection<GrantedAuthority>,
+        attributes: Map<String, Any>,
+        userNameAttributeName: String,
+        val memberPrincipal: MemberPrincipal // MemberVO 추가
+    ) : DefaultOAuth2User(authorities, attributes, userNameAttributeName), OAuth2User
+    ```
 
     </details>
 
@@ -1592,92 +1593,92 @@ spring security : 6.1.4
     <details>
         <summary>SecurityCustomErrorCode</summary>
 
-  - 사용자가 정의한 예외 코드
+    - 사용자가 정의한 예외 코드
 
-  ```kotlin
-  package com.example.kotlin.security.exception
+    ```kotlin
+    package com.example.kotlin.security.exception
 
-  import org.springframework.http.HttpStatus
+    import org.springframework.http.HttpStatus
 
-  enum class SecurityCustomErrorCode (
-      val httpStatus: HttpStatus,
-      val code: String,
-      val msg: String
-  ) {
-      /* oauth2 */
-      OAUTH2_SERVICE_IS_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR,"O001","OAuth2 Service is not found"),
-      OAUTH2_CONTENT_IS_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR,"O002","OAuth2 Content is not found"),
-      OAUTH2_CONTENT_TYPE_MISMATCH(HttpStatus.INTERNAL_SERVER_ERROR,"O003","OAuth2 Content Type Mismatch"),
-      OAUTH2_USER_INFO_IS_NULL(HttpStatus.INTERNAL_SERVER_ERROR,"O004","OAuth2 User Info is null"),
-      OAUTH2_USER_INFO_KEY_IS_NULL(HttpStatus.INTERNAL_SERVER_ERROR,"O005","OAuth2 User Info Key is null"),
-      OAUTH2_USER_INFO_EMAIL_IS_NULL(HttpStatus.INTERNAL_SERVER_ERROR,"O006","OAuth2 User Info Email is null"),
-      OAUTH2_USER_INFO_NAME_IS_NULL(HttpStatus.INTERNAL_SERVER_ERROR,"O007","OAuth2 User Info Name is null"),
+    enum class SecurityCustomErrorCode (
+        val httpStatus: HttpStatus,
+        val code: String,
+        val msg: String
+    ) {
+        /* oauth2 */
+        OAUTH2_SERVICE_IS_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR,"O001","OAuth2 Service is not found"),
+        OAUTH2_CONTENT_IS_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR,"O002","OAuth2 Content is not found"),
+        OAUTH2_CONTENT_TYPE_MISMATCH(HttpStatus.INTERNAL_SERVER_ERROR,"O003","OAuth2 Content Type Mismatch"),
+        OAUTH2_USER_INFO_IS_NULL(HttpStatus.INTERNAL_SERVER_ERROR,"O004","OAuth2 User Info is null"),
+        OAUTH2_USER_INFO_KEY_IS_NULL(HttpStatus.INTERNAL_SERVER_ERROR,"O005","OAuth2 User Info Key is null"),
+        OAUTH2_USER_INFO_EMAIL_IS_NULL(HttpStatus.INTERNAL_SERVER_ERROR,"O006","OAuth2 User Info Email is null"),
+        OAUTH2_USER_INFO_NAME_IS_NULL(HttpStatus.INTERNAL_SERVER_ERROR,"O007","OAuth2 User Info Name is null"),
 
-      /* security */
-      SECURITY_PRINCIPAL_IS_NULL(HttpStatus.INTERNAL_SERVER_ERROR,"S008","Security Principal is null"),
+        /* security */
+        SECURITY_PRINCIPAL_IS_NULL(HttpStatus.INTERNAL_SERVER_ERROR,"S008","Security Principal is null"),
 
-      /* jwt */
-      JWT_TOKEN_TYPE_MISMATCH(HttpStatus.UNAUTHORIZED,"J001","JWT Token Type Mismatch"),
-      JWT_COOKIE_IS_NOT_FOUND(HttpStatus.UNAUTHORIZED,"J002","JWT Cookie is not found"),
-      JWT_AUTH_HEADER_IS_NOT_FOUND(HttpStatus.UNAUTHORIZED,"J003","JWT Auth Header is not found"),
-      JWT_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED,"J004","JWT Token Expired"),
-      JWT_TOKEN_IS_NULL(HttpStatus.UNAUTHORIZED,"J005","JWT Token is null"),
-      JWT_TAMPERED_INVALID(HttpStatus.UNAUTHORIZED,"J006","JWT Token Tampered or Invalid"),
-      JWT_TOKEN_MALFORMED(HttpStatus.UNAUTHORIZED,"J007","JWT Token Malformed"),
-      JWT_TOKEN_ILLEGAL_ARGUMENT(HttpStatus.UNAUTHORIZED,"J008","JWT Token illegal argument"),
-      JWT_TOKEN_ACCESS_DENIED(HttpStatus.FORBIDDEN,"J009","JWT Token access denied"),
-  }
+        /* jwt */
+        JWT_TOKEN_TYPE_MISMATCH(HttpStatus.UNAUTHORIZED,"J001","JWT Token Type Mismatch"),
+        JWT_COOKIE_IS_NOT_FOUND(HttpStatus.UNAUTHORIZED,"J002","JWT Cookie is not found"),
+        JWT_AUTH_HEADER_IS_NOT_FOUND(HttpStatus.UNAUTHORIZED,"J003","JWT Auth Header is not found"),
+        JWT_TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED,"J004","JWT Token Expired"),
+        JWT_TOKEN_IS_NULL(HttpStatus.UNAUTHORIZED,"J005","JWT Token is null"),
+        JWT_TAMPERED_INVALID(HttpStatus.UNAUTHORIZED,"J006","JWT Token Tampered or Invalid"),
+        JWT_TOKEN_MALFORMED(HttpStatus.UNAUTHORIZED,"J007","JWT Token Malformed"),
+        JWT_TOKEN_ILLEGAL_ARGUMENT(HttpStatus.UNAUTHORIZED,"J008","JWT Token illegal argument"),
+        JWT_TOKEN_ACCESS_DENIED(HttpStatus.FORBIDDEN,"J009","JWT Token access denied"),
+    }
 
-  ```
+    ```
 
     </details>
 
     <details>
         <summary>SecurityCustomException</summary>
 
-  - 커스텀 예외 추가.
-  - 런타임 예외 상속.
+    - 커스텀 예외 추가.
+    - 런타임 예외 상속.
 
-  ```kotlin
-  package com.example.kotlin.security.exception
+    ```kotlin
+    package com.example.kotlin.security.exception
 
 
-  class SecurityCustomException(
-      val securityCustomErrorCode: SecurityCustomErrorCode
-  ) : RuntimeException(securityCustomErrorCode.msg)
-  ```
+    class SecurityCustomException(
+        val securityCustomErrorCode: SecurityCustomErrorCode
+    ) : RuntimeException(securityCustomErrorCode.msg)
+    ```
 
-    </details>
+      </details>
 
-    <details>
-        <summary>SecurityCustomExceptionHandler</summary>
+      <details>
+          <summary>SecurityCustomExceptionHandler</summary>
 
-  - 커스텀 예외 발생 시 예외 핸들링
+    - 커스텀 예외 발생 시 예외 핸들링
 
-  ```kotlin
-  package com.example.kotlin.security.exception
+    ```kotlin
+    package com.example.kotlin.security.exception
 
-  import org.springframework.http.ResponseEntity
-  import org.springframework.web.bind.annotation.ExceptionHandler
-  import org.springframework.web.bind.annotation.RestControllerAdvice
+    import org.springframework.http.ResponseEntity
+    import org.springframework.web.bind.annotation.ExceptionHandler
+    import org.springframework.web.bind.annotation.RestControllerAdvice
 
-  @RestControllerAdvice
-  class SecurityCustomExceptionHandler {
+    @RestControllerAdvice
+    class SecurityCustomExceptionHandler {
 
-      /**
-      * Controller에서 SecurityCustomException 발생한 경우 실행 되는 메소드
-      * @param securityCustomException SecurityCustomException
-      * @return ResponseEntity<Map<String, Any>>
-      */
-      @ExceptionHandler(SecurityCustomException::class)
-      fun securityCustomException(securityCustomException: SecurityCustomException): ResponseEntity<Map<String, Any>> {
-          // 출력 메시지 (Response 객체를 만들어 한번에 관리하는 것이 좋으나 넘어가겠음)
-          val map = mapOf("code" to securityCustomException.securityCustomErrorCode.code,"msg" to securityCustomException.securityCustomErrorCode.msg)
-          return ResponseEntity(map, securityCustomException.securityCustomErrorCode.httpStatus)
-      }
+        /**
+        * Controller에서 SecurityCustomException 발생한 경우 실행 되는 메소드
+        * @param securityCustomException SecurityCustomException
+        * @return ResponseEntity<Map<String, Any>>
+        */
+        @ExceptionHandler(SecurityCustomException::class)
+        fun securityCustomException(securityCustomException: SecurityCustomException): ResponseEntity<Map<String, Any>> {
+            // 출력 메시지 (Response 객체를 만들어 한번에 관리하는 것이 좋으나 넘어가겠음)
+            val map = mapOf("code" to securityCustomException.securityCustomErrorCode.code,"msg" to securityCustomException.securityCustomErrorCode.msg)
+            return ResponseEntity(map, securityCustomException.securityCustomErrorCode.httpStatus)
+        }
 
-  }
-  ```
+    }
+    ```
 
     </details>
 
@@ -1688,436 +1689,436 @@ spring security : 6.1.4
     <details>
         <summary>Member</summary>
 
-  - OAuth2 관련 필드 추가
+    - OAuth2 관련 필드 추가
 
-    ```kotlin
-    package com.example.kotlin.member
+      ```kotlin
+      package com.example.kotlin.member
 
-    import jakarta.persistence.*
-    import java.util.*
+      import jakarta.persistence.*
+      import java.util.*
 
-    @Entity
-    @Table(name = "MEMBER_TABLE")
-    class Member(
-        @Id
-        @GeneratedValue(strategy = GenerationType.UUID)
-        @Column(name = "id", nullable = false)
-        var id: UUID?,
+      @Entity
+      @Table(name = "MEMBER_TABLE")
+      class Member(
+          @Id
+          @GeneratedValue(strategy = GenerationType.UUID)
+          @Column(name = "id", nullable = false)
+          var id: UUID?,
 
-        @Column(name = "name", nullable = false)
-        var name: String,
+          @Column(name = "name", nullable = false)
+          var name: String,
 
-        @Column(name = "email", nullable = false)
-        var email: String,
+          @Column(name = "email", nullable = false)
+          var email: String,
 
-        @Column(name = "picture")
-        var picture: String?,
+          @Column(name = "picture")
+          var picture: String?,
 
-        @Enumerated(EnumType.STRING)
-        var role: Role,
+          @Enumerated(EnumType.STRING)
+          var role: Role,
 
-        @Column(name = "oauth2_key")
-        var oAuth2Key: String?,
+          @Column(name = "oauth2_key")
+          var oAuth2Key: String?,
 
-        @Column(name = "oauth2_provider")
-        var oAuth2Provider: String?
-    )
+          @Column(name = "oauth2_provider")
+          var oAuth2Provider: String?
+      )
 
-    ```
+      ```
 
     </details>
 
     <details>
         <summary>MemberPrincipal</summary>
 
-  - Member가 바뀌면서 필드 값도 변경됨.
-  - token에 정보를 주거나 가져올 때, Json 형태로 직렬화, 역직렬화가 필요하여 각 필드에 어노테이션 추가. (무조건 이름을 써야한다.)
+    - Member가 바뀌면서 필드 값도 변경됨.
+    - token에 정보를 주거나 가져올 때, Json 형태로 직렬화, 역직렬화가 필요하여 각 필드에 어노테이션 추가. (무조건 이름을 써야한다.)
 
-  ```kotlin
-  package com.example.kotlin.security.jwt
+    ```kotlin
+    package com.example.kotlin.security.jwt
 
-  import com.example.kotlin.member.Member
-  import com.example.kotlin.member.Role
-  import com.fasterxml.jackson.annotation.JsonProperty
-  import java.util.*
+    import com.example.kotlin.member.Member
+    import com.example.kotlin.member.Role
+    import com.fasterxml.jackson.annotation.JsonProperty
+    import java.util.*
 
-  /**
-  * Access token에 담고 싶은 정보들. 또는 JWT 로직 간 주고 받는 데이터를 가지는 객체.
-  * @property id String?
-  * @property name String?
-  * @property email String?
-  * @property picture String?
-  * @property role String?
-  * @constructor
-  */
-  data class MemberPrincipal(
-      // JsonProperty -> access token 정보 교환을 할 때 필요한 직렬화, 역직렬화 를 위한 어노테이션
-      @JsonProperty("id") val id: String?,
-      @JsonProperty("name") val name: String?,
-      @JsonProperty("email") val email: String?,
-      @JsonProperty("picture") val picture: String?,
-      @JsonProperty("role") val role: String?
-  ){
-      constructor(member: Member) : this(
-          id = member.id.toString(),
-          name = member.name,
-          email = member.email,
-          picture = member.picture,
-          role = member.role.toString()
-      )
-  }
-  ```
+    /**
+    * Access token에 담고 싶은 정보들. 또는 JWT 로직 간 주고 받는 데이터를 가지는 객체.
+    * @property id String?
+    * @property name String?
+    * @property email String?
+    * @property picture String?
+    * @property role String?
+    * @constructor
+    */
+    data class MemberPrincipal(
+        // JsonProperty -> access token 정보 교환을 할 때 필요한 직렬화, 역직렬화 를 위한 어노테이션
+        @JsonProperty("id") val id: String?,
+        @JsonProperty("name") val name: String?,
+        @JsonProperty("email") val email: String?,
+        @JsonProperty("picture") val picture: String?,
+        @JsonProperty("role") val role: String?
+    ){
+        constructor(member: Member) : this(
+            id = member.id.toString(),
+            name = member.name,
+            email = member.email,
+            picture = member.picture,
+            role = member.role.toString()
+        )
+    }
+    ```
 
     </details>
 
     <details>
         <summary>MemberRepository</summary>
 
-  - OAuth2 서비스 별 개인 키가 있음.
-  - 서비스에서 동일한 키가 발생할 확률은 낮음.
-  - 따라서, 가입된 유저인지 찾을 때 OAuth2 키 사용.
+    - OAuth2 서비스 별 개인 키가 있음.
+    - 서비스에서 동일한 키가 발생할 확률은 낮음.
+    - 따라서, 가입된 유저인지 찾을 때 OAuth2 키 사용.
 
-  ```kotlin
-  package com.example.kotlin.member.repository
+    ```kotlin
+    package com.example.kotlin.member.repository
 
-  import com.example.kotlin.member.Member
-  import org.springframework.data.jpa.repository.JpaRepository
+    import com.example.kotlin.member.Member
+    import org.springframework.data.jpa.repository.JpaRepository
 
-  interface MemberRepository : JpaRepository<Member, Long> {
-      fun findByoAuth2Key(oAuth2Key: String): Member?
-  }
-  ```
+    interface MemberRepository : JpaRepository<Member, Long> {
+        fun findByoAuth2Key(oAuth2Key: String): Member?
+    }
+    ```
 
     </details>
 
     <details>
         <summary>OAuth2UserInfo</summary>
 
-  - Member 필드 변경에 따른 코드 수정
+    - Member 필드 변경에 따른 코드 수정
 
-  ```kotlin
-  package com.example.kotlin.security.oauth2
+    ```kotlin
+    package com.example.kotlin.security.oauth2
 
-  import com.example.kotlin.member.Member
-  import com.example.kotlin.member.Role
+    import com.example.kotlin.member.Member
+    import com.example.kotlin.member.Role
 
-  class OAuth2UserInfo(
-      val name: String,
-      val email: String,
-      val picture: String?,
-      val oAuth2Key : String,
-      val oAuth2Provider : String
-  ){
-      fun toEntity(): Member {
-          return Member(id=null, name=name, email=email, picture=picture, oAuth2Key = oAuth2Key, oAuth2Provider=oAuth2Provider, role = Role.ROLE_USER)
-      }
-  }
-  ```
+    class OAuth2UserInfo(
+        val name: String,
+        val email: String,
+        val picture: String?,
+        val oAuth2Key : String,
+        val oAuth2Provider : String
+    ){
+        fun toEntity(): Member {
+            return Member(id=null, name=name, email=email, picture=picture, oAuth2Key = oAuth2Key, oAuth2Provider=oAuth2Provider, role = Role.ROLE_USER)
+        }
+    }
+    ```
 
     </details>
 
     <details>
         <summary>OAuth2Attributes</summary>
 
-  - Member 필드 변경에 따른 수정
-  - 커스텀 예외로 변경
+    - Member 필드 변경에 따른 수정
+    - 커스텀 예외로 변경
 
-  ```kotlin
-  package com.example.kotlin.security.oauth2
+    ```kotlin
+    package com.example.kotlin.security.oauth2
 
-  import com.example.kotlin.security.exception.SecurityCustomErrorCode
-  import com.example.kotlin.security.exception.SecurityCustomException
+    import com.example.kotlin.security.exception.SecurityCustomErrorCode
+    import com.example.kotlin.security.exception.SecurityCustomException
 
-  enum class OAuth2Attributes(
-      val nameAttributeKey: String,
-      val oauth2UserInfo: (Map<String, Any>) -> OAuth2UserInfo
-  ) {
-      GOOGLE("google", { map ->
-          OAuth2UserInfo(
-              map["name"]?.toString()
-                  ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_NAME_IS_NULL),
-              map["email"]?.toString()
-                  ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_EMAIL_IS_NULL),
-              map["picture"]?.toString(),
-              map["sub"]?.toString()
-                  ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_KEY_IS_NULL),
-              "google"
-          )
-      }),
+    enum class OAuth2Attributes(
+        val nameAttributeKey: String,
+        val oauth2UserInfo: (Map<String, Any>) -> OAuth2UserInfo
+    ) {
+        GOOGLE("google", { map ->
+            OAuth2UserInfo(
+                map["name"]?.toString()
+                    ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_NAME_IS_NULL),
+                map["email"]?.toString()
+                    ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_EMAIL_IS_NULL),
+                map["picture"]?.toString(),
+                map["sub"]?.toString()
+                    ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_KEY_IS_NULL),
+                "google"
+            )
+        }),
 
-      NAVER("naver", { attributes ->
-          val content =
-              attributes["response"] ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_CONTENT_IS_NOT_FOUND)
-          val map: Map<String, Any> =
-              content as? Map<String, Any>
-                  ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_CONTENT_TYPE_MISMATCH)
-          OAuth2UserInfo(
-              map["nickname"]?.toString()
-                  ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_NAME_IS_NULL),
-              map["email"]?.toString()
-                  ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_EMAIL_IS_NULL),
-              map["profile_image"]?.toString(),
-              map["id"]?.toString()
-                  ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_KEY_IS_NULL),
-              "naver"
-          )
-      }),
+        NAVER("naver", { attributes ->
+            val content =
+                attributes["response"] ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_CONTENT_IS_NOT_FOUND)
+            val map: Map<String, Any> =
+                content as? Map<String, Any>
+                    ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_CONTENT_TYPE_MISMATCH)
+            OAuth2UserInfo(
+                map["nickname"]?.toString()
+                    ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_NAME_IS_NULL),
+                map["email"]?.toString()
+                    ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_EMAIL_IS_NULL),
+                map["profile_image"]?.toString(),
+                map["id"]?.toString()
+                    ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_KEY_IS_NULL),
+                "naver"
+            )
+        }),
 
-      KAKAO("kakao", { attributes ->
-          val properties = attributes["properties"]
-              ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_CONTENT_IS_NOT_FOUND)
-          val kakao_account = attributes["kakao_account"]
-              ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_CONTENT_IS_NOT_FOUND)
-          val map: Map<String, Any> =
-              properties as? Map<String, Any>
-                  ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_CONTENT_TYPE_MISMATCH)
-          val map2: Map<String, Any> =
-              kakao_account as? Map<String, Any>
-                  ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_CONTENT_TYPE_MISMATCH)
-          OAuth2UserInfo(
-              map["nickname"]?.toString()
-                  ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_NAME_IS_NULL),
-              map2["email"]?.toString()
-                  ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_EMAIL_IS_NULL),
-              map["profile_image"]?.toString(),
-              attributes["id"]?.toString()
-                  ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_KEY_IS_NULL),
-              "kakao"
-          )
-      });
+        KAKAO("kakao", { attributes ->
+            val properties = attributes["properties"]
+                ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_CONTENT_IS_NOT_FOUND)
+            val kakao_account = attributes["kakao_account"]
+                ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_CONTENT_IS_NOT_FOUND)
+            val map: Map<String, Any> =
+                properties as? Map<String, Any>
+                    ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_CONTENT_TYPE_MISMATCH)
+            val map2: Map<String, Any> =
+                kakao_account as? Map<String, Any>
+                    ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_CONTENT_TYPE_MISMATCH)
+            OAuth2UserInfo(
+                map["nickname"]?.toString()
+                    ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_NAME_IS_NULL),
+                map2["email"]?.toString()
+                    ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_EMAIL_IS_NULL),
+                map["profile_image"]?.toString(),
+                attributes["id"]?.toString()
+                    ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_USER_INFO_KEY_IS_NULL),
+                "kakao"
+            )
+        });
 
-      companion object {
-          fun extract(registrationId: String, attributes: Map<String, Any>): OAuth2UserInfo {
-              return values().find { it.nameAttributeKey == registrationId }?.oauth2UserInfo?.invoke(attributes)
-                  ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_SERVICE_IS_NOT_FOUND)
-          }
-      }
-  }
-  ```
+        companion object {
+            fun extract(registrationId: String, attributes: Map<String, Any>): OAuth2UserInfo {
+                return values().find { it.nameAttributeKey == registrationId }?.oauth2UserInfo?.invoke(attributes)
+                    ?: throw SecurityCustomException(SecurityCustomErrorCode.OAUTH2_SERVICE_IS_NOT_FOUND)
+            }
+        }
+    }
+    ```
 
     </details>
 
     <details>
         <summary>JWTProvider</summary>
 
-  - 커스텀 에러 상황 발생.
-  - 기능 설명 추가.
-  - 필드 변경에 따른 수정.
+    - 커스텀 에러 상황 발생.
+    - 기능 설명 추가.
+    - 필드 변경에 따른 수정.
 
-  ```kotlin
-  package com.example.kotlin.security.jwt.provider
+    ```kotlin
+    package com.example.kotlin.security.jwt.provider
 
-  import com.example.kotlin.common.logger
-  import com.example.kotlin.security.AuthConstants
-  import com.example.kotlin.security.exception.SecurityCustomErrorCode
-  import com.example.kotlin.security.exception.SecurityCustomException
-  import com.example.kotlin.security.jwt.MemberPrincipal
-  import com.fasterxml.jackson.databind.ObjectMapper
-  import io.jsonwebtoken.*
-  import jakarta.servlet.http.Cookie
-  import jakarta.xml.bind.DatatypeConverter
-  import org.springframework.http.ResponseCookie
-  import org.springframework.stereotype.Component
-  import java.security.Key
-  import java.util.*
-  import javax.crypto.spec.SecretKeySpec
+    import com.example.kotlin.common.logger
+    import com.example.kotlin.security.AuthConstants
+    import com.example.kotlin.security.exception.SecurityCustomErrorCode
+    import com.example.kotlin.security.exception.SecurityCustomException
+    import com.example.kotlin.security.jwt.MemberPrincipal
+    import com.fasterxml.jackson.databind.ObjectMapper
+    import io.jsonwebtoken.*
+    import jakarta.servlet.http.Cookie
+    import jakarta.xml.bind.DatatypeConverter
+    import org.springframework.http.ResponseCookie
+    import org.springframework.stereotype.Component
+    import java.security.Key
+    import java.util.*
+    import javax.crypto.spec.SecretKeySpec
 
-  @Component
-  class JWTProvider {
-      //    @Value("\${jwt.secret}")
-      private val jwtSecretKey: String = "exampleSecretKeyExampleSecretKeyExampleSecretKeyExampleSecretKey"
-      private val log = logger()
-      private val objectMapper = ObjectMapper()
+    @Component
+    class JWTProvider {
+        //    @Value("\${jwt.secret}")
+        private val jwtSecretKey: String = "exampleSecretKeyExampleSecretKeyExampleSecretKeyExampleSecretKey"
+        private val log = logger()
+        private val objectMapper = ObjectMapper()
 
-      /**
-      * token 헤더 만들기
-      * @return Map<String, Any>
-      */
-      private fun createHeader(): Map<String, Any> {
-          val header: MutableMap<String, Any> = HashMap()
-          header["typ"] = "JWT" // 토큰 타입
-          header["alg"] = "HS256" // signature(서명) 알고리즘
-          return header
-      }
+        /**
+        * token 헤더 만들기
+        * @return Map<String, Any>
+        */
+        private fun createHeader(): Map<String, Any> {
+            val header: MutableMap<String, Any> = HashMap()
+            header["typ"] = "JWT" // 토큰 타입
+            header["alg"] = "HS256" // signature(서명) 알고리즘
+            return header
+        }
 
-      /**
-      * token 공개, 비공개 claims 만들기
-      * @param memberPrincipal MemberPrincipal
-      * @return Map<String, Any>
-      */
-      private fun createClaims(memberPrincipal: MemberPrincipal): Map<String, Any> {
-          val claims: MutableMap<String, Any> = HashMap()
-          claims["email"] = memberPrincipal.email as Any
-          claims["role"] = memberPrincipal.role as Any
-          claims["memberPrincipal"] = objectMapper.writeValueAsString(memberPrincipal) // 객체를 json 형식으로 만들기
-          return claims
-      }
+        /**
+        * token 공개, 비공개 claims 만들기
+        * @param memberPrincipal MemberPrincipal
+        * @return Map<String, Any>
+        */
+        private fun createClaims(memberPrincipal: MemberPrincipal): Map<String, Any> {
+            val claims: MutableMap<String, Any> = HashMap()
+            claims["email"] = memberPrincipal.email as Any
+            claims["role"] = memberPrincipal.role as Any
+            claims["memberPrincipal"] = objectMapper.writeValueAsString(memberPrincipal) // 객체를 json 형식으로 만들기
+            return claims
+        }
 
-      /**
-      * token 사인 만들기
-      * @return Key
-      */
-      private fun createSignature(): Key {
-          val apiKeySecretBytes = DatatypeConverter.parseBase64Binary(jwtSecretKey)
-          return SecretKeySpec(apiKeySecretBytes, SignatureAlgorithm.HS256.jcaName)
-      }
+        /**
+        * token 사인 만들기
+        * @return Key
+        */
+        private fun createSignature(): Key {
+            val apiKeySecretBytes = DatatypeConverter.parseBase64Binary(jwtSecretKey)
+            return SecretKeySpec(apiKeySecretBytes, SignatureAlgorithm.HS256.jcaName)
+        }
 
-      /**
-      * access token 유효 기간 설정
-      * @return Date
-      */
-      private fun createExpiredDate(): Date {
-          val c = Calendar.getInstance()
-          c.add(Calendar.MINUTE, 30) // 30분
-          return c.time
-      }
+        /**
+        * access token 유효 기간 설정
+        * @return Date
+        */
+        private fun createExpiredDate(): Date {
+            val c = Calendar.getInstance()
+            c.add(Calendar.MINUTE, 30) // 30분
+            return c.time
+        }
 
-      /**
-      * access token 생성
-      * @param memberPrincipal MemberPrincipal
-      * @return String
-      */
-      fun generateJwtToken(memberPrincipal: MemberPrincipal): String {
-          return Jwts.builder()
-              .setHeader(createHeader())
-              .setClaims(createClaims(memberPrincipal))
-              .setSubject(memberPrincipal.id.toString())
-              .setExpiration(createExpiredDate())
-              .setIssuedAt(Date())
-              .signWith(createSignature(), SignatureAlgorithm.HS256)
-              .compact()
-      }
+        /**
+        * access token 생성
+        * @param memberPrincipal MemberPrincipal
+        * @return String
+        */
+        fun generateJwtToken(memberPrincipal: MemberPrincipal): String {
+            return Jwts.builder()
+                .setHeader(createHeader())
+                .setClaims(createClaims(memberPrincipal))
+                .setSubject(memberPrincipal.id.toString())
+                .setExpiration(createExpiredDate())
+                .setIssuedAt(Date())
+                .signWith(createSignature(), SignatureAlgorithm.HS256)
+                .compact()
+        }
 
-      /**
-      * 헤더에서 token 추출
-      * @param header String
-      * @return String
-      */
-      fun getTokenFromHeader(header: String): String {
-          // 만약 개발자가 지정한 토큰 타입이 아닌 경우 에러 발생
-          if (!header.startsWith(AuthConstants.TOKEN_TYPE)) {
-              throw SecurityCustomException(SecurityCustomErrorCode.JWT_TOKEN_TYPE_MISMATCH)
-          }
-          return header.split(" ")[1]
-      }
+        /**
+        * 헤더에서 token 추출
+        * @param header String
+        * @return String
+        */
+        fun getTokenFromHeader(header: String): String {
+            // 만약 개발자가 지정한 토큰 타입이 아닌 경우 에러 발생
+            if (!header.startsWith(AuthConstants.TOKEN_TYPE)) {
+                throw SecurityCustomException(SecurityCustomErrorCode.JWT_TOKEN_TYPE_MISMATCH)
+            }
+            return header.split(" ")[1]
+        }
 
-      /**
-      * token claims 추출
-      * @param token String
-      * @return Claims
-      */
-      fun getClaimsFromToken(token: String): Claims {
+        /**
+        * token claims 추출
+        * @param token String
+        * @return Claims
+        */
+        fun getClaimsFromToken(token: String): Claims {
 
-          return try {
-              Jwts.parserBuilder()
-                  .setSigningKey(DatatypeConverter.parseBase64Binary(jwtSecretKey))
-                  .build()
-                  .parseClaimsJws(token)
-                  .body
-          } catch (e: MalformedJwtException) {
-              throw SecurityCustomException(SecurityCustomErrorCode.JWT_TOKEN_MALFORMED)
-          } catch (e: ExpiredJwtException) {
-              throw SecurityCustomException(SecurityCustomErrorCode.JWT_TOKEN_EXPIRED)
-          } catch (e: UnsupportedJwtException) {
-              throw SecurityCustomException(SecurityCustomErrorCode.JWT_TAMPERED_INVALID)
-          } catch (e: IllegalArgumentException) {
-              throw SecurityCustomException(SecurityCustomErrorCode.JWT_TOKEN_ILLEGAL_ARGUMENT)
-          } catch (e: NullPointerException) {
-              throw SecurityCustomException(SecurityCustomErrorCode.JWT_TOKEN_IS_NULL)
-          }
-      }
+            return try {
+                Jwts.parserBuilder()
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(jwtSecretKey))
+                    .build()
+                    .parseClaimsJws(token)
+                    .body
+            } catch (e: MalformedJwtException) {
+                throw SecurityCustomException(SecurityCustomErrorCode.JWT_TOKEN_MALFORMED)
+            } catch (e: ExpiredJwtException) {
+                throw SecurityCustomException(SecurityCustomErrorCode.JWT_TOKEN_EXPIRED)
+            } catch (e: UnsupportedJwtException) {
+                throw SecurityCustomException(SecurityCustomErrorCode.JWT_TAMPERED_INVALID)
+            } catch (e: IllegalArgumentException) {
+                throw SecurityCustomException(SecurityCustomErrorCode.JWT_TOKEN_ILLEGAL_ARGUMENT)
+            } catch (e: NullPointerException) {
+                throw SecurityCustomException(SecurityCustomErrorCode.JWT_TOKEN_IS_NULL)
+            }
+        }
 
-      /**
-      * token에서 email 추출
-      * @param token String
-      * @return String
-      */
-      fun getUserEmailFromToken(token: String): String {
-          return getClaimsFromToken(token)["email"].toString()
-      }
+        /**
+        * token에서 email 추출
+        * @param token String
+        * @return String
+        */
+        fun getUserEmailFromToken(token: String): String {
+            return getClaimsFromToken(token)["email"].toString()
+        }
 
-      /**
-      * token에서 role 추출
-      * @param token String
-      * @return String
-      */
-      fun getUserRoleFromToken(token: String): String {
-          return getClaimsFromToken(token)["role"].toString()
-      }
+        /**
+        * token에서 role 추출
+        * @param token String
+        * @return String
+        */
+        fun getUserRoleFromToken(token: String): String {
+            return getClaimsFromToken(token)["role"].toString()
+        }
 
-      /**
-      * token에서 memberPrincipal 추출
-      * @param token String
-      * @return MemberPrincipal
-      */
-      fun getMemberPrincipalFromToken(token: String): MemberPrincipal {
-          val memberPrincipalInfo = getClaimsFromToken(token)["memberPrincipal"] ?: throw SecurityCustomException(
-              SecurityCustomErrorCode.OAUTH2_USER_INFO_IS_NULL
-          )
-          return objectMapper.readValue(memberPrincipalInfo.toString(), MemberPrincipal::class.java)
-      }
+        /**
+        * token에서 memberPrincipal 추출
+        * @param token String
+        * @return MemberPrincipal
+        */
+        fun getMemberPrincipalFromToken(token: String): MemberPrincipal {
+            val memberPrincipalInfo = getClaimsFromToken(token)["memberPrincipal"] ?: throw SecurityCustomException(
+                SecurityCustomErrorCode.OAUTH2_USER_INFO_IS_NULL
+            )
+            return objectMapper.readValue(memberPrincipalInfo.toString(), MemberPrincipal::class.java)
+        }
 
-      /**
-      * refresh token 유효 기간 설정
-      * @return Date
-      */
-      private fun createRefreshTokenExpiredDate(): Date {
-          val c = Calendar.getInstance()
-          c.add(Calendar.MONTH, 1) // 1개월
-          return c.time
-      }
+        /**
+        * refresh token 유효 기간 설정
+        * @return Date
+        */
+        private fun createRefreshTokenExpiredDate(): Date {
+            val c = Calendar.getInstance()
+            c.add(Calendar.MONTH, 1) // 1개월
+            return c.time
+        }
 
-      /**
-      * refresh token 생성
-      * @return String
-      */
-      fun generateRefreshToken(): String {
-          return Jwts.builder()
-              .setHeader(createHeader())
-              .setExpiration(createRefreshTokenExpiredDate())
-              .setIssuedAt(Date())
-              .signWith(createSignature(), SignatureAlgorithm.HS256)
-              .compact()
-      }
+        /**
+        * refresh token 생성
+        * @return String
+        */
+        fun generateRefreshToken(): String {
+            return Jwts.builder()
+                .setHeader(createHeader())
+                .setExpiration(createRefreshTokenExpiredDate())
+                .setIssuedAt(Date())
+                .signWith(createSignature(), SignatureAlgorithm.HS256)
+                .compact()
+        }
 
-      /**
-      * cookie 생성
-      * @param refreshToken String
-      * @return ResponseCookie
-      */
-      fun generateRefreshTokenCookie(refreshToken: String): ResponseCookie {
-          return ResponseCookie.from(AuthConstants.REFRESH_TOKEN_PREFIX, refreshToken)
-              .httpOnly(true)
-              .sameSite("None")
-              .path("/")
-              .maxAge(60 * 60 * 24 * 30) // 30일
-              .build()
-      }
+        /**
+        * cookie 생성
+        * @param refreshToken String
+        * @return ResponseCookie
+        */
+        fun generateRefreshTokenCookie(refreshToken: String): ResponseCookie {
+            return ResponseCookie.from(AuthConstants.REFRESH_TOKEN_PREFIX, refreshToken)
+                .httpOnly(true)
+                .sameSite("None")
+                .path("/")
+                .maxAge(60 * 60 * 24 * 30) // 30일
+                .build()
+        }
 
-      /**
-      * cookie에서 refresh token 추출
-      * @param cookies Array<Cookie>
-      * @return String
-      */
-      fun getRefreshToken(cookies: Array<Cookie>): String {
-          return cookies.firstOrNull { it.name == AuthConstants.REFRESH_TOKEN_PREFIX }?.value
-              ?: throw SecurityCustomException(SecurityCustomErrorCode.JWT_COOKIE_IS_NOT_FOUND)
-      }
+        /**
+        * cookie에서 refresh token 추출
+        * @param cookies Array<Cookie>
+        * @return String
+        */
+        fun getRefreshToken(cookies: Array<Cookie>): String {
+            return cookies.firstOrNull { it.name == AuthConstants.REFRESH_TOKEN_PREFIX }?.value
+                ?: throw SecurityCustomException(SecurityCustomErrorCode.JWT_COOKIE_IS_NOT_FOUND)
+        }
 
-      /**
-      * refresh token 남은 유효 기간이 7일 이하 여부 판단.
-      * @param refreshToken String
-      * @return Boolean
-      */
-      fun isNeedToUpdateRefreshToken(refreshToken: String): Boolean {
-          val expiresAt = getClaimsFromToken(refreshToken).expiration
-          val calendar = Calendar.getInstance()
-          calendar.time = Date()
-          calendar.add(Calendar.DATE, 7)
-          return expiresAt.before(calendar.time)
-      }
-  }
-  ```
+        /**
+        * refresh token 남은 유효 기간이 7일 이하 여부 판단.
+        * @param refreshToken String
+        * @return Boolean
+        */
+        fun isNeedToUpdateRefreshToken(refreshToken: String): Boolean {
+            val expiresAt = getClaimsFromToken(refreshToken).expiration
+            val calendar = Calendar.getInstance()
+            calendar.time = Date()
+            calendar.add(Calendar.DATE, 7)
+            return expiresAt.before(calendar.time)
+        }
+    }
+    ```
 
     </details>
 
@@ -2547,62 +2548,62 @@ spring security : 6.1.4
     <details>
         <summary>LoginController</summary>
 
-  - access token 만료된 경우, 먼저 401 에러가 발생하고 해당 커스텀 예외 코드가 발생할 것임.
-  - 이를 클라이언트가 확인하고 해당 코드 발생 시 토큰 재발급 요청을 보냄.
-  - 이를 처리하는 controller.
+    - access token 만료된 경우, 먼저 401 에러가 발생하고 해당 커스텀 예외 코드가 발생할 것임.
+    - 이를 클라이언트가 확인하고 해당 코드 발생 시 토큰 재발급 요청을 보냄.
+    - 이를 처리하는 controller.
 
-  ```kotlin
-  package com.example.kotlin.member.controller
+    ```kotlin
+    package com.example.kotlin.member.controller
 
-  import com.example.kotlin.common.logger
-  import com.example.kotlin.security.AuthConstants
-  import com.example.kotlin.security.exception.SecurityCustomErrorCode
-  import com.example.kotlin.security.exception.SecurityCustomException
-  import com.example.kotlin.security.jwt.provider.JWTProvider
-  import jakarta.servlet.http.HttpServletRequest
-  import jakarta.servlet.http.HttpServletResponse
-  import org.springframework.web.bind.annotation.GetMapping
-  import org.springframework.web.bind.annotation.PostMapping
-  import org.springframework.web.bind.annotation.RequestMapping
-  import org.springframework.web.bind.annotation.RestController
+    import com.example.kotlin.common.logger
+    import com.example.kotlin.security.AuthConstants
+    import com.example.kotlin.security.exception.SecurityCustomErrorCode
+    import com.example.kotlin.security.exception.SecurityCustomException
+    import com.example.kotlin.security.jwt.provider.JWTProvider
+    import jakarta.servlet.http.HttpServletRequest
+    import jakarta.servlet.http.HttpServletResponse
+    import org.springframework.web.bind.annotation.GetMapping
+    import org.springframework.web.bind.annotation.PostMapping
+    import org.springframework.web.bind.annotation.RequestMapping
+    import org.springframework.web.bind.annotation.RestController
 
-  @RestController
-  @RequestMapping("/api/v1/login")
-  class LoginController(
-      private val jwtProvider: JWTProvider
-  ) {
-      private val log = logger()
+    @RestController
+    @RequestMapping("/api/v1/login")
+    class LoginController(
+        private val jwtProvider: JWTProvider
+    ) {
+        private val log = logger()
 
-      @GetMapping("/success")
-      fun login(): String? {
-          return "login success"
-      }
+        @GetMapping("/success")
+        fun login(): String? {
+            return "login success"
+        }
 
-      @PostMapping("/token/issuance")
-      fun issuance(request: HttpServletRequest, response: HttpServletResponse): String {
-          log.info("========={}=========", request.requestURI)
+        @PostMapping("/token/issuance")
+        fun issuance(request: HttpServletRequest, response: HttpServletResponse): String {
+            log.info("========={}=========", request.requestURI)
 
-          val cookies = request.cookies
-          var refreshToken = jwtProvider.getRefreshToken(cookies)
+            val cookies = request.cookies
+            var refreshToken = jwtProvider.getRefreshToken(cookies)
 
-          jwtProvider.getClaimsFromToken(refreshToken)
+            jwtProvider.getClaimsFromToken(refreshToken)
 
-          val header = request.getHeader(AuthConstants.AUTH_HEADER) ?: throw SecurityCustomException(
-              SecurityCustomErrorCode.JWT_AUTH_HEADER_IS_NOT_FOUND
-          )
-          var accessToken = jwtProvider.getTokenFromHeader(header)
-          val memberPrincipal =
-              jwtProvider.getMemberPrincipalFromToken(accessToken)
+            val header = request.getHeader(AuthConstants.AUTH_HEADER) ?: throw SecurityCustomException(
+                SecurityCustomErrorCode.JWT_AUTH_HEADER_IS_NOT_FOUND
+            )
+            var accessToken = jwtProvider.getTokenFromHeader(header)
+            val memberPrincipal =
+                jwtProvider.getMemberPrincipalFromToken(accessToken)
 
-          accessToken = jwtProvider.generateJwtToken(memberPrincipal)
-          refreshToken = jwtProvider.generateRefreshToken()
-          val responseCookie = jwtProvider.generateRefreshTokenCookie(refreshToken)
-          response.addHeader(AuthConstants.AUTH_HEADER, AuthConstants.TOKEN_TYPE + accessToken)
-          response.addHeader(AuthConstants.COOKIE_HEADER, responseCookie.toString())
-          return "issuance success"
-      }
-  }
-  ```
+            accessToken = jwtProvider.generateJwtToken(memberPrincipal)
+            refreshToken = jwtProvider.generateRefreshToken()
+            val responseCookie = jwtProvider.generateRefreshTokenCookie(refreshToken)
+            response.addHeader(AuthConstants.AUTH_HEADER, AuthConstants.TOKEN_TYPE + accessToken)
+            response.addHeader(AuthConstants.COOKIE_HEADER, responseCookie.toString())
+            return "issuance success"
+        }
+    }
+    ```
 
     </details>
 
