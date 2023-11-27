@@ -55,7 +55,7 @@ public class CallService {
 
 <br/>
 
-### 다이나믹 프록시 VS CGLIB 프록시
+### JDK 다이나믹 프록시 VS CGLIB 프록시
 
 ![Alt text](image/image-3.png)
 
