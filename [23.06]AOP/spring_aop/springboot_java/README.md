@@ -1,8 +1,91 @@
-최종 작성일 : 2023.07.26.</br>
+> ## Spring AOP 동작 과정
 
-# SpringAOP
+- @Aspect가 있을 경우 Advisor로 변환해서 @Aspect Advisor 빌더 내부에 저장하는 작업을 수행함.
+  ![Alt text](image/image.png)
 
-## 1. 의존성 추가
+- 이후 다음 과정을 통해 Advisor 로직을 넣음.
+  ![Alt text](image/image-1.png)
+
+1. 스프링 빈 대상이 되는 객체를 생성. (Component Scan 대상)
+2. 생성된 객체를 빈 저장소에 등록하기 직전에 빈 후처리기에 전달.
+3. 빈 후처리기에서 해당 빈의 프록시를 만들어 이를 @Aspect Advisor 빌더 내부에 전달.
+4. 빌더 내부에 저장된 모든 Advisor 조회하여 포인트컷의 정보와 동일한 Advisor를 찾음.
+   - Advisor를 찾은 경우 프록시를 생성하고 해당 프록시를 빈 저장소에 반환.
+   - 못찾은 경우 전달받은 프록시를 그대로 빈 저장소에 반환.
+5. 빈 저장소는 반환 받은 프록시로 스프링 컨테이너에 빈 등록.
+
+<br/>
+<br/>
+
+> ## Spring AOP 사용 시 주의사항
+
+### Bean 등록
+
+- @Aspect는 Advisor를 쉽게 만들 수 있도록 도와주는 역할을 하는 것이지 컴포넌트 스캔이 되는 것은 아님. 따라서 반드시 빈 등록을 해야함.
+
+<br/>
+
+### 프록시 내부 호출
+
+```java
+@Slf4j
+@Component
+public class CallService {
+
+   @LogAOP
+    public void external() {
+        log.info("call external");
+        internal(); //내부 메서드 호출(this.internal())
+    }
+
+    @LogAOP
+    public void internal() {
+        log.info("call internal");
+    }
+
+}
+```
+
+![Alt text](image/image-2.png)
+
+- 빈 컨테이너에는 CallServic() 프록시가 있음.
+- external(), internal()을 호출하면 해당 프록시를 통해 호출 됨.
+- external(), internal()을 각각 호출하면 둘 다 적용이 됨. 그러나 external() 안의 internal()은 AOP가 적용되지 않음.
+- 대안 방법으로는 구조 변경, 지연 조회 등이 있음. (지연 조회는 ObjectProvider, ApplicationContext를 사용)
+
+<br/>
+
+### 다이나믹 프록시 VS CGLIB 프록시
+
+![Alt text](image/image-3.png)
+
+- MemberServiceImpl 대상으로 프록시 생성할 경우 MemberService 기반으로 프록시 생성하여 빈 등록.
+- 해당 프록시는 MemberServiceImpl 타입 캐스팅 불가능.
+  - DI 시 문제 발생.
+
+<br/>
+
+![Alt text](image/image-4.png)
+
+- MemberServiceImpl 대상으로 프록시 생성할 경우 MemberServiceImpl 기반으로 프록시 생성하여 빈 등록.
+- 해당 프록시는 MemberService 타입 캐스팅 가능.
+  - DI 시 문제 발생 없음.
+- CGLIB는 다양한 문제가 있음.
+  - 대상 클래스 기본 생성자 필수.
+    - 클래스를 상속받아 구현되기 때문에 자식 생성자에서 부모 클래스의 생성자를 반드시 호출 해야 함.
+  - 부모 생성자 2번 호출.
+    - target 객체를 생성할 때 1번.
+    - 프록시 객체를 생성할 때 부모 생성자 호출 1번.
+  - final 키워드를 클래스, 메서드에 사용 불가.
+    - 상속 문제가 있지만, 일반적으로 웹 개발에서는 final 키워드 잘 사용하지 않아서 특별히 문제가 되진 않음.
+- 스프링은 해당 문제를 해결하고 GCLIB 사용을 채택함.
+  - objenesis 라이브러리로 기본 생성자 없이 객체 생성.
+  - target 생성할 때 생성자 호출 1번, objenesis 라이브러리로 프록시 객체 생성할 때는 생성자 호출 없이 객체 생성.
+
+<br/>
+<br/>
+
+> ## 의존성 추가
 
 ```gradlew
 dependencies {
@@ -12,7 +95,7 @@ dependencies {
 
 <br/>
 
-## 2. Aspect 클래스 작성
+> ## Aspect 클래스 작성
 
 - @Aspect, 빈 등록
 - <details>
@@ -129,7 +212,7 @@ dependencies {
 
 <br/>
 
-## 3. 추가 정보
+> ## 추가 정보
 
 <details>
   <summary>@EnableAspectJAutoProxy</summary>
