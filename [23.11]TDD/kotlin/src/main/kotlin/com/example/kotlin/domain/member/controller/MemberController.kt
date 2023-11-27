@@ -18,7 +18,7 @@ class MemberController(
         return memberService.save(memberDTO)
     }
     @GetMapping("/find/{id}")
-    fun memberFindById(@PathVariable var id:UUID):Member?{
+    fun memberFindById(@PathVariable id:UUID):Member?{
         return memberService.findById(id)
     }
 

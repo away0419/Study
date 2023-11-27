@@ -4,6 +4,7 @@ import com.example.kotlin.domain.member.Member
 import com.example.kotlin.domain.member.MemberDTO
 import com.example.kotlin.domain.member.repository.MemberRepository
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 
@@ -14,7 +15,7 @@ class MemberService(
         return memberRepository.save(memberDTO.toEntity())
     }
 
-    fun findById(memberDTO: MemberDTO): Member? {
-        return memberRepository.findMemberById(memberDTO.id)
+    fun findById(id: UUID): Member? {
+        return memberRepository.findMemberById(id)
     }
 }
