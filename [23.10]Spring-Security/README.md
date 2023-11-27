@@ -11,6 +11,7 @@
 - 권한 : 인가 과정에서 사용.
 
 <br/>
+<br/>
 
 > ## 스프링 시큐리티 특징
 
@@ -20,6 +21,7 @@
 - 기본적으로 세션 & 쿠키 방식. 추가적으로 JWT 방식
 - 인증 관리자(UsenamePasswordAuthenticationFilter)와 접근 결정 관리자(FilterSecurityInterceptor)를 통해 리소스(DB) 접근 관리.
 
+<br/>
 <br/>
 
 > ## UsernamePasswordAuthenticationToken (인증 플로우에서 사용되는 객체)
@@ -32,6 +34,7 @@
 - Credential(민감한 정보) : 사용자 검증을 할 때 사용 되는 정보, 저장소에 저장되어 있는 민감한 정보. (대부분 비밀번호)
 - List<GrantedAuthority\>(권한 목록) : Principal이 가지고 있는 권한 목록. (각각 ROLE로 작명. ROLE_ADMIN, ROLE_USER 등)
 
+<br>
 <br>
 
 > ## 인증 플로우
@@ -61,6 +64,7 @@
 12. [UsernamePasswordAuthenticationFilter] 인증 완료된 객체 SecurityContextHolder 안에 있는 SecurityContext에 저장됨. (기본적으로 SecurityContext에 저장된 정보는 SecurityContextPersistenceFilter를 통해 HttpSession에 저장되어 인증 상태 유지 -> Session 방식)
 
 <br/>
+<br/>
 
 > ## 인가 권한 확인 플로우
 
@@ -70,6 +74,7 @@
 2. [AuthorizationFilter] AuthorizationManager 인터페이스를 구현한 RequestMatcherDelegatingAuthorizationManager 호출. (Authentication, HttpServletRequest 전달)
 3. [RequestMatcherDelegatingAuthorizationManager] 확인 결과 적절한 권한을 가졌다면 통과. 아니라면 예외 발생. 해당 에러는 ExceptionTranslationFilter가 처리.
 
+<br>
 <br>
 
 > ## 인증 인가 예외 처리
@@ -113,6 +118,7 @@
     - 디버깅이 어려움.
     - 보안 설계를 신중하게 설계 해야 함.
 
+<br/>
 <br/>
 
 > ## 모듈
@@ -269,6 +275,7 @@
 </details>
 
 <br/>
+<br/>
 
 > ## SecurityFilterChain
 
@@ -289,6 +296,9 @@
 - addFilterbefore() : 해당 필터 실행 전 지점에 필터 추가.
 - Security를 적용하기 위해 여러가지 Filter를 상속 받아 로직을 구현함. 이때, 어떤 Filter을 상속 받아야 하는지 해당 표를 보면 됨.
 - 해당 그림만으로 설명하긴 힘드므로 실습을 통해서 알아가는 것이 좋음.
+
+<br/>
+<br/>
 
 > ## 기타
 
@@ -389,6 +399,7 @@
   - 인코딩된 헤더(Header)와 인코딩된 페이로드(payload), 비밀 키(Secret)와 알고리즘을 기반으로 백엔드에서 발급됨.
 
 <br>
+<br>
 
 > ## 로그인 후 회원 검증 방식
 
@@ -420,7 +431,8 @@
 
     ![Alt text](image/image-3.png)
 
-   <br/>
+<br/>
+<br/>
 
 > ## Security + JWT 프로세스
 
@@ -442,6 +454,9 @@
   - 사용자가 Header에 보낸 Token을 JwtVerificationFilter에서 검증.
   - 검증이 완료되었다면 인증된 객체를 만들어 SecurityContext에 저장. 이를 통해 이후 단계에서 문제 없이 통과 가능. (만약 저장하지 않을 경우, 다음 단계에서 인증된 객체를 찾지 못하여 통과 못할 수 있음)
   - 이때, SecurityContext에 저장된 정보는 모든 단계 통과 후 SecurityContextPersistenceFilter가 삭제하여 유지 되지 않도록 만듬. (SecurityConfig에서 세션을 stateless로 설정 해야함)
+
+<br/>
+<br/>
 
 > ## Refresh Token 생긴 이유와 흐름, 전략
 
@@ -490,6 +505,9 @@
   - 탈취 된 Access Token인지 확인 불가능.
   - Refresh Token 탈취 된 경우 Access Token 재발급 가능하여 Access Token 탈취 된 것과 똑같음.
 
+<br/>
+<br/>
+
 > ## 기타
 
 <details>
@@ -517,12 +535,18 @@
 - 사용자 인증 확인을 다른 서비스에 위임하는 것.
 - 다른 서비스에 저장 된 사용자 정보를 받아올 수 있음.
 
+<br/>
+<br/>
+
 > ## Security OAuth2 제공 서비스
 
 - Spring Security에서 지원하는 OAuth2 제공 서비스들은 구글, 페이스북, 깃허브 등이 있음.
 - Naver와 Kakao의 경우 지원하지 않으므로 추가 설정이 필요함.
 - 사용자 정보는 Json 형태이며, 서비스 별 제공해주는 사용자 정보가 다름. 또한, Json 필드 명도 다르기 때문에 해당 서비스에 가서 확인 해야 함.
   - 서비스1 ={"nickname" : "사용자"}, 서비스2 = {"name" : "사용자"} 처럼 다를 수 있음.
+
+<br/>
+<br/>
 
 > ## 많이 사용되는 OAuth2 Flow
 
@@ -543,6 +567,9 @@
   - 없는 경우 로그인 성골 로직으로 이동.
 - 로그인 성공 핸들러에서 우리 서버가 만든 Access Token, Refresh Token 발급. OR Session 저장.
 - 이후 사용자의 요청은 JWT 방식과 동일.
+
+<br/>
+<br/>
 
 > ## Authorization code 있는 이유
 
