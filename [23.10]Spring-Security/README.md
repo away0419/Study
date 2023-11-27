@@ -1,14 +1,6 @@
-```
-최근 수정 날짜 : 23.11.07
-Java : 자체 로그인, JWT 구현
-Kotlin : OAuth2 로그인, JWT 구현
-React : OAuth2 로그인 구현
-```
+# Spring Security
 
-<details>
-  <summary>Spring-Security</summary>
-
-### 스프링 시큐리티란
+> ## 스프링 시큐리티란
 
 스프링 기반 보안을 (인증, 권한, 인가) 담당하는 스프링 하위 프레임워크.
 보안과 관련된 많은 옵션을 제공. (개발 비용 감소)
@@ -19,8 +11,9 @@ React : OAuth2 로그인 구현
 - 권한 : 인가 과정에서 사용.
 
 <br/>
+<br/>
 
-### 스프링 시큐리티 특징
+> ## 스프링 시큐리티 특징
 
 - 보안과 관련 된 체계적인 옵션 제공.
 - Filter 기반으로 MVC와 분리하여 관리 및 동작.
@@ -29,8 +22,9 @@ React : OAuth2 로그인 구현
 - 인증 관리자(UsenamePasswordAuthenticationFilter)와 접근 결정 관리자(FilterSecurityInterceptor)를 통해 리소스(DB) 접근 관리.
 
 <br/>
+<br/>
 
-### UsernamePasswordAuthenticationToken (인증 플로우에서 사용되는 객체)
+> ## UsernamePasswordAuthenticationToken (인증 플로우에서 사용되는 객체)
 
 - 인증 완료 전 OR 인증 완료 후의 정보를 가지는 객체.
 - 여러 단계에서 사용되며, 단계 별 사용자 정보를 편하게 주고 받기 위한 객체.
@@ -41,8 +35,9 @@ React : OAuth2 로그인 구현
 - List<GrantedAuthority\>(권한 목록) : Principal이 가지고 있는 권한 목록. (각각 ROLE로 작명. ROLE_ADMIN, ROLE_USER 등)
 
 <br>
+<br>
 
-### 인증 플로우
+> ## 인증 플로우
 
 ![Alt text](image/image-0.png)
 
@@ -69,8 +64,9 @@ React : OAuth2 로그인 구현
 12. [UsernamePasswordAuthenticationFilter] 인증 완료된 객체 SecurityContextHolder 안에 있는 SecurityContext에 저장됨. (기본적으로 SecurityContext에 저장된 정보는 SecurityContextPersistenceFilter를 통해 HttpSession에 저장되어 인증 상태 유지 -> Session 방식)
 
 <br/>
+<br/>
 
-### 인가 권한 확인 플로우
+> ## 인가 권한 확인 플로우
 
 ![Alt text](image/image-4.png)
 
@@ -79,8 +75,9 @@ React : OAuth2 로그인 구현
 3. [RequestMatcherDelegatingAuthorizationManager] 확인 결과 적절한 권한을 가졌다면 통과. 아니라면 예외 발생. 해당 에러는 ExceptionTranslationFilter가 처리.
 
 <br>
+<br>
 
-### 인증 인가 예외 처리
+> ## 인증 인가 예외 처리
 
 - Security 인증 인가 로직에서 예외가 발생한 경우 처리 방법은 다음과 같음.
 - 주의점은 해당 방법들 간 처리 순서가 정해져 있음. 따라서 앞에서 처리할 경우 뒤에 로직은 실행 안될 수 있음. (Filter 형식이기 때문에 순서가 있음)
@@ -122,8 +119,9 @@ React : OAuth2 로그인 구현
     - 보안 설계를 신중하게 설계 해야 함.
 
 <br/>
+<br/>
 
-### 모듈
+> ## 모듈
 
 <details>
   <summary>더보기</summary>
@@ -277,8 +275,9 @@ React : OAuth2 로그인 구현
 </details>
 
 <br/>
+<br/>
 
-### SecurityFilterChain
+> ## SecurityFilterChain
 
 ![Alt text](image/image-1.png)
 | 필터명 | 설명 |
@@ -298,7 +297,10 @@ React : OAuth2 로그인 구현
 - Security를 적용하기 위해 여러가지 Filter를 상속 받아 로직을 구현함. 이때, 어떤 Filter을 상속 받아야 하는지 해당 표를 보면 됨.
 - 해당 그림만으로 설명하긴 힘드므로 실습을 통해서 알아가는 것이 좋음.
 
-### 기타
+<br/>
+<br/>
+
+> ## 기타
 
 <details>
   <summary>로그인 이후 사용자 정보 얻는 방법</summary>
@@ -344,14 +346,13 @@ React : OAuth2 로그인 구현
    - SpringSecurity 3.2 부터 사용 가능.
 
 </details>
-</details>
 
----
+<br/>
+<br/>
 
-<details>
-  <summary>JWT</summary>
+# JWT
 
-### JWT란
+> ## JWT란
 
 - JSON 객체를 통해 안정하게 정보를 전송할 수 있는 웹 표준.
 - '.' 구분자로 세 부분으로 구분되어 있음.
@@ -398,8 +399,9 @@ React : OAuth2 로그인 구현
   - 인코딩된 헤더(Header)와 인코딩된 페이로드(payload), 비밀 키(Secret)와 알고리즘을 기반으로 백엔드에서 발급됨.
 
 <br>
+<br>
 
-### 로그인 후 회원 검증 방식
+> ## 로그인 후 회원 검증 방식
 
 - 세션
 
@@ -429,9 +431,10 @@ React : OAuth2 로그인 구현
 
     ![Alt text](image/image-3.png)
 
-   <br/>
+<br/>
+<br/>
 
-### Security + JWT 프로세스
+> ## Security + JWT 프로세스
 
 - JWT는 크게 두가지 방법을 사용함.
 
@@ -452,7 +455,10 @@ React : OAuth2 로그인 구현
   - 검증이 완료되었다면 인증된 객체를 만들어 SecurityContext에 저장. 이를 통해 이후 단계에서 문제 없이 통과 가능. (만약 저장하지 않을 경우, 다음 단계에서 인증된 객체를 찾지 못하여 통과 못할 수 있음)
   - 이때, SecurityContext에 저장된 정보는 모든 단계 통과 후 SecurityContextPersistenceFilter가 삭제하여 유지 되지 않도록 만듬. (SecurityConfig에서 세션을 stateless로 설정 해야함)
 
-### Refresh Token 생긴 이유와 흐름, 전략
+<br/>
+<br/>
+
+> ## Refresh Token 생긴 이유와 흐름, 전략
 
 - Access Token의 만료 시간이 클수록 탈취 될 가능성이 높음. 반대로 만료 시간이 작으면 자주 로그아웃 됨. 이를 해결하고자 나온 Token.
 - 흐름은 다음과 같음.
@@ -499,7 +505,10 @@ React : OAuth2 로그인 구현
   - 탈취 된 Access Token인지 확인 불가능.
   - Refresh Token 탈취 된 경우 Access Token 재발급 가능하여 Access Token 탈취 된 것과 똑같음.
 
-### 기타
+<br/>
+<br/>
+
+> ## 기타
 
 <details>
     <summary>Authorization Header</summary>
@@ -513,28 +522,33 @@ React : OAuth2 로그인 구현
   - HOBA : 전자 서명 사용
   - Mutual : 암호를 이용한 서버-클라이언트 상호 인증
   - AWS4-HMAC-SHA256 : AWS 전자 서명 사용
-    </details>
   </details>
 
----
+<br/>
+<br/>
 
-<details>
-  <summary>OAuth2</summary>
+# OAUTH2
 
-#### 간단 개념
+> ## OAUTH2란
 
 - 인증을 위한 개방형 표준 프로토콜.
 - 사용자 인증 확인을 다른 서비스에 위임하는 것.
 - 다른 서비스에 저장 된 사용자 정보를 받아올 수 있음.
 
-#### Security OAuth2 제공 서비스
+<br/>
+<br/>
+
+> ## Security OAuth2 제공 서비스
 
 - Spring Security에서 지원하는 OAuth2 제공 서비스들은 구글, 페이스북, 깃허브 등이 있음.
 - Naver와 Kakao의 경우 지원하지 않으므로 추가 설정이 필요함.
 - 사용자 정보는 Json 형태이며, 서비스 별 제공해주는 사용자 정보가 다름. 또한, Json 필드 명도 다르기 때문에 해당 서비스에 가서 확인 해야 함.
   - 서비스1 ={"nickname" : "사용자"}, 서비스2 = {"name" : "사용자"} 처럼 다를 수 있음.
 
-#### 많이 사용되는 OAuth2 Flow
+<br/>
+<br/>
+
+> ## 많이 사용되는 OAuth2 Flow
 
 ![Alt text](image/image-7.png)
 
@@ -554,10 +568,11 @@ React : OAuth2 로그인 구현
 - 로그인 성공 핸들러에서 우리 서버가 만든 Access Token, Refresh Token 발급. OR Session 저장.
 - 이후 사용자의 요청은 JWT 방식과 동일.
 
-#### Authorization code 있는 이유
+<br/>
+<br/>
+
+> ## Authorization code 있는 이유
 
 - 사용자가 OAuth2 제공 서비스에서 로그인 성공 한 경우 Redirect로 이동함.
 - Redirect 이동의 경우 데이터를 URL에 담아서 보낼 수 밖에 없음.
 - 따라서, Access Token이 노출될 수 있기 때문에 사용함.
-
-</details>
