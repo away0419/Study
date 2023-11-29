@@ -1,17 +1,16 @@
 package com.example.kotlin.domain.member.repository
 
 import com.example.kotlin.domain.member.Member
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.matchers.should
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNot
-import io.kotest.matchers.shouldNotHave
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.test.context.TestPropertySource
 import java.util.*
 
-@DataJpaTest
+@DataJpaTest(properties = ["spring.config.location=classpath:application-test.yaml"])
+//@TestPropertySource(properties = ["spring.config.location=classpath:application-test.yaml"])
 internal class MemberRepositoryTest(
     @Autowired
     private val memberRepository: MemberRepository
@@ -31,7 +30,17 @@ internal class MemberRepositoryTest(
             it("찾지 못한 경우 null을 반환한다.") {
                 val response = memberRepository.findMemberById(UUID.randomUUID())
 
-                response shouldBe null
+                response.shouldBeNull()
+            }
+
+            it("찾은 경우 member 반환한다."){
+                val request = UUID.fromString("4a9e5e6b-0b68-4eaa-9e38-53590a0332d4")
+                val result = memberRepository.findMemberById(request)
+                val response = Member(UUID.fromString("4a9e5e6b-0b68-4eaa-9e38-53590a0332d4"), "홍길동", "hong@gmail.com")
+
+                result?.id shouldBe response.id
+                result?.name shouldBe response.name
+                result?.email shouldBe response.email
             }
         }
     }

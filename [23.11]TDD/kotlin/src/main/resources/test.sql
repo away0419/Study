@@ -1,0 +1,1 @@
+INSERT INTO MEMBER (ID, NAME, EMAIL) VALUES ('4a9e5e6b-0b68-4eaa-9e38-53590a0332d4', '홍길동', 'hong@gmail.com');
