@@ -55,9 +55,11 @@ internal class MemberServiceTest: DescribeSpec({
             every { memberRepository.findMemberById(ofType(UUID::class)) } returns response
             val result = memberService.findById(request)
 
-            result?.id shouldBe response.id
-            result?.name shouldBe response.name
-            result?.email shouldBe response.email
+            result?.run {
+                id shouldBe response.id
+                name shouldBe response.name
+                email shouldBe response.email
+            }
         } // 동일한 context 안에서 spyk<>()가 공유 되므로, 아래에 있는 다른 it도  stubbing 적용 됨을 주의 하자.
 
     }

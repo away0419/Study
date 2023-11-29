@@ -38,9 +38,11 @@ internal class MemberRepositoryTest(
 
                 val result = memberRepository.findMemberById(request)
 
-                result?.id shouldBe response.id
-                result?.name shouldBe response.name
-                result?.email shouldBe response.email
+                result?.run {
+                    id shouldBe response.id
+                    name shouldBe response.name
+                    email shouldBe response.email
+                }
             }
         }
     }
