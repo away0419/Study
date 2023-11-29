@@ -6,7 +6,6 @@ import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
-import org.springframework.test.context.TestPropertySource
 import java.util.*
 
 @DataJpaTest(properties = ["spring.config.location=classpath:application-test.yaml"])
@@ -35,8 +34,9 @@ internal class MemberRepositoryTest(
 
             it("찾은 경우 member 반환한다."){
                 val request = UUID.fromString("4a9e5e6b-0b68-4eaa-9e38-53590a0332d4")
-                val result = memberRepository.findMemberById(request)
                 val response = Member(UUID.fromString("4a9e5e6b-0b68-4eaa-9e38-53590a0332d4"), "홍길동", "hong@gmail.com")
+
+                val result = memberRepository.findMemberById(request)
 
                 result?.id shouldBe response.id
                 result?.name shouldBe response.name
