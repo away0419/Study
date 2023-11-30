@@ -215,9 +215,12 @@
 
 - kotest에서 사용하는 Assertions.
 - 해당 조건을 만족하지 못하면 Test 실패.
+- 약 325개 정도 있음.
+- 확장 함수, 중위 함수 스타일을 가짐.
 
     ```kotlin
-    name shouldBe "kyunam" // 동일한지 확인.
+    name shouldBe "kyunam" // 동일한지 확인. (중위 함수)
+    name.shouldBe("kyunam") // 동일한지 확인. (확장 함수)
     
     mylist.forExactly(3) {
         it.city shouldBe "Chicago"
@@ -294,9 +297,9 @@
 > ## Kotest Isolation Mode
 
 - 테스트 간 격리 설정. (Isolation Mode)
-  - SingleInstance - Default (1개의 인스턴스 실행)
-  - InstancePerTest (Test 단위로 인스턴스 실행)
-  - InstancePerLeaf (Leaf 단위로 인스턴스 실행)
+  - SingleInstance - Default (1개의 sepc 인스턴스 생성)
+  - InstancePerTest (Test 단위로 sepc 인스턴스 생성.) 
+  - InstancePerLeaf (Leaf 단위로 sepc 인스턴스 생성.)
 - 기본 값일 때, mocking 등의 이유로 테스트간 충돌이 발생할 수 있음. 테스트 간 완전한 격리를 위해선 InstancePerLeaf 로 지정 해야 함.
 - 한마디로 Mock 객체 재사용을 방지할 수 있음. 
 
@@ -514,7 +517,8 @@ testImplementation("com.ninja-squad:springmockk:3.0.1") // mockk spring
   import java.util.*
   
   @DataJpaTest(properties = ["spring.config.location=classpath:application-test.yaml"]) // test 용 설정 파일 불러오기
-  //@TestPropertySource(properties = ["spring.config.location=classpath:application-test.yaml"])
+  // @TestPropertySource(properties = ["spring.config.location=classpath:application-test.yaml"])
+  // @TestPropertySource("classpath:application-test.properties") properties 일 경우
   internal class MemberRepositoryTest(
       @Autowired
       private val memberRepository: MemberRepository
