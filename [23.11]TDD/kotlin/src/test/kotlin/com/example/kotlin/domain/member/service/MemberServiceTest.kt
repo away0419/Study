@@ -5,16 +5,11 @@ import com.example.kotlin.domain.member.MemberDTO
 import com.example.kotlin.domain.member.repository.MemberRepository
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.nulls.shouldBeNull
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.every
-import io.mockk.mockk
 import io.mockk.spyk
-import org.hibernate.annotations.processing.SQL
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.test.context.TestPropertySource
-import java.util.UUID
+import java.util.*
 
 @TestPropertySource(properties = ["spring.config.location=classpath:application-test.yaml"])
 internal class MemberServiceTest: DescribeSpec({

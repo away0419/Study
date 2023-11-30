@@ -5,6 +5,7 @@ import com.example.kotlin.domain.member.MemberDTO
 import com.example.kotlin.domain.member.service.MemberService
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.mockk.every
 import io.mockk.mockk
 import org.springframework.http.MediaType
@@ -18,6 +19,8 @@ internal class MemberControllerTest : DescribeSpec({
     val memberService = mockk<MemberService>()
     val memberController = MemberController(memberService)
     val mockMvc: MockMvc = MockMvcBuilders.standaloneSetup(memberController).build()
+
+    extensions(SpringExtension)
 
     describe("MemberControllerTest") {
         context("회원 가입 요청") {

@@ -2,20 +2,24 @@ package com.example.kotlin.domain.member.repository
 
 import com.example.kotlin.domain.member.Member
 import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.extensions.spring.SpringExtension
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import java.util.*
 
-@DataJpaTest(properties = ["spring.config.location=classpath:application-test.yaml"])
+@DataJpaTest(properties = ["spring.config.location=classpath:application-test.yaml"]) // test 용 설정 파일 불러오기
 //@TestPropertySource(properties = ["spring.config.location=classpath:application-test.yaml"])
 internal class MemberRepositoryTest(
     @Autowired
     private val memberRepository: MemberRepository
 ) : DescribeSpec({
+
+    extensions(SpringExtension)
+
     describe("MemberRepository") {
-        context("회원 가입") {
+        context("회원 가입 시 옳바른 형식을 보낸 경우") {
             it("성공") {
                 val member = Member(name = "홍길동", email = "hong@gmail.com")
                 val response = memberRepository.save(member)
