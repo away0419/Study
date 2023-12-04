@@ -2,6 +2,9 @@
 
 [STT 공식 문서](https://cloud.google.com/speech-to-text/docs/transcribe-client-libraries?hl=ko#client-libraries-install-java)
 
+<br/>
+<br/>
+
 > ## STT
 
 - 1분 이상의 오디오는 Google Cloud Storage에 파일을 올려 이용해야함.

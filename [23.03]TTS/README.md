@@ -18,16 +18,18 @@
 - [Google Cloud](https://cloud.google.com/text-to-speech/docs/samples?hl=ko)
 - 해당 링크에 들어가 무료로 시작하기 클릭
 - 카드 등록 후 프로젝트 생성
-  </br>
-  </br>
+
+</br>
+</br>
 
 > ## Google Cloud Text-to-Speech API 활성화하기
 
 - 프로젝트 선택
 - "API 및 서비스" > "라이브러리"로 이동
 - "Google Cloud Text-to-Speech API"를 검색하고 활성화 (STT도 같이 나오니 필요할 경우 활성화)
-- </br>
-  </br>
+
+</br>
+</br>
 
 > ## 서비스 계정 생성하기
 
