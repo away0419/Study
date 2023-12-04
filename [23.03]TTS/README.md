@@ -48,7 +48,7 @@
 <br>
 <br>
 
-## 해당 Json 환경 변수에 등록
+> ## 해당 Json 환경 변수에 등록
 
 - "실행"으로 "sysdm.cpl" 열기
 - GOOGLE_APPLICATION_CREDENTIALS=/Users/.../Speech-01-xxxxx.json 등록
