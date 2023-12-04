@@ -1,4 +1,4 @@
-# GitHub Action
+> ## GitHub Action
 
 - GitHub에서 무료로 CI/CD를 위한 서버를 제공.
 - 아무것도 설치되어 있지 않기 때문에 기본적인 툴 설치 해야함. (ex. linux, ubuntu)
@@ -6,27 +6,30 @@
 - 현재 repository에 있는 소스를 이용함.
 - Branch 별 CI/CD 적용 가능.
 
-### project, yaml 생성
+<br/>
+<br/>
+
+> ## project, yaml 생성
 
 1. github 프로젝트 세팅
    ![Alt text](image4/image.png)
-
-<br/>
 
 2. action에 들어가서 기본 파일 선택 (프로젝트랑 비슷한 것 고르면 됨. 아무거나 하고 수정해도 됨)
    ![Alt text](image4/image-1.png)
 
 <br/>
+<br/>
 
-### 변수 생성
+> ## 변수 생성
 
 - GitHub Repository에 저장할 수 없는 민감한 정보들을 따로 저장하면 yaml에서 사용 가능.
   ![Alt text](image4/image-5.png)
   repository > settings > Secrets and variables > Actions > new repository secret 을 통해 yml에서 사용할 변수 등록.
 
 <br/>
+<br/>
 
-### yaml 예시
+> ## yaml 예시
 
 ```yaml
 # yaml 용도
@@ -89,7 +92,7 @@ jobs:
             cd /home/ubuntu/github/fast-automl-api/build/libs
             sudo pkill -f fast-automl-0.0.1-SNAPSHOT.jar
             sudo chmod 777 fast-automl-0.0.1-SNAPSHOT.jar
-            nohup java -jar -Xms512M -Xmx512M fast-automl-0.0.1-SNAPSHOT.jar &
+            nohup java -jar -Xms512M -Xmx512M /home/ubuntu/github/fast-automl-api/build/libs/fast-automl-0.0.1-SNAPSHOT.jar > output.log 2>&1 &
 
 #       직접 나의 서버에 접속한 뒤, GitHub에서 pull 받고 build 하고 실행. (비추)
 #      - name: execute remote ssh
