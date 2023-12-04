@@ -1,4 +1,4 @@
-### CI/CD 란
+> ## CI/CD 란
 
 - 애플리케이션 개발 단계 자동화이며 지속적인 통합, 서비스 제공, 배포를 통해 개발 및 운영팀에서 발생하는 문제를 해결하기 위한 솔루션.
 - CI (Continuous Delivery) : 지속적인 통합
@@ -8,8 +8,9 @@
   - 지속적으로 배포하여 서비스가 지속적으로 제공 될 수 있도록 함.
 
 <br/>
+<br/>
 
-### 가장 많이 사용 되는 도구
+> ## 가장 많이 사용 되는 도구
 
 - Jenkins
 - CircleCI
@@ -17,8 +18,9 @@
 - Github Actions
 
 <br/>
+<br/>
 
-### CI/CD 과정 (feat. GitHub Action)
+> ## CI/CD 과정 (feat. GitHub Action)
 
 1. GitHub 소스 Push. (CI)
 2. GitHub Action Server 실행. (CI)
@@ -27,8 +29,9 @@
 5. 해당 서버에서 프로젝트 실행. (CD)
 
 <br/>
+<br/>
 
-### 실제 서버에 Build 완료 된 파일 전송하는 방법
+> ## 실제 서버에 Build 완료 된 파일 전송하는 방법
 
 - 실제 서버에 직접 전송 : SSH-SCP-SSH ([사용법](https://github.com/away0419/Study-2023/tree/main/Linux/Ubuntu/#명령어))
 - 중간 서버를 거쳐 전송 : AWS S3, Oracle Cloud Bucket
