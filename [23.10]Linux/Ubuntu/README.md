@@ -1,4 +1,4 @@
-## Ubuntu
+> ## Ubuntu
 
 - Linux 배포판.
 - GUI (그래픽 사용자 인터페이스)와 CLI (명령 행 인터페이스)가 있음.
@@ -6,7 +6,7 @@
 
 <br>
 
-## 명령어
+> ## 설치 & 명령어
 
 <details>
     <summary>APT</summary>
