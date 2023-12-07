@@ -43,7 +43,7 @@
 <details>
   <summary>팩토리 메소드</summary>
 
-![Alt text](image/image.png)
+![Alt text](image/factoryMethod-1.png)
 
 - 객체 생성을 생성자로 하는 것이 아닌, 객체 생성 메소드를 가진 [인터페이스 또는 추상 클래스]를 만들고(캡슐화) 이를 상속 받은 서브 클래스를 만들거나 다이렉트로 객체 생성 메소드만 가진 클래스를 만들어 사용하는 패턴. (상황에 맞춰 중 선택)
 - 장점
