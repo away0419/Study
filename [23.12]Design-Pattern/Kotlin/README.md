@@ -101,3 +101,87 @@
   }
   ```
 </details>
+
+
+> ## 팩토리 메소드
+
+<details>
+  <summary>객체</summary>
+
+- 생성 하려는 객체들
+
+```kotlin
+package factoryMethod
+
+open class Drink {
+}
+```
+
+```kotlin
+package factoryMethod
+
+class Coffee : Drink(){
+}
+```
+
+```kotlin
+package factoryMethod
+
+class Tea : Drink() {
+}
+```
+</details>
+
+<details>
+  <summary>factory 부모</summary>
+
+- factory 인터페이스
+- 객체 생성 메소드를 가지고 있음.
+
+  ```kotlin
+  package factoryMethod
+  
+  fun interface DrinkFactory {
+      fun makeDrink() : Drink
+  }
+  ```
+</details>
+
+<details>
+  <summary>factory 자식</summary>
+
+- 실제 객체 생성 기능을 구현한 서브 클래스.
+
+  ```kotlin
+  package factoryMethod
+  
+  class DrinkFactoryImpl : DrinkFactory {
+      override fun makeDrink(): Drink {
+          println("make Drink")
+          return Drink()
+      }
+  }
+  ```
+
+  ```kotlin
+  package factoryMethod
+  
+  class CoffeeFactory : DrinkFactory {
+      override fun makeDrink(): Drink {
+          println("make Coffee")
+          return Coffee()
+      }
+  }
+  ```
+
+  ```kotlin
+  package factoryMethod
+  
+  class TeaFactoryImpl : DrinkFactory{
+      override fun makeDrink(): Drink {
+          println("make Tea")
+          return Tea()
+      }
+  }
+  ```
+</details>
