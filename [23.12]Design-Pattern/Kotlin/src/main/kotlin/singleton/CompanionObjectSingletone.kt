@@ -56,9 +56,10 @@ class CompanionObjectSingletone private constructor() {
     companion object {
         private val instance: CompanionObjectSingletone by lazy { CompanionObjectSingletone() }
 
-        fun getInstance(): CompanionObjectSingletone {
+        fun createInstance(): CompanionObjectSingletone {
             return instance
         }
+
     }
 
 }
