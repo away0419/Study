@@ -1,3 +1,5 @@
+package singletone;
+
 public class LazyHolder {
 
     private static class LazyHolderInner {

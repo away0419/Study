@@ -1,3 +1,5 @@
+package singletone;
+
 public class EagerInaitialization {
     private static EagerInaitialization instance = new EagerInaitialization();
 

@@ -1,3 +1,5 @@
+package singletone;
+
 public class DoubleCheckedLocking {
     private volatile static DoubleCheckedLocking instance;
 

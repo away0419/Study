@@ -1,3 +1,5 @@
+package singletone;
+
 public class LazyInitialization {
 
     private static LazyInitialization instance;
