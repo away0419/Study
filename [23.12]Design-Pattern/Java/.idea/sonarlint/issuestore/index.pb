@@ -1,22 +1,10 @@
 
-K
-src/LazyInitialization.java,c\3\c3ee07bd26fba0d3a4cb3ba41344c6c5b69e36ea
-M
-src/EagerInaitialization.java,1\d\1d1de2f25ec94066f2fb8b2cc42068a12bc8f8d7
-M
-src/DoubleCheckedLocking.java,a\e\aefde8bdb25fc1e4a9e7394967dcc8c16d639afa
-C
-src/LazyHolder.java,6\a\6abe9bfe20d44890092f239ac5a4b6e1942a3440
 9
 	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
 N
 src/singletone/LazyHolder.java,e\0\e0960c6d879832dd84b21e89c63bae5d38659be6
-F
-src/factoryMethod.java,2\c\2c392100f4aabe71647d0f5619ee53d97ca4cefb
 L
 src/factoryMethod/Drink.java,d\9\d914c482f35eca53688eaff5ff943cc1b19f61c8
-L
-src/factoryMethod/Coffe.java,c\4\c4f71c163adc35c3b423a62d4cabe1f36c2089e5
 M
 src/factoryMethod/Coffee.java,9\1\91b1ed7d6d5935a152115ade93d6762619f1980f
 J
@@ -25,8 +13,6 @@ K
 src/factoryMethod/Main.java,5\7\572fccdf085c78e1b9d4453ee19f4d9ed7102436
 S
 #src/factoryMethod/DrinkFactory.java,c\c\cc1b17955fefd8da9172459105a85a72186330c0
-T
-$src/factoryMethod/CoffeeFactory.java,1\3\13d626b476b0b332d17c99e771c97f873206be36
 X
 (src/factoryMethod/CoffeeFactoryImpl.java,8\9\89b2ec9e16760de8cbd49d0a6de6a4d19ecf7f9a
 U

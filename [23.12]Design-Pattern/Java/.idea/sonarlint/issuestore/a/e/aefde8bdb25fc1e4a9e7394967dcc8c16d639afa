@@ -1,7 +1,0 @@
-
-7
-java:S1220""Move this file to a named package.8ג¢ûהֳ1
-y
-java:S3077"WUse a thread-safe type; adding "volatile" is not enough to make this field thread-safe.(‘Ýגפתÿÿÿÿ8ח¢ûהֳ1
-g
-java:S1124"EReorder the modifiers to comply with the Java Language Specification.(‘Ýגפתÿÿÿÿ8י¢ûהֳ1
