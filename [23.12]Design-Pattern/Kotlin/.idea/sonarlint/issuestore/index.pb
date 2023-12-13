@@ -19,8 +19,6 @@ a
 .src/main/kotlin/factoryMethod/CoffeeFactory.kt,a\c\ac40408a67c120b7eed8b14cc86fb0db59908284
 _
 /src/main/kotlin/factoryMethod/TeaFactoryImpl.kt,c\2\c2afd5275335e9d081178de374011353a835aaf9
-W
-'src/main/kotlin/factoryMethod/Main.java,f\9\f951490ef503d91fd5300b38010cb59b71a57a27
 U
 %src/main/kotlin/factoryMethod/Main.kt,6\8\68774c1a48c89d07ba14d34e67520fa3d8a6f78a
 Q
