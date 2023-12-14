@@ -22,4 +22,6 @@
 
 > ## Abstract Factory (생성)
 
+- FactoryBean에서 사용하고 있음. 스프링 구문으로 생성 및 관리할 수 없는 객체를 Bean으로 활용할 수 있게끔 어댑터 역할을 함.
+  - ex) 싱글톤으로 처리된 객체를 Bean으로 활용하고 싶은경우
 - Hibernate 프레임워크의 org.hibernate.cfg.Configuration 클래스에서 사용
