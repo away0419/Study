@@ -15,3 +15,11 @@
 > ## Factory Method (생성)
 
 - 싱글톤 패턴이 팩토리 메소드 패턴을 사용하므로 Bean 등록에 팩토리 메소드 패턴이 사용된다 볼 수 있음.
+
+
+<br/>
+<br/>
+
+> ## Abstract Factory (생성)
+
+- Hibernate 프레임워크의 org.hibernate.cfg.Configuration 클래스에서 사용
