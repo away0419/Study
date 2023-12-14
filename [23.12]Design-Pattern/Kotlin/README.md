@@ -135,7 +135,7 @@ class Tea : Drink() {
 </details>
 
 <details>
-  <summary>factory 부모</summary>
+  <summary>Factory 추상화</summary>
 
 - factory 인터페이스
 - 객체 생성 메소드를 가지고 있음.
@@ -150,7 +150,7 @@ class Tea : Drink() {
 </details>
 
 <details>
-  <summary>factory 자식</summary>
+  <summary>Factory 구현화</summary>
 
 - 실제 객체 생성 기능을 구현한 서브 클래스.
 
@@ -187,3 +187,101 @@ class Tea : Drink() {
   }
   ```
 </details>
+
+<br/>
+<br/>
+
+> ## 추상 팩토리 (생성)
+
+<details>
+  <summary>객체</summary>
+
+- 객체 : 버거, 음료수
+- 객체 집합 : 버거 셋트
+
+  ```kotlin
+  package abstractFactory
+  
+  class BurgerKingBurger:Burger {
+      init {
+          println("make BurgerKingBurger")
+      }
+  }
+  ```
+  
+  ```kotlin
+  package abstractFactory
+  
+  class BurgerKingDrink:Drink {
+      init {
+          println("make BurgerKingDrink")
+      }
+  }
+  ```
+  ```kotlin
+  package abstractFactory
+  
+  class MacdonaldBurger() :Burger {
+      init {
+          println("make MacdonaldBurger")
+      }
+  }
+  ```
+  ```kotlin
+  package abstractFactory
+  
+  class MacdonaldDrink:Drink {
+      init {
+          println("make MacdonaldDrink")
+      }
+  }
+  ```
+  ```kotlin
+  package abstractFactory
+  
+  data class BurgerSet(
+      val burger:Burger,
+      val drink: Drink
+  )
+  ```
+
+</details> 
+
+<details>
+  <summary>Factory 추상화</summary>
+
+- 객체 집합 생성 메소드를 가진 팩토리.
+
+  ```kotlin
+  package abstractFactory
+  
+  interface BurgerSetFactory {
+      fun makeBurgerSet(type: String):BurgerSet?
+  }
+  ```
+
+</details> 
+
+<details>
+  <summary>Factory 구현화</summary>
+
+- 실제 객체를 생성하는 팩토리
+
+  ```kotlin
+  package abstractFactory
+  
+  class BurgerSetFactoryImpl:BurgerSetFactory {
+      override fun makeBurgerSet(type: String): BurgerSet?{
+          var burgerSet:BurgerSet? = null
+  
+          when(type){
+              "Macdonald" -> burgerSet = BurgerSet(MacdonaldBurger(), MacdonaldDrink())
+              "BurgerKing" -> burgerSet = BurgerSet(BurgerKingBurger(), BurgerKingDrink())
+          }
+  
+          return burgerSet
+      }
+  }
+  ```
+</details> 
+
