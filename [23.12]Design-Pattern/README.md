@@ -18,7 +18,7 @@
 - 클라이언트와 생성해야 하는 객체 인스턴스 사이의 연결을 끊어 주는 역할.
 
   <details>
-    <summary>싱글톤</summary>
+    <summary>싱글톤 (Singleton)</summary>
 
   - 객체 인스턴스를 하나만 만들고 이 인스턴스에 대한 전역 접근을 제공하는 패턴.
   - 장점
@@ -41,7 +41,7 @@
   </details>
 
   <details>
-    <summary>팩토리 메소드</summary>
+    <summary>팩토리 메소드 (Factory Method)</summary>
 
   ![Alt text](image/factoryMethod-1.png)
 
@@ -61,7 +61,9 @@
   </details>
 
   <details>
-    <summary>추상 팩토리</summary>
+    <summary>추상 팩토리 (Abstract Factory)</summary>
+
+  ![Alt text](image/abstractFactory-1.png)
 
   - 연관되는 객체를 집합으로 묶어 추상화 한 뒤, 해당 집합의 객체들을 한번에 생성할 수 있게 구현하여 연관 객체들을 생성하는 패턴.
   - 객체 생성을 생성자로 바로 하는 것이 아니고 캡슐화 한다는 점은 팩토리 메소드와 같으나 상위 개념은 아님.
