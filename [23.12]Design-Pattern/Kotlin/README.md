@@ -285,3 +285,49 @@ class Tea : Drink() {
   ```
 </details> 
 
+<br/>
+<br/>
+
+> ## 정적 팩토리 메소드 (생성)
+
+<details>
+  <summary>객체</summary>
+
+- companion object 메소드 생성.
+
+  ```kotlin
+  package staticFactoryMethod
+  
+  class Drink {
+      companion object{
+          fun from():Drink{
+              return Drink()
+          }
+  
+          fun of(): Drink{
+              return Drink()
+          }
+  
+          fun valueOf():Drink{
+              return Drink()
+          }
+  
+          fun getInstance(): Drink{
+              return Drink()
+          }
+          
+          fun newInstance(): Drink{
+              return Drink()
+          }
+          
+          fun getString():String{
+              return "Drink"
+          }
+          
+          fun newString():String{
+              return "Drink"
+          }
+      }
+  }
+  ```
+</details>
