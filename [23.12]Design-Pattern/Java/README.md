@@ -312,3 +312,54 @@
   }
   ```
 </details>
+
+<br/>
+<br/>
+
+> ## 정적 팩토리 메소드 (생성)
+
+<details>
+  <summary>객체</summary>
+
+- 객체 안에 객체를 반환하는 스태틱 메소드가 있음.
+
+  ```java
+  package staticFactoryMethod;
+  
+  public class Drink {
+      private Drink(){}
+  
+      public static Drink from(String msg){
+          System.out.println("make Drink" + msg);
+          return new Drink();
+      }
+  
+      public static Drink of(String... msg){
+          System.out.println("make Drink");
+          for (String str :
+                  msg) {
+              System.out.println(str);
+          }
+          return new Drink();
+      }
+  
+      public static Drink getInstance(){
+          return new Drink();
+      }
+  
+      public static Drink newInstance(){
+          return new Drink();
+      }
+  
+      public static String getString(){
+          return "Drink";
+      }
+  
+      public static String newString(){
+          return "Drink";
+      }
+  }
+  ```
+</details>
+
+
