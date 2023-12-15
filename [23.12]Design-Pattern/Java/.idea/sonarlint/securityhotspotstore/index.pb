@@ -38,18 +38,8 @@ X
 -.idea/sonarlint/securityhotspotstore/index.pb,8\8\88a9255124c95bdc913197c120a8d560edc59c8e
 N
 src/abstractFactory/Drink.java,0\b\0b2fe7cc857bd8a02198052876a1b2efcab7e2ed
-M
-src/abstractFactory/Food.java,4\1\416b4af6b5a2f900c6c344e802779de03c37f4b2
-N
-src/abstractFactory/Pizza.java,1\e\1ec43b373a73aa393857cff048c041ffe6189b33
 R
 "src/abstractFactory/Hamburger.java,3\7\372928c0b80ccef15e0c2f7a250df1786f49f492
-R
-"src/abstractFactory/Macdonald.java,a\1\a13a451755b8b9eb96968963d0d575af1b90851d
-T
-$src/abstractFactory/ShopFactory.java,9\0\90b6a373b5274ea2166ffa3eca190ef97db9cc1b
-Q
-!src/abstractFactory/MacDrink.java,5\b\5b610ff3ed2288a354260feb4c853fb6e2e2e3c1
 W
 'src/abstractFactory/MacdonaldDrink.java,f\2\f22d4564f909db0570870d7ea8b3e377847daa49
 X
@@ -58,10 +48,6 @@ X
 ,src/abstractFactory/BurgerKingHamburger.java,5\5\55dafe72410076967e008165e49a92421823a072
 [
 +src/abstractFactory/MacdonaldHamburger.java,6\9\699e8f02d1bf5ca10f591a06f031cb08fd7a9d7a
-S
-#src/abstractFactory/SetFactory.java,e\5\e53a92bd387e7154445242fc25f4be3c92451168
-Q
-!src/abstractFactory/BugerSet.java,b\7\b7e3f4806346684d296459d180dd2cd05714150e
 Y
 )src/abstractFactory/BurgerSetFactory.java,7\3\733a301af52e196bb5326a566a4e8c95d991eca3
 R
@@ -70,3 +56,5 @@ R
 -src/abstractFactory/BurgerSetFactoryImpl.java,4\5\4577b78efc23e0a7d0e1af824f657817c1ec4216
 M
 src/abstractFactory/Main.java,1\a\1a5368f04d044793882ebaa767b7ec13a4eb14b9
+R
+"src/staticFactoryMethod/Drink.java,6\9\69933e161d4983e6385f1561e6ccb237e85eb7aa
