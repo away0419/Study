@@ -36,8 +36,6 @@ X
 (src/main/kotlin/abstractFactory/Drink.kt,8\0\80085917c8457da3fb06aa50da895154b656027c
 \
 ,src/main/kotlin/abstractFactory/BurgerSet.kt,5\6\569767e3e233308bf95aab88c9d55b89992f5c18
-a
-1src/main/kotlin/abstractFactory/MacdonaldBuger.kt,e\c\ecaa22d1ff1de1bc6ab5115eb6063d258ff20491
 b
 2src/main/kotlin/abstractFactory/MacdonaldBurger.kt,0\7\07631b2ce8755103e55915c373d83444b0bcf745
 c
@@ -54,3 +52,5 @@ W
 'src/main/kotlin/abstractFactory/main.kt,3\7\37c5d6f5d9746d57a0d6b4a562a84569f07c3764
 W
 'src/main/kotlin/abstractFactory/Main.kt,a\c\ac79050e38739ba1b040f7b40034dfece3ff6ec2
+\
+,src/main/kotlin/staticFactoryMethod/Drink.kt,5\9\5981f1a06b13c02f72824d5bd3ef1f99d63ad0e0
