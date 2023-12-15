@@ -141,7 +141,7 @@
 </details>
 
 <details>
-  <summary>Factory 부모</summary>
+  <summary>Factory 추상화</summary>
 
 - 객체 생성 메소드만 가진 [인터페이스, 추상 클래스] 생성.
 
@@ -156,7 +156,7 @@
 </details>
 
 <details>
-  <summary>Factory 자식</summary>
+  <summary>Factory 구현화</summary>
 
 - 부모를 상속 받은 서브 클래스 생성 또는 바로 기본 클래스 생성.
 
@@ -195,4 +195,171 @@
   }
   ```
 </details>
+
+<br/>
+<br/>
+
+> ## 추상 팩토리 (생성)
+
+<details>
+  <summary>객체</summary>
+
+- 객체 집합 별 객체를 생성할 것임.
+- 버거 세트가 객체 집합임. 매장별 각각 [햄버거, 음료수] 객체가 있음.
+
+  ```java
+  package abstractFactory;
+  
+  public class BurgerKingHamburger implements Hamburger{
+      public BurgerKingHamburger(){
+          System.out.println("make BurgerKingHamburger");
+      }
+  }
+  ```
+  
+  ```java
+  package abstractFactory;
+  
+  public class BurgerKingDrink implements Drink{
+      public BurgerKingDrink(){
+          System.out.println("make BurgerKingDrink");
+      }
+  }
+  ```
+  
+  ```java
+  package abstractFactory;
+  
+  public class MacdonaldHamburger implements Hamburger{
+      public MacdonaldHamburger(){
+          System.out.println("make MacdonaldHamburger");
+      }
+  }
+  ```
+  
+  ```java
+  package abstractFactory;
+  
+  public class MacdonaldDrink implements  Drink{
+      public MacdonaldDrink(){
+          System.out.println("make MacdonaldDrink");
+      }
+  }
+  ```
+
+  ```java
+  package abstractFactory;
+  
+  public class BurgerSet {
+      private final Hamburger hamburger;
+      private final Drink drink;
+  
+      public BurgerSet(Hamburger hamburger, Drink drink) {
+          this.hamburger = hamburger;
+          this.drink = drink;
+      }
+  
+      public Hamburger getHamburger() {
+          return hamburger;
+      }
+  
+      public Drink getDrink() {
+          return drink;
+      }
+  }
+  ```
+
+
+</details>
+
+<details>
+  <summary>Factory 추상화</summary>
+
+- 굳이 따진다면 해당 팩토리는 버거 세트의 팩토리 메소드 패턴임.
+- 타입 별 객체 집합 군 객체를 만드는 팩토리 이기 때문에 추상 팩토리라 할 수 있음.
+- 결국 팩토리 메소드와 추상 팩토리는 서로 관계가 있음. 그렇다고 동일한 패턴은 아님.
+
+  ```java
+  package abstractFactory;
+  
+  public interface BurgerSetFactory {
+      public BurgerSet makeSet(String type);
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>Factory 구현화</summary>
+
+- 실제 객체를 생성 하는 로직 구현.
+- 타입별 버거 세트를 만들어서 반환함.
+
+  ```java
+  package abstractFactory;
+  
+  public class BurgerSetFactoryImpl implements BurgerSetFactory{
+      @Override
+      public BurgerSet makeSet(String type) {
+          BurgerSet burgerSet = null;
+          switch (type){
+              case "BurgerKing" -> burgerSet = new BurgerSet(new BurgerKingHamburger(), new BurgerKingDrink());
+              case "Macdonald" -> burgerSet = new BurgerSet(new MacdonaldHamburger(), new MacdonaldDrink());
+              default -> System.out.println("해당 버거 세트가 없음");
+          }
+          return burgerSet;
+      }
+  }
+  ```
+</details>
+
+<br/>
+<br/>
+
+> ## 정적 팩토리 메소드 (생성)
+
+<details>
+  <summary>객체</summary>
+
+- 객체 안에 객체를 반환하는 스태틱 메소드가 있음.
+
+  ```java
+  package staticFactoryMethod;
+  
+  public class Drink {
+      private Drink(){}
+  
+      public static Drink from(String msg){
+          System.out.println("make Drink" + msg);
+          return new Drink();
+      }
+  
+      public static Drink of(String... msg){
+          System.out.println("make Drink");
+          for (String str :
+                  msg) {
+              System.out.println(str);
+          }
+          return new Drink();
+      }
+  
+      public static Drink getInstance(){
+          return new Drink();
+      }
+  
+      public static Drink newInstance(){
+          return new Drink();
+      }
+  
+      public static String getString(){
+          return "Drink";
+      }
+  
+      public static String newString(){
+          return "Drink";
+      }
+  }
+  ```
+</details>
+
 
