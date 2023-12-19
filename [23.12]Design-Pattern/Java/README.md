@@ -362,4 +362,75 @@
   ```
 </details>
 
+<br/>
+<br/>
 
+> ## 이넘 팩토리 메소드 (생성)
+<details>
+  <summary>객체</summary>
+
+- 음식을 상속받은 음료수와 햄버거.
+
+  ```java
+  package enumFactoryMethod;
+  
+  public interface Food {
+  }
+  ```
+  ```java
+  package enumFactoryMethod;
+  
+  public class Drink implements Food{
+      public Drink(){
+          System.out.println("make Drink");
+      }
+  }
+  ```
+  ```java
+  package enumFactoryMethod;
+  
+  public class Hamburger implements Food{
+      public Hamburger(){
+          System.out.println("make Hamburger");
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>Factory Enum</summary>
+
+- Enum 상수로 음료수, 햄버거 생성.
+- 추상 메소드를 만들어 모든 상수에서 구현하도록 강제함.
+
+  ```java
+  package enumFactoryMethod;
+  
+  public enum EnumFoodFactory {
+      DRINK("음료수"){
+        public Food createFood(){
+            return new Drink();
+        }
+      },
+      HAMBURGER("햄버거") {
+          public Food createFood(){
+              return new Hamburger();
+          }
+      };
+  
+      private final String name;
+  
+      EnumFoodFactory(String name) {
+          this.name = name;
+      }
+      String getName(){
+          return this.name;
+      }
+  
+      // 추상 메소드. 모든 상수에서 구현 해야 함.
+      abstract Food createFood();
+  }
+  ```
+
+</details>
