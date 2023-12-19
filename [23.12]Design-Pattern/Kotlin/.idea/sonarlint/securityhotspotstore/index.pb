@@ -54,3 +54,13 @@ W
 'src/main/kotlin/abstractFactory/Main.kt,a\c\ac79050e38739ba1b040f7b40034dfece3ff6ec2
 \
 ,src/main/kotlin/staticFactoryMethod/Drink.kt,5\9\5981f1a06b13c02f72824d5bd3ef1f99d63ad0e0
+`
+0src/main/kotlin/enumFactoryMethod/FoodFactory.kt,1\0\10cc4a6cd4bc225bc0b103bfad69e17f4b1b59a1
+Y
+)src/main/kotlin/enumFactoryMethod/Food.kt,a\f\afdf7a12a3770663ae1050844d5c1f2bfeacfca7
+Z
+*src/main/kotlin/enumFactoryMethod/Drink.kt,3\c\3c51273d4269e87e7697cb06a1aa6461b9e67740
+^
+.src/main/kotlin/enumFactoryMethod/Hamburger.kt,a\8\a8eb08e1211d2b094ec0044f9b25b132795a98c6
+Y
+)src/main/kotlin/enumFactoryMethod/Main.kt,0\a\0a766785168f1fd579b59accd14003649cbb183e

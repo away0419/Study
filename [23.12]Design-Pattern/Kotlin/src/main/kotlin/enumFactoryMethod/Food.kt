@@ -1,0 +1,4 @@
+package enumFactoryMethod
+
+interface Food {
+}
