@@ -106,17 +106,28 @@
 
   </details>
 
-<details>
-  <summary>이넘 팩토리 메소드 패턴 (Enum Factory Method)</summary>
+  <details>
+    <summary>이넘 팩토리 메소드 패턴 (Enum Factory Method)</summary>
 
-- Enum을 이용한 객체 생성 패턴.
-- 장점
-  - 정적 팩토리 메소드와 동일.
-- 단점
-  - 정적 팩토리 메소드와 동일.
-- static과 차이가 별로 나지 않음.
+  - Enum을 이용한 객체 생성 패턴.
+  - 장점
+    - 정적 팩토리 메소드와 동일.
+  - 단점
+    - 정적 팩토리 메소드와 동일.
+  - static과 차이가 별로 나지 않음.
 
-</details>
+  </details>
+
+  <details>
+    <summary>다이나믹 팩토리 패턴 (Dynamic Factory)</summary>
+
+  - 자바의 Class 클래스를 이용한 [Reflection API](https://github.com/away0419/Study-2023/tree/main/%5B23.01%5DLanguage/Java/ReflectionAPI) 기법을 이용한 패턴.
+  - 장점
+    - 이넘 팩토리 메소드의 문제점인 객체 상속을 해결.
+  - 단점
+    - 예외 처리 필수.
+
+  </details>
 
 - 빌더
 - 프로토타입
