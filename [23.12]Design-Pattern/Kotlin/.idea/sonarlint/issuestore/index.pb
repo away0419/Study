@@ -64,3 +64,7 @@ Z
 .src/main/kotlin/enumFactoryMethod/Hamburger.kt,a\8\a8eb08e1211d2b094ec0044f9b25b132795a98c6
 Y
 )src/main/kotlin/enumFactoryMethod/Main.kt,0\a\0a766785168f1fd579b59accd14003649cbb183e
+`
+0src/main/kotlin/dynamicFactory/DynamicFactory.kt,4\b\4b9bdbce0bb44d28b906dc5212bfe1a53b541e37
+V
+&src/main/kotlin/dynamicFactory/Main.kt,7\0\7083e5fc720f0382b8a54f09ad21ff03ec45b0c0
