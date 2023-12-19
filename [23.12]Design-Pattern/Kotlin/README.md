@@ -331,3 +331,70 @@ class Tea : Drink() {
   }
   ```
 </details>
+
+<br/>
+<br/>
+
+> ## 이넘 팩토리 메소드 (생성)
+<details>
+  <summary>객체</summary>
+
+- Food 상속 받은 음료수, 햄버거
+
+  ```kotlin
+  package enumFactoryMethod
+  
+  interface Food {
+  }
+  ```
+  
+  ```kotlin
+  package enumFactoryMethod
+  
+  class Drink: Food {
+      init {
+          println("make Drink")
+      }
+  }
+  ```
+  
+  ```kotlin
+  package enumFactoryMethod
+  
+  class Hamburger:Food {
+      init{
+          println("make Hamburger")
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>Factory Enum</summary>
+
+- 음식 객체를 생성하는 팩토리 이넘.
+- 추상 메소드를 만들고 모든 상수가 해당 메소드를 구현할 수 있도록 하면 됨.
+
+```kotlin
+package enumFactoryMethod
+
+enum class FoodFactory(
+  val foodName: String
+) {
+  DRINK("음료수"){
+    override fun createFood(): Food {
+      return Drink()
+    }
+  },
+  HAMBURGER("햄버거"){
+    override fun createFood(): Food {
+      return Hamburger()
+    }
+  };
+  abstract fun createFood(): Food
+}
+```
+
+</details>
+
