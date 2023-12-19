@@ -106,6 +106,18 @@
 
   </details>
 
+<details>
+  <summary>이넘 팩토리 메소드 패턴 (Enum Factory Method)</summary>
+
+- Enum을 이용한 객체 생성 패턴.
+- 장점
+  - 정적 팩토리 메소드와 동일.
+- 단점
+  - 정적 팩토리 메소드와 동일.
+- static과 차이가 별로 나지 않음.
+
+</details>
+
 - 빌더
 - 프로토타입
 </details>
