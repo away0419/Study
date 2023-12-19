@@ -51,3 +51,16 @@ public class Product {
 
 <br/>
 <br/>
+
+> ## Enum Factory Method (생성)
+
+- Spring Security에서 OAuth2를 이용할 때 사용한 경험이 있음.
+  - OAuth2 서비스 별 객체가 다른데 이를 생성할 때 사용함.
+
+<br/>
+<br/>
+
+> ## Dynamic Factory (생성)
+
+- AOP 로깅 작업 시 비슷하게 사용한 경험이 있음.
+  - 객체 생성은 아니고 타입별 로깅 처리를 위해 Reflection API를 이용함.
