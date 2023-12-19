@@ -68,3 +68,13 @@ O
 src/enumFactoryMethod/Food.java,9\f\9f8cb049dc5b77d9c81389bbfae4090f97a5f284
 O
 src/enumFactoryMethod/Main.java,3\e\3ef910112567760b9e39cb64eedff0c1bfe7f738
+L
+src/dynamicFactory/Food.java,9\4\941cb8e39517761921f0f6ea2545fe5b06a42c83
+M
+src/dynamicFactory/Drink.java,7\3\73b2caeb7654f49fb2c874117df735bca19216a2
+Q
+!src/dynamicFactory/Hamburger.java,a\2\a2c9c69c86ec9fdfaecf4bf5e23534ec5ac8212a
+V
+&src/dynamicFactory/DynamicFactory.java,d\0\d0c71574ec7534b1367925095c9cc9604fa98e8f
+L
+src/dynamicFactory/Main.java,9\8\98d1cb1886f570d47688ec6102d8efc82a6c97a2
