@@ -447,3 +447,114 @@ object DynamicFactory {
 
 <br/>
 <br/>
+
+> ## 빌더 (생성)
+
+<details>
+  <summary>객체</summary>
+
+- 코틀린은 기본적으로 객체 생성 시 필드명을 매핑하여 순서를 마음대로 정할 수 있기 때문에 가독성 측면에선 큰 도움이 되지않음.
+- 코틀린에서 빌드 패턴을 쓸 이유는 단일 책임 원칙을 지키기 위함 또는 생성자 접근을 막기 위함일 것이라 생각 됨.
+
+  ```kotlin
+  package builder
+  
+  class Drink(
+      val name: String,
+      val size: String,
+      val price: String
+  ){
+      override fun toString(): String {
+          return "Drink(name='$name', size='$size', price='$price')"
+      }
+  }
+  ```
+</details>
+
+<details>
+  <summary>Builder</summary>
+
+- 해당 방법은 빌더 클래스를 따로 생성해야 하며 기존 객체의 생성자를 private로 만들 수 없음.
+- 객체 생성 지연 및 생성 기능 분리가 주 목적
+
+  ```kotlin
+  package builder
+  
+  class DrinkBuilder (
+      private var name: String = "",
+      private var size: String = "",
+      private var price: String = ""
+  ) {
+      fun name(name: String): DrinkBuilder {
+          this.name = name
+          return this
+      }
+      fun size(size: String): DrinkBuilder {
+          this.size = size
+          return this
+      }
+  
+      fun price(price: String): DrinkBuilder {
+          this.price = price
+          return this
+      }
+  
+      fun build(): Drink{
+          return Drink(name, size, price)
+      }
+  }
+  ```
+</details>
+
+<details>
+  <summary>중첩 클래스 Builder</summary>
+
+- 객체 안에 중첩 클래스를 만듬.
+- 객체의 생성자를 private로 만들 수 있음.
+
+  ```kotlin
+  package builder
+  
+  class Hamburger private constructor(
+      val name: String,
+      val size: String,
+      val price: String
+  ) {
+      // 중첩 클래스로 정적 이너 클래스와 비슷한 개념이다.
+      class Builder(
+          private var name: String = "",
+          private var size: String = "",
+          private var price: String = "",
+          ) {
+          fun name(name: String): Builder {
+              this.name = name
+              return this
+          }
+  
+          fun size(size: String): Builder {
+              this.size = size
+              return this
+          }
+  
+          fun price(price: String): Builder {
+              this.price = price
+              return this
+          }
+  
+          fun build(): Hamburger{
+              return Hamburger(name, size, price)
+          }
+      }
+  
+      override fun toString(): String {
+          return "Hamburger(name='$name', size='$size', price='$price')"
+      }
+  
+  
+  }
+  ```
+</details>
+
+
+<br/>
+<br/>

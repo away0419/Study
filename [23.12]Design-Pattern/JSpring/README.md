@@ -64,3 +64,9 @@ public class Product {
 
 - AOP 로깅 작업 시 비슷하게 사용한 경험이 있음.
   - 객체 생성은 아니고 타입별 로깅 처리를 위해 Reflection API를 이용함.
+
+<br/>
+<br/>
+
+> ## Builder (생성)
+- lombok의 @Builder에서 사용됨.
