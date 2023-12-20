@@ -504,3 +504,155 @@
   ```
 </details>
 
+
+<br/>
+<br/>
+
+> ## 빌더 (생성)
+
+<details>
+  <summary>객체</summary>
+
+- 음료수.
+- 객체 안에 빌더 처럼 메소드를 구현할 순 있으나, 빌더 패턴은 아니고 단순 Setter임.
+- 생성자를 private 하게 만들 수 없음.
+
+```java
+package builder;
+
+public class Drink {
+    private String name;
+    private String size;
+    private String price;
+
+// 해당 로직은 setter와 다를바 없으며 불변성을 보장하지 못함. builder 패턴이라 보기 힘듬.
+//    public Drink name(String name){
+//        this.name = name;
+//        return this;
+//    }
+//
+//    public Drink size(String size){
+//        this.size = size;
+//        return this;
+//    }
+//
+//    public Drink price(String price){
+//        this.price = price;
+//        return this;
+//    }
+
+    public Drink(String name, String size, String price) {
+        this.name = name;
+        this.size = size;
+        this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return "Drink{" +
+                "name='" + name + '\'' +
+                ", size='" + size + '\'' +
+                ", price='" + price + '\'' +
+                '}';
+    }
+}
+```
+
+</details>
+
+<details>
+  <summary>Builder</summary>
+
+- Drink 생성 역할을 하는 클래스.
+
+```java
+package builder;
+
+public class DrinkBuilder {
+    private String name;
+    private String size;
+    private String price;
+
+    public DrinkBuilder name(String name){
+        this.name = name;
+        return this;
+    }
+
+    public DrinkBuilder size(String size){
+        this.size = size;
+        return this;
+    }
+
+    public DrinkBuilder price(String price){
+        this.price = price;
+        return this;
+    }
+
+    public Drink build(){
+        return new Drink(this.name, this.size, this.price);
+    }
+}
+```
+
+</details>
+
+<details>
+  <summary>Inner Class Builder</summary>
+
+- 객체의 생성자를 private 하게 만들 수 있음.
+
+  ```java
+  package builder;
+  
+  public class Hamburger {
+      private String name;
+      private String size;
+      private int price;
+  
+      public static class HamburgerBuilder{
+          private String name;
+          private String size;
+          private int price;
+  
+          public HamburgerBuilder name(String name){
+              this.name = name;
+              return this;
+          }
+  
+          public HamburgerBuilder size(String size){
+              this.size = size;
+              return this;
+          }
+  
+          public HamburgerBuilder price(int price){
+              this.price = price;
+              return this;
+          }
+  
+          public Hamburger build(){
+              return new Hamburger(this.name, this.size, this.price);
+          }
+      }
+  
+      private Hamburger(String name, String size, int price) {
+          this.name = name;
+          this.size = size;
+          this.price = price;
+      }
+  
+      @Override
+      public String toString() {
+          return "Hamburger{" +
+                  "name='" + name + '\'' +
+                  ", size='" + size + '\'' +
+                  ", price=" + price +
+                  '}';
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
