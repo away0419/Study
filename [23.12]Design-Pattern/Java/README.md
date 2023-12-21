@@ -656,3 +656,41 @@ public class DrinkBuilder {
 <br/>
 <br/>
 
+> ## 프로토타입 (생성)
+
+<details>
+  <summary>객체</summary>
+
+- Cloneable 상속 받아 오버라이딩.
+- 깊은 복사.
+
+  ```java
+  package prototpye;
+  
+  import java.util.ArrayList;
+  import java.util.List;
+  
+  public class Drink implements Cloneable {
+      private List<Integer> list = new ArrayList<>();
+  
+      public Drink(List<Integer> list) {
+          this.list = list;
+      }
+  
+      @Override
+      protected Object clone() throws CloneNotSupportedException {
+          List<Integer> copyList = new ArrayList<>(list);
+          return new Drink(copyList);
+      }
+  
+      @Override
+      public String toString() {
+  
+          return "Drink{" +
+                  "list = " + System.identityHashCode(list) + list +
+                  '}';
+      }
+  }
+  ```
+
+</details>
