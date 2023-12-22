@@ -17,8 +17,8 @@
 - 객체 인스턴스를 생성하는 패턴.
 - 클라이언트와 생성해야 하는 객체 인스턴스 사이의 연결을 끊어 주는 역할.
 
-  <details>
-    <summary>싱글톤 (Singleton)</summary>
+    <details>
+      <summary>싱글톤 (Singleton)</summary>
 
   - 객체 인스턴스를 하나만 만들고 이 인스턴스에 대한 전역 접근을 제공하는 패턴.
   - 장점
@@ -38,10 +38,10 @@
     - 캐시
     - 로그 기록 객체
 
-  </details>
+    </details>
 
-  <details>
-    <summary>팩토리 메소드 (Factory Method)</summary>
+    <details>
+      <summary>팩토리 메소드 (Factory Method)</summary>
 
   ![Alt text](image/factoryMethod-1.png)
 
@@ -58,10 +58,10 @@
     - 코드 복잡성 증가.
       - 어떤 클래스와 이어져 있는지 확인 해야 함.
 
-  </details>
+    </details>
 
-  <details>
-    <summary>추상 팩토리 (Abstract Factory)</summary>
+    <details>
+      <summary>추상 팩토리 (Abstract Factory)</summary>
 
   ![Alt text](image/abstractFactory-1.png)
 
@@ -79,10 +79,10 @@
     - 코드의 복잡성 증가.
     - 객체 집한에 새로운 객체를 추가할 경우 수정해야 되는 부분이 많음.
 
-  </details>
+    </details>
 
-  <details>
-    <summary>정적 팩토리 메소드 패턴 (Static Factory Method)</summary>
+    <details>
+      <summary>정적 팩토리 메소드 패턴 (Static Factory Method)</summary>
 
   - static Method를 이용하여 객체를 생성하는 패턴.
   - 장점
@@ -104,10 +104,10 @@
     - get[orderType] : 다른 타입의 인스턴스 생성. (getInstance와 동일. 단, 인스턴스의 타입은 [orderType])
     - new[orderType] : 항상 다른 타입의 새로운 인스턴스 생성. (getInstance와 동일. 단, 인스턴스의 타입은 [orderType])
 
-  </details>
+    </details>
 
-  <details>
-    <summary>이넘 팩토리 메소드 패턴 (Enum Factory Method)</summary>
+    <details>
+      <summary>이넘 팩토리 메소드 패턴 (Enum Factory Method)</summary>
 
   - Enum을 이용한 객체 생성 패턴.
   - 장점
@@ -116,10 +116,10 @@
     - 정적 팩토리 메소드와 동일.
   - static과 차이가 별로 나지 않음.
 
-  </details>
+    </details>
 
-  <details>
-    <summary>다이나믹 팩토리 패턴 (Dynamic Factory)</summary>
+    <details>
+      <summary>다이나믹 팩토리 패턴 (Dynamic Factory)</summary>
 
   - 자바의 Class 클래스를 이용한 [Reflection API](https://github.com/away0419/Study-2023/tree/main/%5B23.01%5DLanguage/Java/ReflectionAPI) 기법을 이용한 패턴.
   - 장점
@@ -127,10 +127,10 @@
   - 단점
     - 예외 처리 필수.
 
-  </details>
+    </details>
 
-  <details>
-    <summary>빌더 패턴 (Builder)</summary>
+    <details>
+      <summary>빌더 패턴 (Builder)</summary>
 
   - 복잡한 객체 생성 방법을 단계별로 나누어 생성하는 패턴.
   - 기존의 자바 빈 패턴의 경우 일관성과 불변성에 문제가 발생함.
@@ -147,25 +147,24 @@
     - 생성자 보다 성능이 떨어짐.
     - 필드 개수가 적다면 빌더 패턴은 과함.
 
+    </details>
+
+    <details>
+      <summary>프로토타입</summary>
+
+  - 원본 객체를 새로운 객체에 복사하는 패턴.
+  - 객체를 처음부터 생성하기엔 비용이 많이 들 경우, 이미 존재하는 객체를 복사할때 사용.
+    - ex) 동일한 목록을 DB에서 가져오는 경우. (가져온 정보는 같으나 새로운 객체에 담고 있는 경우)
+    - ex) 객체 생성에 수 많은 설정을 해줘야 하는 경우.
+  - 장점
+    - 복잡한 객체 생성 과정을 숨길 수 있음.
+    - 비용을 줄일 수 있음. (객체생성보다 복사가 효율적일 수 있기 때문)
+    - 구체 클래스 없이 객체를 복사할 수 있음.
+  - 단점
+    - 순환 참조가 있는 객체들은 복제 과정 자체가 복잡할 수 있음.
+
+    </details>
   </details>
-
-<details>
-  <summary>프로토타입</summary>
- 
- - 원본 객체를 새로운 객체에 복사하는 패턴.
- - 객체를 처음부터 생성하기엔 비용이 많이 들 경우, 이미 존재하는 객체를 복사할때 사용.
-   - ex) 동일한 목록을 DB에서 가져오는 경우. (가져온 정보는 같으나 새로운 객체에 담고 있는 경우)
-   - ex) 객체 생성에 수 많은 설정을 해줘야 하는 경우.
- - 장점
-   - 복잡한 객체 생성 과정을 숨길 수 있음.
-   - 비용을 줄일 수 있음. (객체생성보다 복사가 효율적일 수 있기 때문)
-   - 구체 클래스 없이 객체를 복사할 수 있음.
- - 단점
-   - 복제 과정 자체가 복잡할 수 있음.
-
-</details>
-
-</details>
 
 <br>
 
@@ -173,15 +172,22 @@
   <summary>구조 패턴</summary>
 
 - 클래스와 객체를 더 큰 구조로 만들 수 있게 구성을 사용하는 패턴.
-  - 어댑터
-  - 브릿지
-  - 컴포짓
-  - 데코레이터
-  - 퍼사드
-  - 플라이웨이트
-  - 프록시
-  </details>
 
+<details>
+  <summary>어댑터</summary>
+
+- 호환되지 않는 인터페이스를 가진 객체들이 협업할 수 있도록 하는 패턴.
+
+</details>
+
+- 어댑터
+- 브릿지
+- 컴포짓
+- 데코레이터
+- 퍼사드
+- 플라이웨이트
+- 프록시
+  </details>
 <br>
 
 <details>
