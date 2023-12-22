@@ -558,3 +558,32 @@ object DynamicFactory {
 
 <br/>
 <br/>
+
+> ## 프로토타입
+
+<details>
+  <summary>객체</summary>
+
+- data class에는 기본적으로 copy 메소드가 있음. 다만, 얕은 복사이므로 깊은 복사를 하려면 사용자 정의가 필요함.
+- 추가적으로 컬렉션에서는 깊은 복사를 해주는 메소드가 있으니 필요 시 찾아서 사용할 것.
+
+```kotlin
+package prototype
+
+data class Drink(val list: List<Int>) {
+
+    fun copy(): Drink{
+        val copyList = list.toMutableList()
+        return Drink(copyList)
+    }
+    
+    override fun toString(): String {
+        val hashCode = System.identityHashCode(list)
+        return "Drink(list=$list, $hashCode)"
+    }
+}
+```
+</details>
+
+ <br/>
+ <br/>
