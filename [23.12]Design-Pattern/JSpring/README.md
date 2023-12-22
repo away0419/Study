@@ -70,3 +70,11 @@ public class Product {
 
 > ## Builder (생성)
 - lombok의 @Builder에서 사용됨.
+
+<br/>
+<br/>
+
+> ## Prototype (생성)
+- ModelMapper 라이브러리에서 사용함.
+  - 자바의 리플렉션을 이용해 구현한 라이브러리.
+  - 명확하게 프로토타입 패턴이라 볼 수 는 없음.
