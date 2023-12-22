@@ -76,3 +76,7 @@ W
 'src/main/kotlin/builder/DrinkBuilder.kt,d\d\ddafb17ae2de571085a385a7ff926a62bcc27baa
 T
 $src/main/kotlin/builder/Hamburger.kt,7\3\73a219aecadf542d59f3fa090466568b41115139
+R
+"src/main/kotlin/prototype/Drink.kt,1\3\13e6180b9c16822f40df5c1ba574996fa8b819f5
+Q
+!src/main/kotlin/prototype/Main.kt,d\7\d7405e1e56d67940a609f752bad1d3e60d0c51e1
