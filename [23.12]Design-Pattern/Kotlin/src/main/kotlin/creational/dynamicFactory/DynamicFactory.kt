@@ -1,8 +1,8 @@
 package creational.dynamicFactory
 
-import enumFactoryMethod.Drink
-import enumFactoryMethod.Food
-import enumFactoryMethod.Hamburger
+import creational.enumFactoryMethod.Drink
+import creational.enumFactoryMethod.Food
+import creational.enumFactoryMethod.Hamburger
 import java.lang.RuntimeException
 
 object DynamicFactory {
