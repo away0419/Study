@@ -84,3 +84,15 @@ H
 src/prototpye/Drink.java,f\8\f8dbd886e87a6bd814779166e538013bff5aff67
 G
 src/prototpye/Main.java,1\6\16cf17c8580e05e9c0550f8b9e6d996568c7defa
+I
+src/structural/Drink.java,4\8\48dc4d253cba2144eb2dacbbddebae427d5dee9b
+G
+src/structural/Car.java,f\0\f09f31281d488939b430de92319161b2acc03a1a
+P
+ src/structural/Adaptor/Wing.java,d\5\d5b09c1bc2224fc86600f958c52dc03724c02ca1
+S
+#src/structural/Adaptor/FlyCar1.java,d\b\db2c265ee2d517769f89ad42437ffef7b55672b3
+S
+#src/structural/Adaptor/FlyCar2.java,f\d\fd09bfc7173de3d1718ccd717522d479cb756e20
+P
+ src/structural/Adaptor/Main.java,6\e\6ebda09e910da9c1469d5c43dbb1679f47f2f8b8
