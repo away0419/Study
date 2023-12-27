@@ -1,4 +1,0 @@
-package abstractFactory
-
-interface Drink {
-}
