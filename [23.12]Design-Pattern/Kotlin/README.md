@@ -559,7 +559,7 @@ object DynamicFactory {
 <br/>
 <br/>
 
-> ## 프로토타입
+> ## 프로토타입 (생성)
 
 <details>
   <summary>객체</summary>
@@ -587,3 +587,79 @@ data class Drink(val list: List<Int>) {
 
  <br/>
  <br/>
+
+> ## 어댑터 (구조)
+
+<details>
+  <summary>객체</summary>
+
+- 기본 차 클래스, 날개 인터페이스
+
+  ```kotlin
+  package structural.adapter
+  
+  open class Car {
+      fun start(){
+          println("시동 ON")
+      }
+      fun end(){
+          println("시동 OFF")
+      }
+  }
+  ```
+  ```kotlin
+  package structural.adapter
+  
+  interface Wing {
+      fun fly();
+  
+  }
+  ```
+  
+</details>
+
+<details>
+  <summary>합성</summary>
+
+- 멤버 변수로 차 클래스를 가짐.
+
+  ```kotlin
+  package structural.adapter
+  
+  class FlyCar1(private val car: Car): Wing {
+      override fun fly() {
+              println("날기")
+      }
+  
+      fun start(){
+          car.start()
+      }
+  
+      fun end(){
+          car.end()
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>상속</summary>
+
+- 차 클래스와 인터페이스를 둘 다 상속 받음.
+
+  ```kotlin
+  package structural.adapter
+  
+  class FlyCar2():Car(), Wing {
+      override fun fly() {
+              println("날기")
+      }
+  }
+  ```
+
+</details>
+
+
+<br/>
+<br/>

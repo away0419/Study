@@ -11,17 +11,17 @@
   - 동기화로 인한 성능 저하 발생.
 
   ```java
-  public class singletone.LazyInitialization {
+  public class creational.singletone.LazyInitialization {
   
-      private static singletone.LazyInitialization instance;
+      private static creational.singletone.LazyInitialization instance;
   
-      private singletone.LazyInitialization() {
+      private creational.singletone.LazyInitialization() {
       }
   
       // 동기화 문제 해결을 위한 synchronized
-      public static synchronized singletone.LazyInitialization getInstance() {
+      public static synchronized creational.singletone.LazyInitialization getInstance() {
           if (instance == null) {
-              instance = new singletone.LazyInitialization();
+              instance = new creational.singletone.LazyInitialization();
           }
   
           return instance;
@@ -39,13 +39,13 @@
   - 인스턴스를 사용하지 않을 경우 메모리 낭비됨.
 
   ```java
-  public class singletone.EagerInaitialization {
-      private static singletone.EagerInaitialization instance = new singletone.EagerInaitialization();
+  public class creational.singletone.EagerInaitialization {
+      private static creational.singletone.EagerInaitialization instance = new creational.singletone.EagerInaitialization();
   
-      private singletone.EagerInaitialization() {
+      private creational.singletone.EagerInaitialization() {
       }
   
-      public static singletone.EagerInaitialization getInstance() {
+      public static creational.singletone.EagerInaitialization getInstance() {
           return instance;
       }
   }
@@ -67,16 +67,16 @@
 - Java 1.5 이상만 가능.
 
   ```java
-  public class singletone.DoubleCheckedLocking {
-      private volatile static singletone.DoubleCheckedLocking instance;
+  public class creational.singletone.DoubleCheckedLocking {
+      private volatile static creational.singletone.DoubleCheckedLocking instance;
   
-      private singletone.DoubleCheckedLocking(){}
+      private creational.singletone.DoubleCheckedLocking(){}
   
-      public static singletone.DoubleCheckedLocking getInstance(){
+      public static creational.singletone.DoubleCheckedLocking getInstance(){
           if (instance == null){
-              synchronized (singletone.DoubleCheckedLocking.class){
+              synchronized (creational.singletone.DoubleCheckedLocking.class){
                   if(instance==null){
-                      instance = new singletone.DoubleCheckedLocking();
+                      instance = new creational.singletone.DoubleCheckedLocking();
                   }
               }
           }
@@ -94,13 +94,13 @@
 - inner class 특징인 호출 되기 전 참조 되지 않는 방식, static 특징인 한번만 호줄 하는 방식, final 키워드를 이용한 불변성 보장 등을 이용함.
 
   ```java
-  public class singletone.LazyHolder {
+  public class creational.singletone.LazyHolder {
   
       private static class LazyHolderInner {
-          private final static singletone.LazyHolder INSTANCE = new singletone.LazyHolder();
+          private final static creational.singletone.LazyHolder INSTANCE = new creational.singletone.LazyHolder();
       }
   
-      public static singletone.LazyHolder getInstance() {
+      public static creational.singletone.LazyHolder getInstance() {
           return LazyHolderInner.INSTANCE;
       }
   }
@@ -119,21 +119,21 @@
 - 해당 클래스들은 Factory의 부모 클래스는 아님.
 
   ```java
-  package factoryMethod;
+  package creational.factoryMethod;
   
   public class Drink {
   }
   ```
-  
+
   ```java
-  package factoryMethod;
+  package creational.factoryMethod;
   
   public class Coffee extends Drink{
   }
   ```
-  
+
   ```java
-  package factoryMethod;
+  package creational.factoryMethod;
   
   public class Tea extends Drink{
   }
@@ -146,7 +146,7 @@
 - 객체 생성 메소드만 가진 [인터페이스, 추상 클래스] 생성.
 
   ```java
-  package factoryMethod;
+  package creational.factoryMethod;
   
   public interface DrinkFactory {
       public Drink makeDrink();
@@ -161,7 +161,7 @@
 - 부모를 상속 받은 서브 클래스 생성 또는 바로 기본 클래스 생성.
 
   ```java
-  package factoryMethod;
+  package creational.factoryMethod;
   
   public class DrinkFactoryImpl implements  DrinkFactory{
       @Override
@@ -170,9 +170,9 @@
       }
   }
   ```
-  
+
   ```java
-  package factoryMethod;
+  package creational.factoryMethod;
   
   public class CoffeeFactoryImpl implements DrinkFactory{
       @Override
@@ -182,9 +182,9 @@
       }
   }
   ```
-  
+
   ```java
-  package factoryMethod;
+  package creational.factoryMethod;
   
   public class TeaFactoryImpl implements DrinkFactory{
       @Override
@@ -208,7 +208,7 @@
 - 버거 세트가 객체 집합임. 매장별 각각 [햄버거, 음료수] 객체가 있음.
 
   ```java
-  package abstractFactory;
+  package creational.abstractFactory;
   
   public class BurgerKingHamburger implements Hamburger{
       public BurgerKingHamburger(){
@@ -216,9 +216,9 @@
       }
   }
   ```
-  
+
   ```java
-  package abstractFactory;
+  package creational.abstractFactory;
   
   public class BurgerKingDrink implements Drink{
       public BurgerKingDrink(){
@@ -226,9 +226,9 @@
       }
   }
   ```
-  
+
   ```java
-  package abstractFactory;
+  package creational.abstractFactory;
   
   public class MacdonaldHamburger implements Hamburger{
       public MacdonaldHamburger(){
@@ -236,9 +236,9 @@
       }
   }
   ```
-  
+
   ```java
-  package abstractFactory;
+  package creational.abstractFactory;
   
   public class MacdonaldDrink implements  Drink{
       public MacdonaldDrink(){
@@ -248,7 +248,7 @@
   ```
 
   ```java
-  package abstractFactory;
+  package creational.abstractFactory;
   
   public class BurgerSet {
       private final Hamburger hamburger;
@@ -280,7 +280,7 @@
 - 결국 팩토리 메소드와 추상 팩토리는 서로 관계가 있음. 그렇다고 동일한 패턴은 아님.
 
   ```java
-  package abstractFactory;
+  package creational.abstractFactory;
   
   public interface BurgerSetFactory {
       public BurgerSet makeSet(String type);
@@ -296,7 +296,7 @@
 - 타입별 버거 세트를 만들어서 반환함.
 
   ```java
-  package abstractFactory;
+  package creational.abstractFactory;
   
   public class BurgerSetFactoryImpl implements BurgerSetFactory{
       @Override
@@ -324,7 +324,7 @@
 - 객체 안에 객체를 반환하는 스태틱 메소드가 있음.
 
   ```java
-  package staticFactoryMethod;
+  package creational.staticFactoryMethod;
   
   public class Drink {
       private Drink(){}
@@ -372,13 +372,13 @@
 - 음식을 상속받은 음료수와 햄버거.
 
   ```java
-  package enumFactoryMethod;
+  package creational.enumFactoryMethod;
   
   public interface Food {
   }
   ```
   ```java
-  package enumFactoryMethod;
+  package creational.enumFactoryMethod;
   
   public class Drink implements Food{
       public Drink(){
@@ -387,7 +387,7 @@
   }
   ```
   ```java
-  package enumFactoryMethod;
+  package creational.enumFactoryMethod;
   
   public class Hamburger implements Food{
       public Hamburger(){
@@ -405,7 +405,7 @@
 - 추상 메소드를 만들어 모든 상수에서 구현하도록 강제함.
 
   ```java
-  package enumFactoryMethod;
+  package creational.enumFactoryMethod;
   
   public enum EnumFoodFactory {
       DRINK("음료수"){
@@ -448,11 +448,11 @@
 - 예외 처리가 중요함.
 
   ```java
-  package dynamicFactory;
+  package creational.dynamicFactory;
   
-  import enumFactoryMethod.Drink;
-  import enumFactoryMethod.Food;
-  import enumFactoryMethod.Hamburger;
+  import creational.enumFactoryMethod.Drink;
+  import creational.enumFactoryMethod.Food;
+  import creational.enumFactoryMethod.Hamburger;
   
   import java.lang.reflect.Constructor;
   import java.lang.reflect.InvocationTargetException;
@@ -518,14 +518,14 @@
 - 생성자를 private 하게 만들 수 없음.
 
 ```java
-package builder;
+package creational.builder;
 
 public class Drink {
-    private String name;
-    private String size;
-    private String price;
+  private String name;
+  private String size;
+  private String price;
 
-// 해당 로직은 setter와 다를바 없으며 불변성을 보장하지 못함. builder 패턴이라 보기 힘듬.
+// 해당 로직은 setter와 다를바 없으며 불변성을 보장하지 못함. creational.builder 패턴이라 보기 힘듬.
 //    public Drink name(String name){
 //        this.name = name;
 //        return this;
@@ -541,20 +541,20 @@ public class Drink {
 //        return this;
 //    }
 
-    public Drink(String name, String size, String price) {
-        this.name = name;
-        this.size = size;
-        this.price = price;
-    }
+  public Drink(String name, String size, String price) {
+    this.name = name;
+    this.size = size;
+    this.price = price;
+  }
 
-    @Override
-    public String toString() {
-        return "Drink{" +
-                "name='" + name + '\'' +
-                ", size='" + size + '\'' +
-                ", price='" + price + '\'' +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "Drink{" +
+            "name='" + name + '\'' +
+            ", size='" + size + '\'' +
+            ", price='" + price + '\'' +
+            '}';
+  }
 }
 ```
 
@@ -566,31 +566,31 @@ public class Drink {
 - Drink 생성 역할을 하는 클래스.
 
 ```java
-package builder;
+package creational.builder;
 
 public class DrinkBuilder {
-    private String name;
-    private String size;
-    private String price;
+  private String name;
+  private String size;
+  private String price;
 
-    public DrinkBuilder name(String name){
-        this.name = name;
-        return this;
-    }
+  public DrinkBuilder name(String name) {
+    this.name = name;
+    return this;
+  }
 
-    public DrinkBuilder size(String size){
-        this.size = size;
-        return this;
-    }
+  public DrinkBuilder size(String size) {
+    this.size = size;
+    return this;
+  }
 
-    public DrinkBuilder price(String price){
-        this.price = price;
-        return this;
-    }
+  public DrinkBuilder price(String price) {
+    this.price = price;
+    return this;
+  }
 
-    public Drink build(){
-        return new Drink(this.name, this.size, this.price);
-    }
+  public Drink build() {
+    return new Drink(this.name, this.size, this.price);
+  }
 }
 ```
 
@@ -602,7 +602,7 @@ public class DrinkBuilder {
 - 객체의 생성자를 private 하게 만들 수 있음.
 
   ```java
-  package builder;
+  package creational.builder;
   
   public class Hamburger {
       private String name;
@@ -665,7 +665,7 @@ public class DrinkBuilder {
 - 깊은 복사.
 
   ```java
-  package prototpye;
+  package creational.prototpye;
   
   import java.util.ArrayList;
   import java.util.List;
@@ -692,5 +692,107 @@ public class DrinkBuilder {
       }
   }
   ```
+</details>
+
+<br/>
+<br/>
+
+> ## 어댑터 (구조)
+
+<details>
+  <summary>객체</summary>
+
+- 시동 on/off 기능이 있는 자동차 클래스.
+- fly 기능이 있는 날개 인터페이스.
+
+  ```java
+  package structural;
+  
+  public class Car {
+  
+      public Car(){
+          System.out.println("make Car");
+      }
+  
+      public void start(){
+          System.out.println("시동 걸기");
+      }
+  
+      public void end(){
+          System.out.println("시동 끄기");
+      }
+  }
+  ```
+  ```java
+  package structural.Adaptor;
+  
+  public interface Wing {
+      public void fly();
+  }
+  ```
 
 </details>
+
+<details>
+  <summary>합성</summary>
+
+- 멤버 변수로 기존 클래스를 가짐.
+- 추가 기능 인터페이스 상속받음.
+
+  ```java
+  package structural.Adaptor;
+  
+  import structural.Car;
+  
+  public class FlyCar1 implements Wing{
+      private Car car;
+  
+      public FlyCar1(Car car){
+          this.car = car;
+          System.out.println("make FlyCar1");
+      }
+  
+      public void start(){
+          car.start();
+      }
+  
+      public void end(){
+          car.end();
+      }
+  
+      @Override
+      public void fly() {
+          System.out.println("날기");
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>상속</summary>
+
+- 기존 클래스를 상속 받음.
+- 추가 기능 인터페이스를 상속 받음.
+
+  ```java
+  package structural.Adaptor;
+  
+  import structural.Car;
+  
+  public class FlyCar2 extends Car implements Wing {
+  
+      public FlyCar2(){
+          System.out.println("make FlyCar2");
+      }
+  
+      @Override
+      public void fly() {
+          System.out.println("날기");
+      }
+  }
+  ```
+</details>
+
+<br/>
+<br/>

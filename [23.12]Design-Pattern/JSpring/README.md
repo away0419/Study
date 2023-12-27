@@ -78,3 +78,15 @@ public class Product {
 - ModelMapper 라이브러리에서 사용함.
   - 자바의 리플렉션을 이용해 구현한 라이브러리.
   - 명확하게 프로토타입 패턴이라 볼 수 는 없음.
+
+<br/>
+<br/>
+
+> ## Adapter (구조)
+
+<details>
+  <summary>MultiValueMap </summary>
+
+![image/adapter-img.png](image/adapter-img.png)
+</details>
+

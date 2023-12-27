@@ -17,8 +17,8 @@
 - 객체 인스턴스를 생성하는 패턴.
 - 클라이언트와 생성해야 하는 객체 인스턴스 사이의 연결을 끊어 주는 역할.
 
-    <details>
-      <summary>싱글톤 (Singleton)</summary>
+  <details>
+    <summary>싱글톤 (Singleton)</summary>
 
   - 객체 인스턴스를 하나만 만들고 이 인스턴스에 대한 전역 접근을 제공하는 패턴.
   - 장점
@@ -33,15 +33,16 @@
     - 내부 상태 변경이 어려움.
     - 개방-폐쇄 원칙에 어긋남.
   - 주로 사용되는 상황.
+
     - 커넥션풀
     - 스레드풀
     - 캐시
     - 로그 기록 객체
 
-    </details>
+  </details>
 
-    <details>
-      <summary>팩토리 메소드 (Factory Method)</summary>
+  <details>
+    <summary>팩토리 메소드 (Factory Method)</summary>
 
   ![Alt text](image/factoryMethod-1.png)
 
@@ -53,15 +54,16 @@
     - 단일 책임 원칙 준수할 수 있음. (객체 생성이라는 하나의 목적을 가진 클래스를 한 곳에 모아 관리 가능)
     - 개방-폐쇄 원칙 준수할 수 있음. (기존 객체 확장)
   - 단점
+
     - [인터페이스, 추상클래스, 서브클래스] 구현으로 인한 클래스 증가.
       - 생성자로 객체 생성하면 만들 필요가 없기 때문.
     - 코드 복잡성 증가.
       - 어떤 클래스와 이어져 있는지 확인 해야 함.
 
-    </details>
+  </details>
 
-    <details>
-      <summary>추상 팩토리 (Abstract Factory)</summary>
+  <details>
+    <summary>추상 팩토리 (Abstract Factory)</summary>
 
   ![Alt text](image/abstractFactory-1.png)
 
@@ -75,14 +77,15 @@
     - 단일 책임 원칙 준수.
     - 개방/폐쇄 원칙 준수.
   - 단점
+
     - 객체가 늘어날때 마다 클래스가 증가.
     - 코드의 복잡성 증가.
     - 객체 집한에 새로운 객체를 추가할 경우 수정해야 되는 부분이 많음.
 
-    </details>
+  </details>
 
-    <details>
-      <summary>정적 팩토리 메소드 패턴 (Static Factory Method)</summary>
+  <details>
+    <summary>정적 팩토리 메소드 패턴 (Static Factory Method)</summary>
 
   - static Method를 이용하여 객체를 생성하는 패턴.
   - 장점
@@ -96,6 +99,7 @@
   - 단점
     - 부모가 되기 위해선 public 혹은 protected 생성자가 필요하므로 정적 팩토리 메소드만 제공할 경우 상속 불가.
   - 정적 팩토리 메소드 네이밍 규칙
+
     - from : 자신의 타입 객체를 생성. (매개변수 0개 이상, 타입 상관 x, 주로 다른 타입)
     - of : 적절한 타입 객체 생성. (매겨변수 0개 이상, 타입 상관 x)
     - valueOf : from과 of의 자세한 버전. (매개변수 1개, 해당 매개변수의 타입을 현재 클래스의 타입으로 바꿀 때 주로 사용)
@@ -104,10 +108,10 @@
     - get[orderType] : 다른 타입의 인스턴스 생성. (getInstance와 동일. 단, 인스턴스의 타입은 [orderType])
     - new[orderType] : 항상 다른 타입의 새로운 인스턴스 생성. (getInstance와 동일. 단, 인스턴스의 타입은 [orderType])
 
-    </details>
+  </details>
 
-    <details>
-      <summary>이넘 팩토리 메소드 패턴 (Enum Factory Method)</summary>
+  <details>
+    <summary>이넘 팩토리 메소드 패턴 (Enum Factory Method)</summary>
 
   - Enum을 이용한 객체 생성 패턴.
   - 장점
@@ -116,21 +120,22 @@
     - 정적 팩토리 메소드와 동일.
   - static과 차이가 별로 나지 않음.
 
-    </details>
+  </details>
 
-    <details>
-      <summary>다이나믹 팩토리 패턴 (Dynamic Factory)</summary>
+  <details>
+    <summary>다이나믹 팩토리 패턴 (Dynamic Factory)</summary>
 
   - 자바의 Class 클래스를 이용한 [Reflection API](https://github.com/away0419/Study-2023/tree/main/%5B23.01%5DLanguage/Java/ReflectionAPI) 기법을 이용한 패턴.
   - 장점
     - 이넘 팩토리 메소드의 문제점인 객체 상속을 해결.
   - 단점
+
     - 예외 처리 필수.
 
-    </details>
+  </details>
 
-    <details>
-      <summary>빌더 패턴 (Builder)</summary>
+  <details>
+    <summary>빌더 패턴 (Builder)</summary>
 
   - 복잡한 객체 생성 방법을 단계별로 나누어 생성하는 패턴.
   - 기존의 자바 빈 패턴의 경우 일관성과 불변성에 문제가 발생함.
@@ -142,15 +147,16 @@
     - 단일 책임 원칙, 복잡한 생성 코드를 고립시킬 수 있음.
     - 객체 생성을 지연할 수 있음.
   - 단점
+
     - 빌더 클래스를 따로 만들어야 하므로 코드 복잡성 증가.
       - 이를 해결하려면 빌더 클래스를 해당 객체의 정적 이너 클래스로 만들면 됨.
     - 생성자 보다 성능이 떨어짐.
     - 필드 개수가 적다면 빌더 패턴은 과함.
 
-    </details>
+  </details>
 
-    <details>
-      <summary>프로토타입</summary>
+  <details>
+    <summary>프로토타입 (Prototype)</summary>
 
   - 원본 객체를 새로운 객체에 복사하는 패턴.
   - 객체를 처음부터 생성하기엔 비용이 많이 들 경우, 이미 존재하는 객체를 복사할때 사용.
@@ -160,11 +166,11 @@
     - 복잡한 객체 생성 과정을 숨길 수 있음.
     - 비용을 줄일 수 있음. (객체생성보다 복사가 효율적일 수 있기 때문)
     - 구체 클래스 없이 객체를 복사할 수 있음.
-  - 단점
-    - 순환 참조가 있는 객체들은 복제 과정 자체가 복잡할 수 있음.
+  - 단점 - 순환 참조가 있는 객체들은 복제 과정 자체가 복잡할 수 있음.
 
-    </details>
   </details>
+
+</details>
 
 <br>
 
@@ -177,10 +183,26 @@
   <summary>어댑터</summary>
 
 - 호환되지 않는 인터페이스를 가진 객체들이 협업할 수 있도록 하는 패턴.
+- 어댑터 패턴 구조는 2가지가 있음.
+  - 객체 어댑터 (합성, 추천)
+    - 새로운 기능을 가진 인터페이스 생성.
+    - 해당 인터페이스를 상속받으며 멤버 변수로 기본 서비스 객체를 가지는 새로운 클래스 생성.
+    - 이를 통해 새로운 클래스는 기존 서비스 객체를 이용하여 기존 서비스 기능을(메소드) 사용할 수 있으며, 새로운 기능을 구현하여 사용할 수 있음.
+    - 멤버 변수로 인해 공간 차지 비용이 발생함.
+  - 클래스 어댑터 (상속)
+    - 새로운 기능을 가진 인터페이스 생성.
+    - 해당 인터페이스와 기존 서비스 객체를 동시에 상속 받는 새로운 클래스 생성.
+    - 기존 서비스 객체의 기능을 오버라이딩 할 수 있으며, 새로운 기능을 구현하여 사용 가능.
+    - 다중 상속이 문제가 될 수 있음.
+- 장점
+  - 호환성 및 기능 확장 가능.
+  - 단일 책임 원칙 준수.
+  - 개방/폐쇄 원칙 준수.
+- 단점
+  - 다수의 인터페이스와 클래스 도입으로 코드 복잡성 증가.
 
 </details>
 
-- 어댑터
 - 브릿지
 - 컴포짓
 - 데코레이터
