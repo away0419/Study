@@ -30,3 +30,23 @@ P
  src/structural/adaptor/Main.java,0\6\067cad36088cd271eb3f3fd46e439474a564edb1
 S
 #src/structural/adaptor/FlyCar1.java,5\8\58002be0b6859f5c09bd7d8da551ee1c3f1cca4f
+Q
+!src/structural/bridge/Button.java,9\f\9f329dc45bb69862d3d29fbefa62f14954e36005
+P
+ src/structural/bridge/Color.java,4\9\49a502485b8f376db1e97b6dbe644db40064397c
+Q
+!src/structural/bridge/Action.java,6\6\66a4541b0a683821a8dde48d6feef2d8cb31abdb
+V
+&src/structural/bridge/StartButton.java,a\0\a000999b15df77418d569f145e974a9dac8fb3b7
+T
+$src/structural/bridge/EndButton.java,a\a\aa49762ea264842bfd2adf24c91bf1d04e4fcb38
+O
+src/structural/bridge/Main.java,5\0\50fd6e8b62b59d1609702e9a8957205cc0ea249c
+L
+src/structural/bridge/Red.kt,6\2\629820c238fdbe67aa171c4baadcd3864fb56aa7
+N
+src/structural/bridge/Red.java,b\3\b39481cda6ce098838bc7be7ef6b67689c09d54a
+O
+src/structural/bridge/Blue.java,e\8\e85865f0ea043c0788c06a46133a5c496036bd2f
+8
+Java.iml,4\b\4b030f50e362de75a10637fd31c94a08dfb492a7
