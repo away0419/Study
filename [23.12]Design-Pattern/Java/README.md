@@ -724,7 +724,7 @@ public class DrinkBuilder {
   }
   ```
   ```java
-  package structural.Adaptor;
+  package structural.adaptor;
   
   public interface Wing {
       public void fly();
@@ -740,7 +740,7 @@ public class DrinkBuilder {
 - 추가 기능 인터페이스 상속받음.
 
   ```java
-  package structural.Adaptor;
+  package structural.adaptor;
   
   import structural.Car;
   
@@ -776,7 +776,7 @@ public class DrinkBuilder {
 - 추가 기능 인터페이스를 상속 받음.
 
   ```java
-  package structural.Adaptor;
+  package structural.adaptor;
   
   import structural.Car;
   
@@ -792,6 +792,105 @@ public class DrinkBuilder {
       }
   }
   ```
+</details>
+
+<br/>
+<br/>
+
+> ## 브릿지 (구조)
+
+<details>
+  <summary>색</summary>
+
+- 색은 버튼의 특징중 하나.
+- 버튼이 Color 인터페이스를 바로 상속 받아도 되며 일반적으로 상속을 추천함.
+- 해당 예시는 상속이 아닌 사용을 이용한 방법을 이용함.
+- interface가 브릿지 역할.
+
+  ```java
+  package structural.bridge;
+  
+  public interface Color {
+      public void getColor();
+  }
+  
+  ```
+  ```java
+  package structural.bridge;
+  
+  public class Red implements Color{
+      @Override
+      public void getColor() {
+          System.out.println("Red");
+      }
+  }
+  
+  ```
+  ```java
+  package structural.bridge;
+  
+  public class Blue implements Color{
+      @Override
+      public void getColor() {
+          System.out.println("Blue");
+      }
+  }
+  
+  ```
+</details>
+
+<details>
+  <summary>버튼</summary>
+
+- 버튼을 종류에 따라 객체로 만들 수 있음.
+- 만약, 기능별 인터페이스를 따로 구현한다면 아래 예시처럼 Start, End 객체를 각각 만들 필요가 없다.
+- 여러 상황을 보여주고자 abstract class를 사용했으며 이를 상속 받는 예시임.
+- 즉, 기능은 상속을 이용하였고 특징은 사용을 이용하였다 볼 수 있음.
+- abstract class가 브릿지 역할.
+
+  ```java
+  package structural.bridge;
+  
+  public abstract class Button {
+      Color color;
+  
+      protected Button(Color color){
+          this.color = color;
+      }
+  
+      public abstract void action();
+  }
+  ```
+  ```java
+  package structural.bridge;
+  
+  public class StartButton extends Button{
+  
+      public StartButton(Color color) {
+          super(color);
+      }
+  
+      @Override
+      public void action() {
+          System.out.println("Start!!!");
+      }
+  }
+  ```
+  ```java
+  package structural.bridge;
+  
+  public class EndButton extends Button{
+      public EndButton(Color color) {
+          super(color);
+      }
+  
+      @Override
+      public void action() {
+          System.out.println("End!!!");
+      }
+  }
+  ```
+
 </details>
 
 <br/>

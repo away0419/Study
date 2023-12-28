@@ -90,3 +90,12 @@ public class Product {
 ![image/adapter-img.png](image/adapter-img.png)
 </details>
 
+<br/>
+<br/>
+
+> ## Bridge (구조)
+
+- @Slf4j 에서 사용함.
+
+<br/>
+<br/>

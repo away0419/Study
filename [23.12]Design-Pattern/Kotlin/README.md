@@ -663,3 +663,82 @@ data class Drink(val list: List<Int>) {
 
 <br/>
 <br/>
+
+
+> ## 브릿지 (구조)
+
+<details>
+  <summary>색</summary>
+
+- 자바와 동일.
+
+  ```kotlin
+  package structural.bridge
+  
+  interface Color {
+      fun getColor()
+  }
+  ```
+  
+  ```kotlin
+  package structural.bridge
+  
+  class Red: Color {
+      override fun getColor() {
+          println("Red")
+      }
+  }
+  ```
+
+  ```kotlin
+  package structural.bridge
+  
+  class Blue: Color {
+      override fun getColor() {
+          println("Blue")
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>버튼</summary>
+
+- 자바와 동일.
+
+  ```kotlin
+  package structural.bridge
+  
+  abstract class Button(val color: Color) {
+      abstract fun action()
+  }
+  ```
+
+  ```kotlin
+  package structural.bridge
+  
+  class StartButton(
+      color: Color
+  ): Button(color) {
+      override fun action() {
+          println("Start!!")
+      }
+  }
+  ```
+  
+  ```kotlin
+  package structural.bridge
+  
+  class EndButton(color: Color): Button(color) {
+      override fun action() {
+          println("End!!!")
+      }
+  }
+  ```
+
+</details>
+
+
+<br/>
+<br/>
