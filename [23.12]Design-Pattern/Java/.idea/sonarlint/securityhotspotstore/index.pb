@@ -64,3 +64,15 @@ W
 'src/structural/composite/NormalBox.java,b\0\b00de8f931c422e7981ad49711456597ce3d170a
 R
 "src/structural/composite/Main.java,2\9\297adae73ca98dd65ff6194e9ad3567c3b595647
+W
+'src/structural/decorator/Hamburger.java,9\a\9a94ed62e1b57fc2059f2ef9d139e65efbb043e9
+\
+,src/structural/decorator/BasicHamBurger.java,0\3\03679b7e7c3ef175b1d829fedac684fd4d665515
+`
+0src/structural/decorator/HamburgerDecorator.java,5\4\54139bad43140b10378771e9ee6b8d7a95ad3a24
+]
+-src/structural/decorator/CheeseDecorator.java,f\5\f57576bf9d90b964d8fe11b7b6442a8be779341b
+^
+.src/structural/decorator/BulgogiDecorator.java,0\f\0ff146ae3a23aa24e28efe18461c369e7c33000f
+R
+"src/structural/decorator/Main.java,a\5\a5186855d8867a3d8d1beb329c7921f3cc87c218
