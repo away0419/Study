@@ -1,4 +1,4 @@
-package structural.Adaptor;
+package structural.adaptor;
 
 import structural.Car;
 
