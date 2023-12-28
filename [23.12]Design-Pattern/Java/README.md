@@ -1009,3 +1009,107 @@ public class DrinkBuilder {
 
 </details>
 
+<br/>
+<br/>
+
+> ## 데코레이터 (구조)
+
+<details>
+  <summary>인터페이스</summary>
+
+- 햄버거가 가지는 기본 기능을 추상화.
+
+  ```java
+  package structural.decorator;
+  
+  public interface Hamburger {
+      public String getName();
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 기본 햄버거 객체.
+
+  ```java
+  package structural.decorator;
+  
+  public class BasicHamBurger implements Hamburger{
+      @Override
+      public String getName() {
+          return "햄버거";
+      }
+  }
+  
+  ```
+
+</details>
+
+<details>
+  <summary>데코레이터</summary>
+
+- 토핑. 즉, 데코레이터 하려는 특징 또는 기능임. 
+- 해당 패턴을 통해 기존 객체에 기능 또는 특징을 더해 새로운 객체로 반환한다.
+- 해당 코드는 완전 새로운 객체가 됨. 기존 객체를 사용할 수는 없을 듯 하다.
+- 결국, 클래스를 만들어야 하는건 동일하나, 종류별로 모두 만들 필요는 없다.
+  - ex) 불고기 불고기 햄버거, 불고기 치즈 햄버거 등 객체 클래스는 불필요.
+- 굳이 추상 클래스로 만들 필요는 없을 것 같기도 하다.
+
+  ```java
+  package structural.decorator;
+  
+  public abstract class HamburgerDecorator implements Hamburger{
+      private Hamburger hamburger;
+  
+      public HamburgerDecorator(Hamburger hamburger) {
+          this.hamburger = hamburger;
+      }
+  
+      @Override
+      public String getName() {
+          return hamburger.getName();
+      }
+  }
+  
+  ```
+
+  ```java
+  package structural.decorator;
+  
+  public class CheeseDecorator extends HamburgerDecorator{
+      public CheeseDecorator(Hamburger hamburger) {
+          super(hamburger);
+      }
+  
+      @Override
+      public String getName() {
+          return "치즈 " + super.getName();
+      }
+  }
+  
+  ```
+
+  ```java
+  package structural.decorator;
+  
+  public class BulgogiDecorator extends HamburgerDecorator{
+      public BulgogiDecorator(Hamburger hamburger) {
+          super(hamburger);
+      }
+  
+      @Override
+      public String getName() {
+          return "불고기 " + super.getName();
+      }
+  }
+  
+  ```
+
+</details>
+
+<br/>
+<br/>
+
