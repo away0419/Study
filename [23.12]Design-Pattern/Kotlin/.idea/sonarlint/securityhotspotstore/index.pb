@@ -38,3 +38,13 @@ Y
 .src/main/kotlin/structural/bridge/EndButton.kt,a\f\afc037fd92f11270eab1741297e04a4ba7727741
 Y
 )src/main/kotlin/structural/bridge/Main.kt,4\1\41f816a2170d19d4822feaad31d058e838bdd3ba
+\
+,src/main/kotlin/structural/composite/Item.kt,f\a\fa18a393296740dab00880eb367c4862274055ce
+[
++src/main/kotlin/structural/composite/Box.kt,c\8\c8a3bda98e713c71872d89bd986be8901f436aca
+b
+2src/main/kotlin/structural/composite/NormalItem.kt,0\a\0ac5f6065a9bfed1358c62cd46478c46b416c2d8
+a
+1src/main/kotlin/structural/composite/NormalBox.kt,1\4\149c7edd0f903469d69b2f425cddf40ee515bce5
+\
+,src/main/kotlin/structural/composite/Main.kt,6\8\685c02462233a02fe4a16569976695f7d95af4ec
