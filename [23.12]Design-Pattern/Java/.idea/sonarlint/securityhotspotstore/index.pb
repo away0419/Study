@@ -50,3 +50,17 @@ O
 src/structural/bridge/Blue.java,e\8\e85865f0ea043c0788c06a46133a5c496036bd2f
 8
 Java.iml,4\b\4b030f50e362de75a10637fd31c94a08dfb492a7
+Q
+!src/structural/composite/Box.java,8\f\8f7f6fd6169bed2b35cc42b88742799e457e24a2
+R
+"src/structural/composite/Item.java,f\0\f0d60a21bfbe65ce8cbc2caf356c13b1b5616c25
+V
+&src/structural/composite/BasicBox.java,1\b\1b6b78e5286adf1455dd381b346396d2b9560a22
+U
+%src/structural/composite/ItemBox.java,d\3\d3fab6a1461eecc92237974fbadabd540c009a80
+X
+(src/structural/composite/NormalItem.java,a\7\a75f055e1405a92fbefdfd10c76466ff465429b3
+W
+'src/structural/composite/NormalBox.java,b\0\b00de8f931c422e7981ad49711456597ce3d170a
+R
+"src/structural/composite/Main.java,2\9\297adae73ca98dd65ff6194e9ad3567c3b595647
