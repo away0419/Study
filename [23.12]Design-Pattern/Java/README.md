@@ -895,3 +895,117 @@ public class DrinkBuilder {
 
 <br/>
 <br/>
+
+> ## 컴포지트 (구조)
+
+<details>
+  <summary>인터페이스</summary>
+
+- 공통적인 부분을 추상화.
+- Item이 최상위 공통 부분이며, Box는 상위 공통 부분임.
+
+  ```java
+  package structural.composite;
+  
+  public interface Item {
+      int getPrice();
+      String getName();
+  }
+  ```
+  
+  ```java
+  package structural.composite;
+  
+  public interface Box  extends Item{
+      void addItem(Item item);
+      void removeItem(Item item);
+      int getAllPrice();
+      String getItems();
+  }
+  ```
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 상자 안에 상자 혹은 아이템이 들어갈 수 있음.
+  - List는 최상위 인터페이스 Item을 받을 수 있게 만들었음.
+
+  ```java
+  package structural.composite;
+  
+  public class NormalItem implements Item{
+      private String name;
+      private int price;
+  
+      public NormalItem(String name, int price) {
+          this.name = name;
+          this.price = price;
+      }
+  
+      @Override
+      public int getPrice() {
+          return this.price;
+      }
+  
+      @Override
+      public String getName() {
+          return this.name;
+      }
+  }
+  ```
+
+  ```java
+  package structural.composite;
+  
+  import java.util.ArrayList;
+  import java.util.List;
+  import java.util.stream.Collectors;
+  
+  public class NormalBox implements Box {
+      private final List<Item> list;
+      private String name;
+      private int price;
+  
+      public NormalBox(String name, int price) {
+          this.name = name;
+          this.price = price;
+          this.list = new ArrayList<>();
+      }
+  
+      @Override
+      public void addItem(Item item) {
+          list.add(item);
+      }
+  
+      @Override
+      public void removeItem(Item item) {
+          list.remove(item);
+      }
+  
+      @Override
+      public int getAllPrice() {
+          return list.stream()
+                  .mapToInt(item -> item instanceof Box box ? box.getAllPrice() + item.getPrice() : item.getPrice())
+                  .sum();
+      }
+  
+      @Override
+      public int getPrice() {
+          return this.price;
+      }
+  
+      @Override
+      public String getName() {
+          return this.name;
+      }
+  
+      @Override
+      public String getItems() {
+          return getName() + " = { " + list.stream().map(item -> item instanceof Box box ? box.getItems() : item.getName()).collect(Collectors.joining(", ")) + " }";
+      }
+  }
+  ```
+
+</details>
+

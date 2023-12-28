@@ -739,6 +739,93 @@ data class Drink(val list: List<Int>) {
 
 </details>
 
+<br/>
+<br/>
+
+> ## 컴포지트 (구조)
+
+<details>
+  <summary>인터페이스</summary>
+
+- 자바와 동일.
+
+  ```kotlin
+  package structural.composite
+  
+  interface Item {
+      fun getPrice():Int
+      fun getName():String
+  }
+  ```
+
+  ```kotlin
+  package structural.composite
+  
+  interface Box:Item {
+      fun getAllPrice(): Int
+      fun getItems(): String
+      fun addItem(item: Item)
+      fun removeItem(item: Item)
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+  ```kotlin
+  package structural.composite
+  
+  class NormalItem(private val name: String, private val price: Int): Item {
+      override fun getPrice():Int {
+          return this.price
+      }
+  
+      override fun getName(): String {
+          return this.name
+      }
+  }
+  ```
+
+  ```kotlin
+  package structural.composite
+  
+  class NormalBox(private val name: String, private val price: Int) : Box {
+      private val list = mutableListOf<Item>()
+  
+      override fun getAllPrice(): Int = list.sumOf {
+          when (it) {
+              is Box -> it.getAllPrice() + it.getPrice()
+              else -> it.getPrice()
+          }
+      }
+  
+      override fun getItems(): String = "$name = { ${list.joinToString(", ") { item ->
+          when (item) {
+              is Box -> item.getItems()
+              else -> item.getName()
+          }
+      }} }"
+  
+      override fun addItem(item: Item) {
+          list.add(item)
+      }
+  
+      override fun removeItem(item: Item) {
+          list.remove(item)
+      }
+  
+      override fun getPrice(): Int = price
+  
+      override fun getName(): String = name
+  }
+  
+  ```
+
+</details>
+
 
 <br/>
 <br/>
+

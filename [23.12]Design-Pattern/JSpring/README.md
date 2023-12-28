@@ -99,3 +99,10 @@ public class Product {
 
 <br/>
 <br/>
+
+> ## Composite (구조)
+
+- ApplicationContext에서 BeanFactory 인스턴스를 트리 구조로 제공함. 즉, ApplicationContext는 컴포지트 패턴이 적용되어 있음.
+
+<br/>
+<br/>
