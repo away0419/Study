@@ -4,10 +4,6 @@
 :
 
 .gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
-Å
-Q.idea/sonarlint/securityhotspotstore/e/0/e0960c6d879832dd84b21e89c63bae5d38659be6,0\7\07566a0fa0467a8e53457de0e68c49a43c6f66d8
-Å
-Q.idea/sonarlint/securityhotspotstore/d/9/d914c482f35eca53688eaff5ff943cc1b19f61c8,6\a\6a023fd0a9773f7a62c1584166209f9c9065d705
 S
 #.idea/sonarlint/issuestore/index.pb,9\f\9fe84ebb15faf917b7def6236dba604453cc61e0
 ]
@@ -34,16 +30,12 @@ Q
 !src/structural/bridge/Button.java,9\f\9f329dc45bb69862d3d29fbefa62f14954e36005
 P
  src/structural/bridge/Color.java,4\9\49a502485b8f376db1e97b6dbe644db40064397c
-Q
-!src/structural/bridge/Action.java,6\6\66a4541b0a683821a8dde48d6feef2d8cb31abdb
 V
 &src/structural/bridge/StartButton.java,a\0\a000999b15df77418d569f145e974a9dac8fb3b7
 T
 $src/structural/bridge/EndButton.java,a\a\aa49762ea264842bfd2adf24c91bf1d04e4fcb38
 O
 src/structural/bridge/Main.java,5\0\50fd6e8b62b59d1609702e9a8957205cc0ea249c
-L
-src/structural/bridge/Red.kt,6\2\629820c238fdbe67aa171c4baadcd3864fb56aa7
 N
 src/structural/bridge/Red.java,b\3\b39481cda6ce098838bc7be7ef6b67689c09d54a
 O
@@ -54,10 +46,6 @@ Q
 !src/structural/composite/Box.java,8\f\8f7f6fd6169bed2b35cc42b88742799e457e24a2
 R
 "src/structural/composite/Item.java,f\0\f0d60a21bfbe65ce8cbc2caf356c13b1b5616c25
-V
-&src/structural/composite/BasicBox.java,1\b\1b6b78e5286adf1455dd381b346396d2b9560a22
-U
-%src/structural/composite/ItemBox.java,d\3\d3fab6a1461eecc92237974fbadabd540c009a80
 X
 (src/structural/composite/NormalItem.java,a\7\a75f055e1405a92fbefdfd10c76466ff465429b3
 W

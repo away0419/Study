@@ -48,3 +48,17 @@ a
 1src/main/kotlin/structural/composite/NormalBox.kt,1\4\149c7edd0f903469d69b2f425cddf40ee515bce5
 \
 ,src/main/kotlin/structural/composite/Main.kt,6\8\685c02462233a02fe4a16569976695f7d95af4ec
+a
+1src/main/kotlin/structural/decorator/Hamburger.kt,9\6\96f0e0b1be8de5a4c244c982a4c36454d0540a3a
+j
+:src/main/kotlin/structural/decorator/HamburgerDecorator.kt,f\e\fe0eac5d3cc7a181a8af1074c71cc7ba10ff6c31
+g
+7src/main/kotlin/structural/decorator/CheeseDecorator.kt,0\1\017c2a5a2ffe885c583fe4d2285c87554225e019
+h
+8src/main/kotlin/structural/decorator/BulgogiDecorator.kt,5\4\542b94229e7f66833afe9bd98fd6b78b99402ce0
+\
+,src/main/kotlin/structural/decorator/Main.kt,d\d\dd3627dbb66e11e84d01852d294f78742d377af4
+f
+6src/main/kotlin/structural/decorator/BasicHamberger.kt,6\f\6f9f9c02c79ffd1fde26f6c109cd0f1062683e93
+f
+6src/main/kotlin/structural/decorator/BasicHamburger.kt,6\f\6fb86e6470d9cbb48f08afaa4ec52948d6b04417
