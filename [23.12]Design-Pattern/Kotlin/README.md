@@ -829,3 +829,79 @@ data class Drink(val list: List<Int>) {
 <br/>
 <br/>
 
+> ## 데코레이터 (구조)
+
+<details>
+  <summary>인터페이스</summary>
+
+- 햄버거가 가지고 있어야 하는 기본 기능.
+
+  ```kotlin
+  package structural.decorator
+  
+  interface Hamburger {
+      fun getName(): String
+  }
+  ```
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 실제 기본 햄버거 객체.
+
+  ```kotlin
+  package structural.decorator
+  
+  class BasicHamburger(): Hamburger{
+      override fun getName(): String {
+          return "햄버거"
+      }
+  }
+  ```
+
+</details>
+
+
+<details>
+  <summary>데코레이터</summary>
+
+- 토핑 추가 기능
+- 기존 객체에 기능을 더해 새로운 객체로 변환.
+- 구현 시 기존 객체를 담는 변수의 타입은 최상위 타입이어야 함. 즉, 햄버거 인터페이스
+
+  ```kotlin
+  package structural.decorator
+  
+  abstract class HamburgerDecorator(private val hamburger: Hamburger): Hamburger {
+      override fun getName(): String {
+         return hamburger.getName()
+      }
+  }
+  ```
+
+  ```kotlin
+  package structural.decorator
+  
+  class CheeseDecorator(
+      val hamburger: Hamburger
+  ): HamburgerDecorator(hamburger) {
+      override fun getName(): String {
+          return "치즈 ${super.getName()}"
+      }
+  }
+  ```
+  
+  ```kotlin
+  package structural.decorator
+  
+  class BulgogiDecorator(private val hamburger: Hamburger): HamburgerDecorator(hamburger){
+      override fun getName(): String {
+          return "불고기 ${hamburger.getName()}"
+      }
+  }
+  
+  ```
+
+</details>
+

@@ -106,3 +106,9 @@ public class Product {
 
 <br/>
 <br/>
+
+> ## Decorator (구조)
+
+- HttpServletRequestWrapper / HttpServletResponseWrapper
+  - httpServletRequest 부가적인 기능을 추가하여 확장 사용 가능.
+  - wrapper로 만들고 httpServletRequest 담아 보내면 이후 Filter는 항상 해당 wrapper 거쳐서 요청 처리 됨.
