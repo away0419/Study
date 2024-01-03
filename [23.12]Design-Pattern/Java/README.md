@@ -1184,3 +1184,75 @@ public class DrinkBuilder {
   ```
 
 </details>
+
+<br/>
+<br/>
+
+> ## 플라이웨이트 (구조)
+
+<details>
+  <summary>객체</summary>
+
+- 먼저 불변인 공통 부분을 따로 빼서 클래스로 만듬. (Model)
+- Model의 특성이 동일한지 아닌지 판단하기 위해 Factory에서 고유 키값 부여. (Map 변수 이용, FlyWeightFactory 라고도 불림)
+- 해당 Model이 있으면 불러오고 없으면 새로 만듬. 이후 만들어진 Model을 실제 객체의 공통 변수에 넣어줌. (Tree)
+
+  ```java
+  package structural.flyweight;
+  
+  import java.util.HashMap;
+  import java.util.Map;
+  
+  public class Model {
+      String type;
+  
+      private Model(String type) {
+          this.type = type;
+      }
+  
+      public static class Factory {
+          private static final Map<String, Model> cache = new HashMap<>();
+  
+          public static Model getInstance(String type) {
+              if (cache.containsKey(type)) {
+                  System.out.print("[기존 나무 모델 가져오기] ");
+                  return cache.get(type);
+              } else {
+                  Model model = new Model(type);
+                  cache.put(type, model);
+                  System.out.print("[새로운 나무 모델 생성하기] ");
+                  return model;
+              }
+          }
+      }
+  }
+  ```
+
+  ```java
+  package structural.flyweight;
+  
+  public class Tree {
+      Model model;
+      double x;
+      double y;
+  
+      private Tree(Model model, double x, double y) {
+          this.model = model;
+          this.x = x;
+          this.y = y;
+      }
+  
+      public static class Factory {
+          public static Tree getInstance(String type) {
+              Model model = Model.Factory.getInstance(type);
+              double x = Math.random() * 10000;
+              double y = Math.random() * 10000;
+  
+              System.out.println(type + "의 좌표: x=" + x + ", y=" + y);
+              return new Tree(model, x, y);
+          }
+      }
+  }
+  ```
+
+</details>

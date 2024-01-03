@@ -977,3 +977,58 @@ data class Drink(val list: List<Int>) {
 
 </details>
 
+<br/>
+<br/>
+
+> ## 플라이웨이트 (구조)
+
+<details>
+  <summary>객체</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package structural.flyweight
+  
+  class Model private constructor(
+      val type:String
+  ) {
+      companion object Factory{
+          private val cache = mutableMapOf<String,Model>()
+          fun getInstance(type: String): Model{
+  
+              if(cache.containsKey(type)){
+                  print("[기존 나무] ")
+              }else{
+                  print("[새로운 나무] ")
+                  cache[type] = Model(type)
+              }
+  
+              return cache[type]!!
+          }
+      }
+  }
+  ```
+
+  ```kotlin
+  package structural.flyweight
+  
+  class Tree private constructor(
+      val type: Model,
+      val x: Double,
+      val y: Double
+  ) {
+      companion object Factory {
+          fun getInstance(type: String): Tree {
+              val model = Model.Factory.getInstance(type)
+              val x = Math.random() * 10000
+              val y = Math.random() * 10000
+  
+              println("$type 위치: x=${x}, y=${y}")
+              return Tree(model, x, y)
+          }
+      }
+  }
+  ```
+
+</details>

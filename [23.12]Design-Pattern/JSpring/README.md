@@ -123,3 +123,10 @@ public class Product {
 
 <br/>
 <br/>
+
+> ## FlyWeight (구조)
+
+- 명확하게 찾기는 어려우나 아이디어를 반영하고 있는 곳이 있음.
+  - Bean Scope
+  - @Cacheable
+
