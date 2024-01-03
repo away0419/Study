@@ -1113,3 +1113,74 @@ public class DrinkBuilder {
 <br/>
 <br/>
 
+> ## 퍼사드 (구조)
+
+<details>
+  <summary>객체</summary>
+
+- 필요한 객체들. (사람, 피자, TV)
+- 각 객체 별 기능이 있음.
+
+  ```java
+  package structural.facade;
+  
+  public class Person {
+      public void move(){
+          System.out.println("움직인다");
+      }
+  
+      public void watch(){
+          System.out.println("본다");
+      }
+  }
+  ```
+
+  ```java
+  package structural.facade;
+  
+  public class Pizza {
+      public void addTopping(){
+          System.out.println("토핑 추가");
+      }
+  
+  }
+  ```
+  
+  ```java
+  package structural.facade;
+  
+  public class Tv {
+      public void ON(){
+          System.out.println("전원 ON");
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>퍼사드</summary>
+
+- 하나의 기능을 위해 필요한 서브 클래스의 기능을 가져와 구현함.
+- 따로 자신만의 기능을 구현하지는 않고 서브 클래스의 기능을 호출하는 용도.
+
+  ```java
+  package structural.facade;
+  
+  public class Facade {
+      public void action(){
+          Person person = new Person();
+          Tv tv = new Tv();
+          Pizza pizza = new Pizza();
+  
+          person.move();
+          pizza.addTopping();
+          person.move();
+          tv.ON();
+          person.watch();
+      }
+  }
+  
+  ```
+
+</details>

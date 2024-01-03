@@ -905,3 +905,75 @@ data class Drink(val list: List<Int>) {
 
 </details>
 
+<br/>
+<br/>
+
+> ## 퍼사드 (구조)
+
+<details>
+  <summary>객체</summary>
+
+- 객체별 기능 구현
+
+  ```kotlin
+  package structural.facade
+  
+  class Person() {
+      fun move(){
+          println("움직인다")
+      }
+  
+      fun watch(){
+          println("본다")
+      }
+  }
+  ```
+
+  ```kotlin
+  package structural.facade
+  
+  class Tv {
+      fun on(){
+          println("TV ON")
+      }
+  }
+  ```
+  
+  ```kotlin
+  package structural.facade
+  
+  class Pizza {
+      fun addTopping(){
+          println("토핑 추가")
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>퍼사드</summary>
+
+- 서브 객체 기능 호출 집합.
+
+  ```kotlin
+  package structural.facade
+  
+  class Facade {
+      fun action(){
+          val person = Person()
+          val tv = Tv()
+          val pizza = Pizza()
+  
+          person.move()
+          pizza.addTopping()
+          person.move()
+          tv.on()
+          person.watch()
+  
+      }
+  }
+  ```
+
+</details>
+
