@@ -72,3 +72,9 @@ Y
 )src/main/kotlin/structural/facade/Main.kt,0\9\0994b9186fde9f0aaf37fd608dd81fafbc24d6c5
 [
 +src/main/kotlin/structural/facade/Facade.kt,e\3\e37fc2d68a97a78e511158bb802306ac71395e69
+]
+-src/main/kotlin/structural/flyweight/Model.kt,f\0\f070fb0580f322ff2330085a93f77132e5bdef93
+\
+,src/main/kotlin/structural/flyweight/Tree.kt,0\f\0f0525a3c0b43c633764541add41bbeccd08e67c
+\
+,src/main/kotlin/structural/flyweight/Main.kt,d\b\dbb65d36f6299c911a8d685d1d76dbcf8df12800
