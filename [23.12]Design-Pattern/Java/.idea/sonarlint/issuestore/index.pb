@@ -64,3 +64,13 @@ W
 .src/structural/decorator/BulgogiDecorator.java,0\f\0ff146ae3a23aa24e28efe18461c369e7c33000f
 R
 "src/structural/decorator/Main.java,a\5\a5186855d8867a3d8d1beb329c7921f3cc87c218
+Q
+!src/structural/facade/Person.java,2\5\25e3124d2d770e8fa74c509e1ac19733bb4d2424
+M
+src/structural/facade/Tv.java,6\b\6b1cd319da173ba2fee165b6d9e87a45b7979630
+P
+ src/structural/facade/Pizza.java,b\6\b615ec75cc9898c3b1cefa8a7837b623050fed8d
+Q
+!src/structural/facade/Facade.java,8\6\86af3d1184ce5b3fc1a822724d41cd8cd5553971
+O
+src/structural/facade/Main.java,b\3\b37378cfa51ec6d1d2d8cfc9399b34af202c0c17
