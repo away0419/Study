@@ -74,3 +74,13 @@ Q
 !src/structural/facade/Facade.java,8\6\86af3d1184ce5b3fc1a822724d41cd8cd5553971
 O
 src/structural/facade/Main.java,b\3\b37378cfa51ec6d1d2d8cfc9399b34af202c0c17
+S
+#src/structural/flyweight/Pizza.java,c\f\cf442e13b2a248d08f43d86b98a94bd61069ce62
+S
+#src/structural/flyweight/Money.java,7\6\76c67ade9b4d4176a85a98a6d96fdb5a5c299cf8
+R
+"src/structural/flyweight/Tree.java,a\b\ab2519d5b4acfc3e7d73af7a9c45d82d02b756c0
+S
+#src/structural/flyweight/Model.java,0\f\0ff4048a6ea4c6cbdb92c13e940c1c6dbff16a0a
+R
+"src/structural/flyweight/Main.java,4\d\4d20499587746306313689b9dfe9a5c0d28e123e
