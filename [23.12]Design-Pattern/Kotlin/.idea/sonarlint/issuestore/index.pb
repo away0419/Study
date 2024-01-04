@@ -60,8 +60,6 @@ h
 ,src/main/kotlin/structural/decorator/Main.kt,d\d\dd3627dbb66e11e84d01852d294f78742d377af4
 f
 6src/main/kotlin/structural/decorator/BasicHamburger.kt,6\f\6fb86e6470d9cbb48f08afaa4ec52948d6b04417
-T
-$src/main/kotlin/structural/Facade.kt,9\2\922011babae57b0e8daf6672a3b7a83d17d44c9e
 [
 +src/main/kotlin/structural/facade/Person.kt,5\b\5b3e3512067c02e3c92877e8b87adc16e7319d26
 W
@@ -78,3 +76,13 @@ Y
 ,src/main/kotlin/structural/flyweight/Tree.kt,0\f\0f0525a3c0b43c633764541add41bbeccd08e67c
 \
 ,src/main/kotlin/structural/flyweight/Main.kt,d\b\dbb65d36f6299c911a8d685d1d76dbcf8df12800
+Y
+)src/main/kotlin/structural/proxy/Image.kt,b\c\bcbd6df411344689a12ce75ea734c3310100d799
+]
+-src/main/kotlin/structural/proxy/HighImage.kt,c\7\c712175f2de90f92a9a8ea769518ba99c44a668e
+`
+0src/main/kotlin/structural/proxy/VirtualProxy.kt,b\d\bd60ce62545d56e8eabf224ede10736ea86f1335
+X
+(src/main/kotlin/structural/proxy/Main.kt,b\7\b7066d1b75517bda81c835affdb4406696d6b75f
+c
+3src/main/kotlin/structural/proxy/ProtectiveProxy.kt,d\9\d9d112f5ce378f4b0e6e74509ed3d7e490efa5b3

@@ -1032,3 +1032,88 @@ data class Drink(val list: List<Int>) {
   ```
 
 </details>
+
+<br/>
+<br/>
+
+> ## 프록시 (구조&행동)
+
+<details>
+  <summary>가상 프록시</summary>
+
+- java와 동일.
+
+  ```kotlin
+  package structural.proxy
+  
+  fun interface Image {
+      fun showImage()
+  }
+  ```
+
+  ```kotlin
+  package structural.proxy
+  
+  class HighImage(
+      val path:String
+  ): Image {
+  
+      init {
+          println("$path 경로 이미지 로딩")
+      }
+  
+      override fun showImage() {
+          println("$path 경로 이미지 출력")
+      }
+  }
+  ```
+
+  ```kotlin
+  package structural.proxy
+  
+  class VirtualProxy(val path:String): Image {
+  
+      init{
+          println("$path 경로 프록시 생성")
+      }
+      
+      override fun showImage() {
+          val highImage = HighImage(this.path)
+          highImage.showImage()    
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>보호 프록시</summary>
+  
+- java와 동일.
+
+  ```kotlin
+  package structural.proxy
+  
+  class ProtectiveProxy(val path: String, val user: String): Image{
+      init{
+          println("$path 경로 프록시 생성")
+      }
+  
+      override fun showImage() {
+          when(this.user){
+              "관리자" -> {
+                  println("$user 접근 성공")
+                  val highImage = HighImage(this.path)
+                  highImage.showImage()
+              }
+              else -> println("$user 접근 불가")
+          }
+  
+  
+      }
+  
+  }
+  ```
+
+</details>
+
