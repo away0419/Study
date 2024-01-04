@@ -130,3 +130,9 @@ public class Product {
   - Bean Scope
   - @Cacheable
 
+<br/>
+<br/>
+
+> ## Proxy (구조&행동)
+
+- 스프링 AOP, JPA 등 내부적으로 많이 사용하고 있음.

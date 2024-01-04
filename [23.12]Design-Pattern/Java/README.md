@@ -1256,3 +1256,100 @@ public class DrinkBuilder {
   ```
 
 </details>
+
+<br/>
+<br/>
+
+
+> ## 프록시 (구조&행동)
+
+<details>
+  <summary>가상 프록시</summary>
+
+- 프록시 객체와 실제 객체의 인터페이스를 동일하게 둠.
+- 프록시에서 객체의 메소드를 호출하도록 설계.
+- 실제 객체가 생성되지 않았음에도 프록시 객체를 통해 로직 넘어감.
+
+  ```java
+  package structural.proxy;
+  
+  interface Image {
+      public void showImage();
+  
+  }
+  ```
+
+  ```java
+  package structural.proxy;
+  
+  public class HighImage implements Image{
+      String path;
+  
+      public HighImage(String path) {
+          System.out.println(path + " 경로의 이미지 로딩");
+          this.path = path;
+      }
+  
+  
+      @Override
+      public void showImage() {
+          System.out.println(path+ " 경로의 이미지 출력");
+      }
+  }
+  
+  ```
+
+  ```java
+  package structural.proxy;
+  
+  public class VirtualProxy implements Image {
+      String path;
+  
+  
+      public VirtualProxy(String path) {
+          this.path = path;
+          System.out.println(path +" 경로의 프록시 생성");
+      }
+  
+      @Override
+      public void showImage() {
+          HighImage highImage = new HighImage(this.path);
+          highImage.showImage();
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>보호 프록시</summary>
+
+- 가상 프록시에 권한을 추가한 것.
+- 가상 프록시랑 별 차이가 없다.
+
+  ```java
+  package structural.proxy;
+  
+  public class ProtectiveProxy implements Image{
+      String path;
+      String authority;
+  
+      public ProtectiveProxy(String path, String authority) {
+          this.path = path;
+          this.authority = authority;
+          System.out.println("["+path +" 경로, "+authority+"사용자] 프록시 생성");
+      }
+  
+      @Override
+      public void showImage() {
+          if(this.authority.equals("관리자")){
+              System.out.println("관리자 접근");
+              HighImage highImage = new HighImage(this.path);
+              highImage.showImage();
+          }else {
+              System.out.println(this.authority + "는 접근할 수 없습니다.");
+          }
+      }
+  }
+  ```
+</details>
