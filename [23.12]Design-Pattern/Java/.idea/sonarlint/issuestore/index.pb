@@ -74,13 +74,19 @@ Q
 !src/structural/facade/Facade.java,8\6\86af3d1184ce5b3fc1a822724d41cd8cd5553971
 O
 src/structural/facade/Main.java,b\3\b37378cfa51ec6d1d2d8cfc9399b34af202c0c17
-S
-#src/structural/flyweight/Pizza.java,c\f\cf442e13b2a248d08f43d86b98a94bd61069ce62
-S
-#src/structural/flyweight/Money.java,7\6\76c67ade9b4d4176a85a98a6d96fdb5a5c299cf8
 R
 "src/structural/flyweight/Tree.java,a\b\ab2519d5b4acfc3e7d73af7a9c45d82d02b756c0
 S
 #src/structural/flyweight/Model.java,0\f\0ff4048a6ea4c6cbdb92c13e940c1c6dbff16a0a
 R
 "src/structural/flyweight/Main.java,4\d\4d20499587746306313689b9dfe9a5c0d28e123e
+O
+src/structural/proxy/Image.java,4\7\47654efd48121ebef88b25826d6ba463b89e5105
+S
+#src/structural/proxy/HighImage.java,4\f\4f60ceab461ad2155f7dfc2a9b269248585b43f3
+V
+&src/structural/proxy/VirtualProxy.java,d\f\df876844a69a56ee0e567dbe81930ead5d793410
+N
+src/structural/proxy/Main.java,6\3\63bdbdae6d02f8029046aef22075241e331b06e1
+Y
+)src/structural/proxy/ProtectiveProxy.java,2\9\29fe93d8cfc3bed41091ae9e66c1918ca3d6a52e
