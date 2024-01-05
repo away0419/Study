@@ -102,3 +102,17 @@ f
 .src/behavioral/chainOfResponsibility/User.java,2\f\2fca520d33e67c2f77aed2d094caf5a57b8887e1
 ^
 .src/behavioral/chainOfResponsibility/Main.java,2\e\2e3797532e360aa0f9a5ea3bfa88089cd1e4bba2
+S
+#src/behavioral/command/Command.java,1\9\194d83171353aa30d709ac087c1987778dc59355
+R
+"src/behavioral/command/Heater.java,3\e\3e84908323e4159bbda182866fed5c84e9dab0af
+P
+ src/behavioral/command/Lamp.java,d\b\dba1b611c78beda9075353d30e5d6ee580637780
+Y
+)src/behavioral/command/HeaterCommand.java,4\c\4c46c9fa0054950d1b99da61495cebbac7133bf8
+W
+'src/behavioral/command/LampCommand.java,9\b\9bb0f417bd39bfbc544af7e84cf4442ce94c3e34
+P
+ src/behavioral/command/Main.java,3\1\319edd17751e16118977d94cbb9d5ce542e98cad
+R
+"src/behavioral/command/Button.java,b\0\b00bc2813366b4b004ea020ec537c808f283319c
