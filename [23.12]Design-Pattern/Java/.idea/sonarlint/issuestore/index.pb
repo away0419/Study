@@ -90,3 +90,15 @@ N
 src/structural/proxy/Main.java,6\3\63bdbdae6d02f8029046aef22075241e331b06e1
 Y
 )src/structural/proxy/ProtectiveProxy.java,2\9\29fe93d8cfc3bed41091ae9e66c1918ca3d6a52e
+a
+1src/behavioral/chainOfResponsibility/Handler.java,1\a\1ad8c3f5632599d86f17b6a1be8fe4c5ab46ba85
+d
+4src/behavioral/chainOfResponsibility/AdminLogin.java,f\5\f52623220667a8201291953a44f8ea528b2a6f36
+_
+/src/behavioral/chainOfResponsibility/Admin.java,d\b\db6e2a460fb9dc461e6bdc031a37546d629b7b33
+f
+6src/behavioral/chainOfResponsibility/LoginHandler.java,7\d\7dd77b98e2193ed837ee36d25c5a3872f6936f95
+^
+.src/behavioral/chainOfResponsibility/User.java,2\f\2fca520d33e67c2f77aed2d094caf5a57b8887e1
+^
+.src/behavioral/chainOfResponsibility/Main.java,2\e\2e3797532e360aa0f9a5ea3bfa88089cd1e4bba2

@@ -86,3 +86,15 @@ X
 (src/main/kotlin/structural/proxy/Main.kt,b\7\b7066d1b75517bda81c835affdb4406696d6b75f
 c
 3src/main/kotlin/structural/proxy/ProtectiveProxy.kt,d\9\d9d112f5ce378f4b0e6e74509ed3d7e490efa5b3
+k
+;src/main/kotlin/behavioral/chainOfResponsibility/Handler.kt,9\c\9cc0794e5c91cb3d3698378a4fa03cd065d1c833
+p
+@src/main/kotlin/behavioral/chainOfResponsibility/LoginHandler.kt,6\5\65a8d704912321f8f872e39c3ddb328a690056a3
+k
+;src/main/kotlin/behavioral/chainOfResponsibility/Admin.java,7\7\77e79c58fe77201233478816b3776d524860c45b
+i
+9src/main/kotlin/behavioral/chainOfResponsibility/Admin.kt,2\0\205d3d774b2f36d805057d9ec29de213e39da491
+h
+8src/main/kotlin/behavioral/chainOfResponsibility/User.kt,3\8\38b1c6f62c194ed85764f43c51a7c7f049b32b56
+h
+8src/main/kotlin/behavioral/chainOfResponsibility/Main.kt,c\f\cf5d298e21508bc5345081fdeedb9a6a1e44a1e1
