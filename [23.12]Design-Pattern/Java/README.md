@@ -1452,3 +1452,66 @@ public class User extends LoginHandler{
 
 <br/>
 <br/>
+
+> ## 커맨드 (행동)
+
+<details>
+  <summary>인터페이스</summary>
+
+- 책임 연쇄와 비슷함.
+- 기본 기능을 추상화.
+
+  ```java
+  package behavioral.command;
+  
+  public interface Command {
+      void run();
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- command를 상속받은 객체와 이를 매개 변수로 받을 수 있는 객체.
+
+  ```java
+  package behavioral.command;
+  
+  public class HeaterCommand implements Command{
+      @Override
+      public void run() {
+          System.out.println("히터 ON");
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.command;
+  
+  public class LampCommand implements Command{
+      @Override
+      public void run() {
+          System.out.println("램프 ON");
+      }
+  }
+  ```
+  
+  ```java
+  package behavioral.command;
+  
+  public class Button {
+      private Command command;
+  
+      public void setCommand(Command command) {
+          this.command = command;
+      }
+  
+      public void action(){
+          command.run();
+      }
+  }
+  ```
+
+</details>
