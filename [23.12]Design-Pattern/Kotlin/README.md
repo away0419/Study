@@ -1117,3 +1117,82 @@ data class Drink(val list: List<Int>) {
 
 </details>
 
+> ## 책임 연쇄
+
+<details>
+  <summary>인터페이스</summary>
+
+- 자바와 동일.
+
+  ```kotlin
+  package behavioral.chainOfResponsibility
+  
+  interface Handler {
+      fun setNextHandler(handler: Handler)
+      fun process(authority: String)
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>추상 클래스</summary>
+
+- java와 동일
+
+  ```kotlin
+  package behavioral.chainOfResponsibility
+  
+  abstract class LoginHandler(): Handler {
+      lateinit var handler: Handler
+      override fun setNextHandler(handler: Handler) {
+          this.handler=handler
+      }
+  
+      override fun process(authority: String) {
+          try{
+              this.handler.process(authority)
+          }catch (exception: Exception){
+              println("로그인 실패")
+          }
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- java와 동일
+
+  ```kotlin
+  package behavioral.chainOfResponsibility
+  
+  class Admin(): LoginHandler() {
+      override fun process(authority: String) {
+          if("Admin" == authority){
+              println("관리자 로그인 성공")
+          }else{
+              super.process(authority)
+          }
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.chainOfResponsibility
+  
+  class User(): LoginHandler() {
+      override fun process(authority: String) {
+          if("User" == authority){
+              println("User 로그인 성공")
+          }else{
+              super.process(authority)
+          }
+      }
+  }
+  ```
+
+</details>
+

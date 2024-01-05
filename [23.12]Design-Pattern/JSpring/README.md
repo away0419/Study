@@ -136,3 +136,10 @@ public class Product {
 > ## Proxy (구조&행동)
 
 - 스프링 AOP, JPA 등 내부적으로 많이 사용하고 있음.
+
+<br/>
+<br/>
+
+> ## Chain-Of-Responsibility (행동)
+
+- Spring Security의 Filter가 해당 패턴으로 되어있음.

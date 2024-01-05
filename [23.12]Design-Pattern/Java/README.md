@@ -1353,3 +1353,102 @@ public class DrinkBuilder {
   }
   ```
 </details>
+
+
+<br/>
+<br/>
+
+> ## 책임 연쇄
+
+<details>
+  <summary>인터페이스</summary>
+
+- Handler가 가지는 기본적인 기능을 포함하고 있음.
+- 책임질 다음 Handler Setter와 해당 프로세스에서 진행할 기능 구현을 강제해야 함.
+
+```java
+package behavioral.chainOfResponsibility;
+
+public interface Handler {
+    void setNextHandler(Handler handler);
+    void process(String authority);
+}
+```
+
+</details>
+
+
+<details>
+  <summary>추상 클래스</summary>
+
+- 해당 추상 클래스는 굳이 없어도 됨.
+- 바로 객체에 인터페이스를 상속 받도록 하는게 일반적.
+- 해당 예시는 기능적으로 좀더 세분화 해보고자 작성함.
+
+  ```java
+  package behavioral.chainOfResponsibility;
+  
+  public abstract class LoginHandler implements Handler{
+  
+      Handler handler;
+  
+      @Override
+      public void setNextHandler(Handler handler) {
+          this.handler = handler;
+      }
+  
+      @Override
+      public void process(String authority) {
+          try{
+              this.handler.process(authority);
+          }catch (Exception e){
+              System.out.println("로그인 실패");
+          }
+      }
+  }
+  
+  ```
+
+</details>
+
+
+<details>
+  <summary>객체</summary>
+
+- 각자의 객체가 process를 자신 만의 기능을 넣어 구현해야함.
+
+```java
+package behavioral.chainOfResponsibility;
+
+public class Admin extends LoginHandler {
+
+    @Override
+    public void process(String authority) {
+        if ("Admin".equals(authority)) {
+            System.out.println("관리자 로그인 완료");
+        } else {
+            super.process(authority);
+        }
+    }
+}
+```
+
+```java
+package behavioral.chainOfResponsibility;
+
+public class User extends LoginHandler{
+    @Override
+    public void process(String authority) {
+        if("User".equals(authority)){
+            System.out.println("사용자 로그인 완료");
+        }else {
+            super.process(authority);
+        }
+    }
+}
+```
+
+</details>
+
+<br/>
+<br/>
