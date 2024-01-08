@@ -143,3 +143,8 @@ public class Product {
 > ## Chain-Of-Responsibility (행동)
 
 - Spring Security의 Filter가 해당 패턴으로 되어있음.
+
+>## Command (행동)
+
+- controller 부분에서 적용해 볼 수 있음.
+

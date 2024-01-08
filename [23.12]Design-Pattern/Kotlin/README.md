@@ -1196,3 +1196,63 @@ data class Drink(val list: List<Int>) {
 
 </details>
 
+<br/>
+<br/>
+
+> ## 커맨드 (행동)
+
+<details>
+  <summary>인터페이스</summary>
+
+- java와 동일
+
+  ```kotlin
+  package behavioral.command
+  
+  fun interface Command {
+      fun run()
+  }
+  ```
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- java와 동일.
+
+  ```kotlin
+  package behavioral.command
+  
+  class Button (private var command: Command? = null){
+      fun setCommand(command: Command){
+          this.command = command
+      }
+  
+      fun action(){
+          this.command?.run()
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.command
+  
+  class HeaterCommand: Command {
+      override fun run() {
+          println("히터 ON")
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.command
+  
+  class LampCommand: Command {
+      override fun run() {
+          println("램프 ON")
+      }
+  }
+  ```
+
+</details>
+
