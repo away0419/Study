@@ -1,4 +1,4 @@
-> ## 싱글톤 패턴
+> ## 싱글톤 패턴 (생성)
 
 <details>
     <summary>object</summary>
@@ -105,7 +105,7 @@
 <br/>
 <br/>
 
-> ## 팩토리 메소드
+> ## 팩토리 메소드 (생성)
 
 <details>
   <summary>객체</summary>
@@ -1117,7 +1117,7 @@ data class Drink(val list: List<Int>) {
 
 </details>
 
-> ## 책임 연쇄
+> ## 책임 연쇄 (행동)
 
 <details>
   <summary>인터페이스</summary>
@@ -1256,3 +1256,168 @@ data class Drink(val list: List<Int>) {
 
 </details>
 
+<br/>
+<br/>
+
+> ## 인터프리터
+
+<details>
+  <summary>인터페이스</summary>
+
+- java와 동일.
+
+  ```kotlin
+  package behavioral.interpreter
+  
+  fun interface Expression {
+      fun interpret(): Double
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+  
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.interpreter
+  
+  class Number(private val double: Double): Expression {
+  
+      override fun interpret(): Double {
+          return this.double
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.interpreter
+  
+  class Addition(private val leftExpression: Expression, private val rightExpression: Expression): Expression {
+  
+      override fun interpret(): Double {
+          return leftExpression.interpret() + rightExpression.interpret();
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.interpreter
+  
+  class Division(private val leftExpression: Expression, private val rightExpression: Expression): Expression {
+  
+      override fun interpret(): Double {
+          if (rightExpression.interpret() == 0.0) throw ArithmeticException("Division by zero")
+          return leftExpression.interpret() / rightExpression.interpret()
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.interpreter
+  
+  class Multiplication(private val leftExpression: Expression, private val rightExpression: Expression): Expression {
+      override fun interpret(): Double {
+          return leftExpression.interpret() * rightExpression.interpret()
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.interpreter
+  
+  class Subtraction(private val leftExpression: Expression, private val rightExpression: Expression): Expression {
+      override fun interpret(): Double {
+          return leftExpression.interpret() - rightExpression.interpret()
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>기능 구현</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.interpreter
+  
+  import java.util.*
+  
+  fun main() {
+      println("사칙연산 표현식을 입력하세요")
+      val userInput = readln()
+  
+      val expression = buildExpression(userInput)
+  
+      try {
+          val result = expression.interpret()
+          println("결과: $result")
+      } catch (e: Exception) {
+          println("오류 발생: ${e.message}")
+      }
+  }
+  
+  private fun buildExpression(userInput: String): Expression {
+      val tokens = userInput.split(" ")
+      val expressionStack = Stack<Expression>()
+      val operatorStack = Stack<String>()
+  
+      for (token in tokens) {
+          if (isNumeric(token)) {
+              expressionStack.push(Number(token.toDouble()))
+          } else if ("+-*/".contains(token)) {
+              while (operatorStack.isNotEmpty() && hasPrecedence(token, operatorStack.peek())) {
+                  val topOperator = operatorStack.pop()
+                  val rightOperand = expressionStack.pop()
+                  val leftOperand = expressionStack.pop()
+                  expressionStack.push(createOperatorExpression(leftOperand, rightOperand, topOperator))
+              }
+              operatorStack.push(token)
+          } else {
+              throw IllegalArgumentException("잘못된 표현식입니다: $token")
+          }
+      }
+  
+      while (operatorStack.isNotEmpty()) {
+          val topOperator = operatorStack.pop()
+          val rightOperand = expressionStack.pop()
+          val leftOperand = expressionStack.pop()
+          expressionStack.push(createOperatorExpression(leftOperand, rightOperand, topOperator))
+      }
+  
+      return if (expressionStack.size == 1) {
+          expressionStack.pop()
+      } else {
+          throw IllegalArgumentException("잘못된 표현식입니다.")
+      }
+  }
+  
+  private fun createOperatorExpression(left: Expression, right: Expression, operator: String): Expression {
+      return when (operator) {
+          "+" -> Addition(left, right)
+          "-" -> Subtraction(left, right)
+          "*" -> Multiplication(left, right)
+          "/" -> Division(left, right)
+          else -> throw IllegalArgumentException("지원되지 않는 연산자입니다: $operator")
+      }
+  }
+  
+  private fun isNumeric(str: String): Boolean {
+      return try {
+          str.toDouble()
+          true
+      } catch (e: NumberFormatException) {
+          false
+      }
+  }
+  
+  private fun hasPrecedence(op1: String, op2: String): Boolean {
+      return (!op1.equals("*") && !op1.equals("/")) || (!op2.equals("+") && !op2.equals("-"))
+  }
+  ```
+
+</details>

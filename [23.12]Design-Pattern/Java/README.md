@@ -1515,3 +1515,223 @@ public class User extends LoginHandler{
   ```
 
 </details>
+
+
+> ## 인터프리터 (행동)
+
+<details>
+  <summary>인터페이스</summary>
+
+- 예제로 사칙연산 계산기를 만들 예정.
+- 패턴 개념은 어렵지 않으나 기능 구현 과정이 어려움.
+
+  ```java
+  package behavioral.interpreter;
+  
+  public interface Expression {
+      double interpret();
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 사칙연산자 식에는 크게 두개의 객체가 존재한다 볼 수 있음.
+- 하나는 피연산자, 다른 하나는 연산자.
+- 연산자는 총 4개만 각각의 객체로 구현함.
+- 동일안 인터페이스를 상속 받아 피연산자, 연산자 구분 없이 일단 하나의 stack으로 관리할 수 있음.
+
+  ```java
+  package behavioral.interpreter;
+  
+  public class Number implements Expression{
+      private double value;
+  
+      public Number(double value) {
+          this.value = value;
+      }
+  
+      @Override
+      public double interpret() {
+          return value;
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.interpreter;
+  
+  public class Addition implements Expression{
+  
+      private Expression leftOperand;
+      private Expression rightOperand;
+  
+  
+      public Addition(Expression leftOperand, Expression rightOperand) {
+          this.leftOperand = leftOperand;
+          this.rightOperand = rightOperand;
+      }
+  
+      @Override
+      public double interpret() {
+          return leftOperand.interpret() + rightOperand.interpret();
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.interpreter;
+  
+  public class Subtraction implements Expression{
+      private Expression leftOperand;
+      private Expression rightOperand;
+  
+      public Subtraction(Expression leftOperand, Expression rightOperand) {
+          this.leftOperand = leftOperand;
+          this.rightOperand = rightOperand;
+      }
+  
+      @Override
+      public double interpret() {
+          return leftOperand.interpret() - rightOperand.interpret();
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.interpreter;
+  
+  public class Multiplication implements Expression{
+  
+      private Expression leftOperand;
+      private Expression rightOperand;
+  
+      public Multiplication(Expression leftOperand, Expression rightOperand) {
+          this.leftOperand = leftOperand;
+          this.rightOperand = rightOperand;
+      }
+  
+      @Override
+      public double interpret() {
+          return leftOperand.interpret() * rightOperand.interpret();
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.interpreter;
+  
+  public class Division implements Expression {
+      private Expression leftOperand;
+      private Expression rightOperand;
+  
+      public Division(Expression leftOperand, Expression rightOperand) {
+          this.leftOperand = leftOperand;
+          this.rightOperand = rightOperand;
+      }
+  
+      @Override
+      public double interpret() {
+          if (rightOperand.interpret() == 0) {
+              throw new ArithmeticException("Division by zero");
+          }
+          return leftOperand.interpret() / rightOperand.interpret();
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>기능 구현</summary>
+
+- 사칙연산자는 패턴과 상관 없이 추가적인 기능 구현이 필요하여 추가하였음.
+- 가끔 코딩 테스트에 사칙연산을 구현하는 문제가 나오니 숙지하면 좋을 듯 함.
+
+```java
+package behavioral.interpreter;
+
+import java.util.Scanner;
+import java.util.Stack;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("사칙연산 표현식을 입력하세요:");
+        String userInput = scanner.nextLine();
+
+        Expression expression = buildExpression(userInput);
+
+        try {
+            double result = expression.interpret();
+            System.out.println("결과: " + result);
+        } catch (Exception e) {
+            System.out.println("오류 발생: " + e.getMessage());
+        }
+    }
+
+    private static Expression buildExpression(String userInput) {
+        String[] tokens = userInput.split(" ");
+        Stack<Expression> expressionStack = new Stack<>();
+        Stack<String> operatorStack = new Stack<>();
+
+        for (String token : tokens) {
+            if (isNumeric(token)) {
+                expressionStack.push(new Number(Double.parseDouble(token)));
+            } else if ("+-*/".contains(token)) {
+                while (!operatorStack.isEmpty() && hasPrecedence(token, operatorStack.peek())) {
+                    String topOperator = operatorStack.pop();
+                    Expression rightOperand = expressionStack.pop();
+                    Expression leftOperand = expressionStack.pop();
+                    expressionStack.push(createOperatorExpression(leftOperand, rightOperand, topOperator));
+                }
+                operatorStack.push(token);
+            } else {
+                throw new IllegalArgumentException("잘못된 표현식입니다: " + token);
+            }
+        }
+
+        while (!operatorStack.isEmpty()) {
+            String topOperator = operatorStack.pop();
+            Expression rightOperand = expressionStack.pop();
+            Expression leftOperand = expressionStack.pop();
+            expressionStack.push(createOperatorExpression(leftOperand, rightOperand, topOperator));
+        }
+
+        if (expressionStack.size() == 1) {
+            return expressionStack.pop();
+        } else {
+            throw new IllegalArgumentException("잘못된 표현식입니다.");
+        }
+    }
+
+    private static Expression createOperatorExpression(Expression left, Expression right, String operator) {
+        return switch (operator) {
+            case "+" -> new Addition(left, right);
+            case "-" -> new Subtraction(left, right);
+            case "*" -> new Multiplication(left, right);
+            case "/" -> new Division(left, right);
+            default -> throw new IllegalArgumentException("지원되지 않는 연산자입니다: " + operator);
+        };
+    }
+
+    private static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private static boolean hasPrecedence(String op1, String op2) {
+        return (!op1.equals("*") && !op1.equals("/")) || (!op2.equals("+") && !op2.equals("-"));
+    }
+
+}
+```
+
+</details>
