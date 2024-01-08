@@ -92,8 +92,6 @@ Y
 )src/structural/proxy/ProtectiveProxy.java,2\9\29fe93d8cfc3bed41091ae9e66c1918ca3d6a52e
 a
 1src/behavioral/chainOfResponsibility/Handler.java,1\a\1ad8c3f5632599d86f17b6a1be8fe4c5ab46ba85
-d
-4src/behavioral/chainOfResponsibility/AdminLogin.java,f\5\f52623220667a8201291953a44f8ea528b2a6f36
 _
 /src/behavioral/chainOfResponsibility/Admin.java,d\b\db6e2a460fb9dc461e6bdc031a37546d629b7b33
 f
@@ -104,10 +102,6 @@ f
 .src/behavioral/chainOfResponsibility/Main.java,2\e\2e3797532e360aa0f9a5ea3bfa88089cd1e4bba2
 S
 #src/behavioral/command/Command.java,1\9\194d83171353aa30d709ac087c1987778dc59355
-R
-"src/behavioral/command/Heater.java,3\e\3e84908323e4159bbda182866fed5c84e9dab0af
-P
- src/behavioral/command/Lamp.java,d\b\dba1b611c78beda9075353d30e5d6ee580637780
 Y
 )src/behavioral/command/HeaterCommand.java,4\c\4c46c9fa0054950d1b99da61495cebbac7133bf8
 W
