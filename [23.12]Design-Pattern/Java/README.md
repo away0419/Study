@@ -1735,3 +1735,122 @@ public class Main {
 ```
 
 </details>
+
+
+> ## 반복자 (행동)
+
+<details>
+  <summary>Iterator</summary>
+
+- 저장소에서 넘어온 배열을 실질적으로 접근할 수 있게 해주는 역할.
+- 공통 코드를 만들어 재사용.
+
+  ```java
+  package behavioral.iterator;
+  
+  public interface Iterator {
+      boolean hasNext();
+      Object next();
+  }
+  ```
+
+  ```java
+  package behavioral.iterator;
+  
+  public class HamburgerIterator implements Iterator{
+      Hamburger[] arr;
+      private int index = 0;
+  
+      public HamburgerIterator(Hamburger[] arr) {
+          this.arr = arr;
+      }
+  
+      @Override
+      public boolean hasNext() {
+          return index < arr.length;
+      }
+  
+      @Override
+      public Hamburger next() {
+          return arr[index++];
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>Collection</summary>
+
+- 여러 객체를 저장하기 위한 저장소.
+- 저장소에 저장된 배열을 Iterator에 넘기는 역할.
+
+  ```java
+  package behavioral.iterator;
+  
+  public interface Collection {
+      Iterator iterator();
+  }
+  
+  ```
+  
+  ```java
+  package behavioral.iterator;
+  
+  public class HamburgerCollection implements Collection{
+      Hamburger[] arr;
+      private int index;
+  
+      public HamburgerCollection(int size) {
+          this.arr = new Hamburger[size];
+      }
+  
+      public void add(Hamburger hamburger){
+          if(index<arr.length){
+              arr[index++] = hamburger;
+          }
+      }
+  
+      @Override
+      public Iterator iterator() {
+          return new HamburgerIterator(this.arr);
+      }
+  
+  }
+  ```
+
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 저장소에 담으려는 객체.
+
+  ```java
+  package behavioral.iterator;
+  
+  public class Hamburger {
+      String name;
+      int price;
+  
+      public Hamburger(String name, int price) {
+          this.name = name;
+          this.price = price;
+      }
+  
+      @Override
+      public String toString() {
+          return "Hamburger{" +
+                  "name='" + name + '\'' +
+                  ", price=" + price +
+                  '}';
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+

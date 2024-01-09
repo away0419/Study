@@ -1421,3 +1421,98 @@ data class Drink(val list: List<Int>) {
   ```
 
 </details>
+
+<br/>
+<br/>
+
+
+> ## 반복자 (행동)
+
+<details>
+  <summary>Iterator</summary>
+
+- Java와 동일.
+- 참고로 next()의 경우 null일 수 있기 때문에 nullable 해주어야 함.
+  - 배열을 원하는 사이즈로 초기화 하고 값은 주지 않을 경우 null 이기 때문임. 
+
+  ```kotlin
+  package behavioral.iterator
+  
+  
+  interface Iterator {
+      fun hasNext(): Boolean
+      fun next(): Any?
+  }
+  ```
+
+  ```kotlin
+  package behavioral.iterator
+  
+  class HamburgerIterator(private val arr: Array<Hamburger?>): Iterator {
+      private var index = 0
+  
+      override fun hasNext(): Boolean {
+          return index < arr.size
+      }
+  
+      override fun next(): Any? {
+          return arr[index++]
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>Collection</summary>
+
+- Java와 동일.
+- 실제 객체를 담을 그릇.
+
+  ```kotlin
+  package behavioral.iterator
+  
+  
+  fun interface Collection {
+      fun iterator(): Iterator
+  }
+  ```
+
+  ```kotlin
+  package behavioral.iterator
+  
+  class HamburgerCollection(private val size: Int) : Collection {
+      private val arr = arrayOfNulls<Hamburger>(size)
+      private var index = 0
+  
+      fun add(hamburger: Hamburger) {
+          if (index < arr.size) {
+              arr[index++] = hamburger
+          }
+      }
+  
+      override fun iterator(): Iterator {
+          return HamburgerIterator(arr)
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.iterator
+  
+  class Hamburger(private val price:Int, private val name: String) {
+      override fun toString(): String {
+          return "Hamburger(price=$price, name='$name')"
+      }
+  }
+  ```
+
+</details>
+

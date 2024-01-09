@@ -161,3 +161,11 @@ public class Product {
 <br/>
 <br/>
 
+> ## Iterator (행동)
+
+- CompositeIterator
+  - 기존의 Interator에서 add 기능만 하나 추가한 것.
+  - add(): 여러 Iterator 조합하여 사용 가능.
+
+<br/>
+<br/>
