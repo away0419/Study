@@ -110,8 +110,6 @@ d
 4src/main/kotlin/behavioral/interpreter/Expression.kt,d\d\dd20e973a14149bce27f467940749ee2f8777722
 `
 0src/main/kotlin/behavioral/interpreter/Number.kt,7\2\725aa91d2b94a56e9aa970c0cc003b4c8f845167
-d
-4src/main/kotlin/behavioral/interpreter/Calculator.kt,1\9\19232a328042a7f5ffceb8c81c084605dedb32d6
 b
 2src/main/kotlin/behavioral/interpreter/Addition.kt,9\2\92e23e9d76f8e5b93839260cd40d3d84787cf766
 b
@@ -122,3 +120,15 @@ e
 5src/main/kotlin/behavioral/interpreter/Subtraction.kt,0\4\0432f05763a3c3705959ffa85621c2dc7cbaacb8
 ^
 .src/main/kotlin/behavioral/interpreter/Main.kt,8\e\8ed92e1d7bce51aaa044c0e269a31c3756958f50
+_
+/src/main/kotlin/behavioral/iterator/Iterator.kt,2\5\252512c29535680daf26b61929c55bc20bfcfc87
+`
+0src/main/kotlin/behavioral/iterator/Hamburger.kt,2\8\28d7fc0e4805ca8ab21035ac71d0a8c1e46fcc68
+a
+1src/main/kotlin/behavioral/iterator/Collection.kt,3\7\37a33354af5817f99dc197072e7eba9f44ef2ae9
+j
+:src/main/kotlin/behavioral/iterator/HamburgerCollection.kt,1\3\135696fde2bde0f9ac8ae27bacd8ea1a2ba83b26
+h
+8src/main/kotlin/behavioral/iterator/HamburgerIterator.kt,6\c\6ca7f00474e1659af6fa5e5c9cace21618bb6940
+[
++src/main/kotlin/behavioral/iterator/main.kt,5\e\5eeff15a04c07825188907e490a3fc4b30192db6

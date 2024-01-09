@@ -116,8 +116,6 @@ V
 &src/behavioral/interpreter/Number.java,f\f\ffd7cf9608490a1ebcb583317b1ec5ac5b8a5693
 X
 (src/behavioral/interpreter/Addition.java,1\e\1ee897ab462d2e93a2aa8fa456f9b389af19aefd
-\
-,src/behavioral/interpreter/Substraction.java,d\7\d7b6746824626bc9224fa678c8b678f82a354b21
 [
 +src/behavioral/interpreter/Subtraction.java,7\0\70089d752c80e902d467212c2da8722055e1e184
 ^
@@ -126,3 +124,15 @@ X
 (src/behavioral/interpreter/Division.java,2\9\29d05c8c477f60abbf1d9d1d07fd191af35fb3b8
 T
 $src/behavioral/interpreter/Main.java,7\c\7c4982f68f3c5d8a069a41c100deb3e13f014435
+U
+%src/behavioral/iterator/Iterator.java,a\9\a9e1192c2ed1393b79a3ae5ea6678e5e6d03a30f
+^
+.src/behavioral/iterator/HamburgerIterator.java,0\a\0a2d990aafde2ddc7cf08c475e5f455e85e21494
+V
+&src/behavioral/iterator/Hamburger.java,a\4\a4d24b5f8c682f750181e6e06d1abef9962bbf99
+`
+0src/behavioral/iterator/HamburgerCollection.java,f\b\fbe47ab094cecea3cbcf0c9b43508b623ff944e1
+W
+'src/behavioral/iterator/Collection.java,6\2\62f965831e6cf51a62a624b06ff3aa5212c09bbc
+Q
+!src/behavioral/iterator/Main.java,b\7\b74290fc469f9b959892c57bfa68a7d816754acc
