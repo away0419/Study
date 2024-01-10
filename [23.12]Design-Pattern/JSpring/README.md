@@ -169,3 +169,12 @@ public class Product {
 
 <br/>
 <br/>
+
+> ## Mediator (생성)
+
+- DispatcherServlet 일종의 중재자로 볼 수 있음.
+
+<br/>
+<br/>
+
+> ##

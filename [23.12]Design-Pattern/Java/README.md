@@ -1358,7 +1358,7 @@ public class DrinkBuilder {
 <br/>
 <br/>
 
-> ## 책임 연쇄
+> ## 책임 연쇄 (행동)
 
 <details>
   <summary>인터페이스</summary>
@@ -1854,3 +1854,102 @@ public class Main {
 <br/>
 <br/>
 
+> ## 중재자 (행동)
+
+<details>
+  <summary>중재자</summary>
+
+- 해당 패턴을 작성하며 많은 고민을 하였음.
+- 중재자는 객체간의 연결을 자신을 통해 연결할 수 있도록 도와주는 역할임.
+- 이때, 중재자를 객체의 필드 값으로 넣어 구현할 것인지, 아니면 중재자에서 객체와 메시지를 전달 받아 구현할 것인지는 패턴과 상관없음.
+- 중재자 패턴은 객체가 가지고 있어야 할 다른 객체들의 리스트를 대신 가지고 있는것이 이 패턴의 핵심일 뿐임. 기능을 어떻게 구현할 지는 알아서 판단 해야 함.
+- 현재 예시는 중재자와 객체 클래스간의 의존도를 높이는 대신 기능 별로 구현한 것임.
+  - 의존도가 발생하였기 때문에 중재자와 객체 클래스를 동시에 작성해야 함. 
+
+  ```java
+  package behavioral.mediator;
+  
+  public interface Mediator {
+      void notice();
+      void forwardRequest(String msg);
+  }
+  ```
+  
+  ```java
+  package behavioral.mediator;
+  
+  import java.util.ArrayList;
+  import java.util.List;
+  
+  public class ItemMediator implements Mediator {
+  
+      List<Adventurer> list = new ArrayList<>();
+  
+      public void addAdventurer(Adventurer adventurer) {
+          list.add(adventurer);
+      }
+  
+      public void forwardRequest(String msg) {
+          notice();
+          for (Adventurer adventurer : list
+          ) {
+              System.out.print(adventurer.getName()+"에게 전달 -> ");
+              adventurer.receiveRequestToMediator(msg);
+          }
+      }
+  
+      @Override
+      public void notice() {
+          System.out.println("[중재인 요청 내역 전달]");
+      }
+  }
+  ```
+  
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 해당 객체는 모험가임. 중재인에게 요청을 전달하는 기능, 중재인에게 받은 메시지를 출력하는 기능이 있음.
+- 앞서 말한 것처럼 두 개의 기능을 제거하고 중재인 클래스에서 Adventurer 객체를 받아 처리하면 의존성을 낮출수 있음.
+
+  ```java
+  package behavioral.mediator;
+  
+  import structural.facade.Person;
+  
+  public class Adventurer {
+  
+      private String name;
+      private Mediator mediator;
+  
+  
+      public Adventurer(String name) {
+          this.name = name;
+      }
+  
+      public String getName() {
+          return name;
+      }
+  
+      public void setMediator(ItemMediator mediator) {
+          mediator.addAdventurer(this);
+          this.mediator = mediator;
+      }
+  
+      public void sendRequestToMediator(String msg) {
+          mediator.forwardRequest(msg);
+      }
+  
+      public void receiveRequestToMediator(String msg) {
+          System.out.println("전달 받은 내용: " + msg);
+      }
+  
+  }
+  
+  ```
+
+</details>
+
+<br/>
+<br/>

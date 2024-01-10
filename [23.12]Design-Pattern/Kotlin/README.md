@@ -1516,3 +1516,81 @@ data class Drink(val list: List<Int>) {
 
 </details>
 
+<br/>
+<br/>
+
+
+> ## 중재자 (행동)
+
+<details>
+  <summary>중재자</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.mediator
+  
+  interface Mediactor {
+      fun forwardRequest(msg: String)
+      fun notice()
+  }
+  ```
+
+  ```kotlin
+  package behavioral.mediator
+  
+  class ItemMediactor : Mediactor {
+  
+      private val list = mutableListOf<Adventurer>();
+  
+      fun addAdventurer(adventurer: Adventurer) {
+          list.add(adventurer)
+      }
+  
+      override fun forwardRequest(msg: String) {
+          notice()
+          list.forEach {
+              print("${it.name} 에게 전달 -> ")
+              it.receiveRequestToMediactor(msg)
+          }
+      }
+  
+      override fun notice() {
+          println("[중재인 요청 전달 목록]")
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.mediator
+  
+  class Adventurer(val name: String) {
+      private var itemMediactor: ItemMediactor? = null
+  
+      fun setMediactor(itemMediactor: ItemMediactor) {
+          this.itemMediactor = itemMediactor
+          itemMediactor.addAdventurer(this)
+      }
+  
+      fun sendRequestToMediactor(msg: String) {
+          itemMediactor?.forwardRequest(msg)
+      }
+  
+      fun receiveRequestToMediactor(msg: String) {
+          println("전달 받은 내용: $msg")
+      }
+  
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
