@@ -1594,3 +1594,50 @@ data class Drink(val list: List<Int>) {
 
 <br/>
 <br/>
+
+> ## 메멘토 (행동)
+
+<details>
+  <summary>메멘토</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.memento
+  
+  class Memento(val job: String, val level: Int) {
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.memento
+  
+  class Adventurer(
+      var job: String,
+      var level: Int
+  ) {
+  
+      fun setData(memento: Memento) {
+          this.job = memento.job
+          this.level = memento.level
+      }
+  
+      fun createMemento(): Memento{
+          return Memento(job,level)
+      }
+  
+      override fun toString(): String {
+          return "Adventurer(job='$job', level=$level)"
+      }
+  }
+  ```
+
+</details>
+

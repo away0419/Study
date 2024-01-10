@@ -170,11 +170,13 @@ public class Product {
 <br/>
 <br/>
 
-> ## Mediator (생성)
+> ## Mediator (행동)
 
 - DispatcherServlet 일종의 중재자로 볼 수 있음.
 
 <br/>
 <br/>
 
-> ##
+> ## 메멘토 (행동)
+
+- Spring 에서 딱히 사용하지 않음. 굳이 따지자면 캐시 등의 기술에 활용할 수 있음.

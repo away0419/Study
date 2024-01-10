@@ -1953,3 +1953,68 @@ public class Main {
 
 <br/>
 <br/>
+
+> ## 메멘토
+
+<details>
+  <summary>메멘토</summary>
+
+- 정보를 따로 관리하기 위한 클래스.
+
+  ```java
+  package behavioral.memento;
+  
+  public class Memento {
+      String job;
+      int level;
+  
+      public Memento(String job, int level) {
+          this.job = job;
+          this.level = level;
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 기존 정보를 메멘토 클래스로 만드는 기능이 있음.
+
+  ```java
+  package behavioral.memento;
+  
+  public class Adventurer {
+      String job;
+      int level;
+  
+      public Adventurer(String job, int level) {
+          this.job = job;
+          this.level = level;
+      }
+  
+      public Memento createMemento(){
+          return new Memento(job, level);
+      }
+  
+      public void setInfo(Memento memento){
+          this.job = memento.job;
+          this.level = memento.level;
+      }
+  
+      @Override
+      public String toString() {
+          return "Adventurer{" +
+                  "job='" + job + '\'' +
+                  ", level=" + level +
+                  '}';
+      }
+  }
+  ```
+
+</details>
+
+
+<br/>
+<br/>
