@@ -1516,6 +1516,8 @@ public class User extends LoginHandler{
 
 </details>
 
+<br/>
+<br/>
 
 > ## 인터프리터 (행동)
 
@@ -1736,6 +1738,8 @@ public class Main {
 
 </details>
 
+<br/>
+<br/>
 
 > ## 반복자 (행동)
 
@@ -1954,7 +1958,7 @@ public class Main {
 <br/>
 <br/>
 
-> ## 메멘토
+> ## 메멘토 (행동)
 
 <details>
   <summary>메멘토</summary>
@@ -2018,3 +2022,96 @@ public class Main {
 
 <br/>
 <br/>
+
+> ## 옵저버 (행동)
+
+<details>
+  <summary>옵저버</summary>
+
+- 관찰자 객체임.
+- 관찰중인 객체가 알림을 보낼경우 어떤 기능을 수행할지 미리 정하면 됨. 굳이 없어도 되긴 하지만 알림을 받는다는 행위 자체가 목적이 있기 때문에 관련 기능이 있을 것임.
+
+  ```java
+  package behavioral.observer;
+  
+  public interface Observer {
+      void receiveNotice(String msg);
+  }
+  ```
+
+  ```java
+  package behavioral.observer;
+  
+  public class Adventurer implements Observer{
+      private String name;
+  
+      public Adventurer(String name) {
+          this.name = name;
+      }
+  
+      @Override
+      public void receiveNotice(String msg) {
+          System.out.println(name +"님 알람이 도착했습니다. 내용: "+ msg);
+      }
+  }
+  
+  ```
+
+</details>
+
+
+<details>
+  <summary>객체</summary>
+
+- 관찰의 대상이 되는 객체.
+- 기본적으로 옵저버 등록, 삭제, 알림 보내기 기능이 있어야 함.
+- 관찰 대상이 되는 객체는 Subject 라는 인터페이스를 상속 받는게 일반적임.
+
+  ```java
+  package behavioral.observer;
+  
+  public interface Subject {
+      void registerObserver(Observer observer);
+      void removeObserver(Observer observer);
+      void sendNotice(String msg);
+  }
+  
+  ```
+
+  ```java
+  package behavioral.observer;
+  
+  import java.util.ArrayList;
+  import java.util.List;
+  
+  public class Store implements Subject {
+  
+      private List<Observer> subscirbers = new ArrayList<>();
+  
+      @Override
+      public void registerObserver(Observer observer) {
+          subscirbers.add(observer);
+      }
+  
+      @Override
+      public void removeObserver(Observer observer) {
+          subscirbers.remove(observer);
+      }
+  
+      @Override
+      public void sendNotice(String msg) {
+          System.out.println("[구독자 메시지 전달 시작]");
+          for (Observer o :
+                  subscirbers) {
+              o.receiveNotice(msg);
+          }
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+

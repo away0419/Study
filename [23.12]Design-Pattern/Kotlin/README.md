@@ -1117,6 +1117,9 @@ data class Drink(val list: List<Int>) {
 
 </details>
 
+<br/>
+<br/>
+
 > ## 책임 연쇄 (행동)
 
 <details>
@@ -1259,7 +1262,7 @@ data class Drink(val list: List<Int>) {
 <br/>
 <br/>
 
-> ## 인터프리터
+> ## 인터프리터 (행동)
 
 <details>
   <summary>인터페이스</summary>
@@ -1640,4 +1643,78 @@ data class Drink(val list: List<Int>) {
   ```
 
 </details>
+
+<br/>
+<br/>
+
+> ## 옵저버 (행동)
+
+<details>
+  <summary>옵저버</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.obsever
+  
+  fun interface Observer {
+      fun receiveNotice(msg: String);
+  }
+  ```
+
+  ```kotlin
+  package behavioral.obsever
+  
+  class Adventurer(private val name: String): Observer {
+      override fun receiveNotice(msg: String) {
+          println("${name}님 메시지가 도작했습니다. 내용: $msg")
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.obsever
+  
+  interface Subject {
+  
+      fun registerObserver(observer: Observer)
+      fun removeObserver(observer: Observer)
+      fun sendNotice(msg: String)
+  }
+  ```
+
+  ```kotlin
+  package behavioral.obsever
+  
+  class Store: Subject {
+      private val subscribers = mutableListOf<Observer>()
+  
+      override fun registerObserver(observer: Observer) {
+          subscribers.add(observer)
+      }
+  
+      override fun removeObserver(observer: Observer) {
+          subscribers.remove(observer)
+      }
+  
+      override fun sendNotice(msg: String) {
+          println("[구독자 송신 목록]")
+          subscribers.forEach{
+              it.receiveNotice(msg)
+          }
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
 

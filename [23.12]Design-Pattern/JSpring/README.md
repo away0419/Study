@@ -144,7 +144,7 @@ public class Product {
 
 - Spring Security의 Filter가 해당 패턴으로 되어있음.
 
-- <br/>
+<br/>
 <br/>
 
 > ## Command (행동)
@@ -177,6 +177,17 @@ public class Product {
 <br/>
 <br/>
 
-> ## 메멘토 (행동)
+> ## Memento (행동)
 
 - Spring 에서 딱히 사용하지 않음. 굳이 따지자면 캐시 등의 기술에 활용할 수 있음.
+
+
+<br/>
+<br/>
+
+> ## Observer (행동)
+
+- 이벤트 핸들링 및 리스너 등록시 패턴 이용함.
+
+<br/>
+<br/>
