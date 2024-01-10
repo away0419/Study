@@ -150,3 +150,13 @@ S
 #src/behavioral/memento/Memento.java,f\3\f38164d46e5fe0eab00613f8a2b9e054b3106155
 P
  src/behavioral/memento/Main.java,1\e\1eca382b1fc169405865dbb01badea3f473003a0
+U
+%src/behavioral/observer/Observer.java,2\b\2b20fd5d6048b6a292a35e5dd505208c923d2c94
+W
+'src/behavioral/observer/Adventurer.java,b\d\bdb1d5b9981bf6672c71979af191556ea720906d
+T
+$src/behavioral/observer/Subject.java,c\5\c5a4d6889758dd19172127a6675cf1c10b0fef10
+R
+"src/behavioral/observer/Store.java,5\b\5b2180049b3a7478769e306ec74b3e0425ab4216
+Q
+!src/behavioral/observer/Main.java,e\d\ed087abe69e2ba99dfb4438b6ffaddb24d3fb730

@@ -150,3 +150,13 @@ Z
 *src/main/kotlin/behavioral/memento/main.kt,b\0\b0be7eb4823484e248b43d478215bfa21c2aa5a0
 Z
 *src/main/kotlin/behavioral/memento/Main.kt,2\0\20ea7bb588b9229be5bf250a75eb71f6e8d63b0d
+^
+.src/main/kotlin/behavioral/obsever/Observer.kt,d\c\dcf043e470103ab3f25383dbdee6a8eac717d0e2
+`
+0src/main/kotlin/behavioral/obsever/Adventurer.kt,1\a\1ac3e520c148672fbdbae9302d201b3d0753ff69
+]
+-src/main/kotlin/behavioral/obsever/Subject.kt,7\1\717d3a33208c11711b6ce28040f09b4728f668cf
+[
++src/main/kotlin/behavioral/obsever/Store.kt,0\3\037f3c5444151263c100db40cde76a3280ab6054
+Z
+*src/main/kotlin/behavioral/obsever/Main.kt,3\1\31549f3148264b439a7955c5888efff7cc60946b
