@@ -132,3 +132,11 @@ h
 8src/main/kotlin/behavioral/iterator/HamburgerIterator.kt,6\c\6ca7f00474e1659af6fa5e5c9cace21618bb6940
 [
 +src/main/kotlin/behavioral/iterator/main.kt,5\e\5eeff15a04c07825188907e490a3fc4b30192db6
+a
+1src/main/kotlin/behavioral/mediactor/Mediactor.kt,1\7\17420000d725605469205b0e92b1bce9bed06e37
+e
+5src/main/kotlin/behavioral/mediactor/ItemMediactor.kt,3\6\3675714ee51948aa08889d4dbbedcf876f6e22b5
+b
+2src/main/kotlin/behavioral/mediactor/Adventurer.kt,6\4\6422ef55e3e6ce29a8d7e817c039785ae8868b22
+\
+,src/main/kotlin/behavioral/mediactor/Main.kt,5\7\5744dfed8c5b2a4b07b3bc934ec038859f4dbc6b
