@@ -144,3 +144,9 @@ Y
 )src/behavioral/mediator/ItemMediator.java,2\0\20c017218c19d94f6e71fc182a5c6d402b022179
 Q
 !src/behavioral/mediator/Main.java,5\e\5e9ce0609f121d6e22a526cfa0b1bfe899be0253
+V
+&src/behavioral/memento/Adventurer.java,e\5\e5957ec7ac3b8ad57bde0968dd02697387153c2f
+S
+#src/behavioral/memento/Memento.java,f\3\f38164d46e5fe0eab00613f8a2b9e054b3106155
+P
+ src/behavioral/memento/Main.java,1\e\1eca382b1fc169405865dbb01badea3f473003a0
