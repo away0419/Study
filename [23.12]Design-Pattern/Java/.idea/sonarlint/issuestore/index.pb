@@ -160,3 +160,13 @@ R
 "src/behavioral/observer/Store.java,5\b\5b2180049b3a7478769e306ec74b3e0425ab4216
 Q
 !src/behavioral/observer/Main.java,e\d\ed087abe69e2ba99dfb4438b6ffaddb24d3fb730
+T
+$src/behavioral/state/PowerState.java,4\1\41e4db9d6b82574d35c3fac0c45e18b480c341cb
+P
+ src/behavioral/state/Laptop.java,b\d\bd7dbb0c392ea4418b7a36c2ab82b83417426895
+Q
+!src/behavioral/state/OnState.java,e\2\e24da04eee998bc95bf21049e3379f9ce0589944
+R
+"src/behavioral/state/OffState.java,a\2\a232f52361ab691627dc6cbc0749c21615a066f5
+N
+src/behavioral/state/Main.java,f\7\f74f4d37bec261854157e9db094b722fdbd45d5d

@@ -140,8 +140,6 @@ b
 2src/main/kotlin/behavioral/mediactor/Adventurer.kt,6\4\6422ef55e3e6ce29a8d7e817c039785ae8868b22
 \
 ,src/main/kotlin/behavioral/mediactor/Main.kt,5\7\5744dfed8c5b2a4b07b3bc934ec038859f4dbc6b
-b
-2src/main/kotlin/behavioral/memento/Adventurer.java,d\7\d7b79d1591d9996f4f4264500f4ef2b9bf5e0ab8
 `
 0src/main/kotlin/behavioral/memento/Adventurer.kt,b\9\b9bf5785287efe02caeca3d1b1eafb2c0af500f7
 ]
@@ -160,3 +158,13 @@ Z
 +src/main/kotlin/behavioral/obsever/Store.kt,0\3\037f3c5444151263c100db40cde76a3280ab6054
 Z
 *src/main/kotlin/behavioral/obsever/Main.kt,3\1\31549f3148264b439a7955c5888efff7cc60946b
+Y
+)src/main/kotlin/behavioral/state/State.kt,8\d\8d5cade75c520d72207d3920ecbc39788b1d5dd6
+Z
+*src/main/kotlin/behavioral/state/Laptop.kt,a\e\ae4d0dc6f8d0b0f83d38203cad99b192f1b8afde
+[
++src/main/kotlin/behavioral/state/OnState.kt,f\9\f9f4624a674b34c37f6daa732537ca0c39e8e742
+\
+,src/main/kotlin/behavioral/state/OffState.kt,e\2\e240008d5a8967e1095ac292e5d057f5217ced99
+X
+(src/main/kotlin/behavioral/state/Main.kt,2\8\289cf4bc2bceef237ea2f28eb1047b3513d3ad51
