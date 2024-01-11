@@ -1718,3 +1718,95 @@ data class Drink(val list: List<Int>) {
 <br/>
 <br/>
 
+> ## 상태 (행동)
+
+<details>
+  <summary>상태</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.state
+  
+  interface State {
+      fun powerButtonPush(laptop: Laptop)
+      fun typeButtonPush()
+  }
+  ```
+
+  ```kotlin
+  package behavioral.state
+  
+  object OffState : State {
+      override fun powerButtonPush(laptop: Laptop) {
+          println("OFF -> ON")
+          laptop.setState(OnState)
+      }
+  
+      override fun typeButtonPush() {
+          println("무반응")
+      }
+  
+      override fun toString(): String {
+          return "현재 상태 OFF"
+      }
+  
+  
+  }
+  ```
+
+  ```kotlin
+  package behavioral.state
+  
+  object OnState : State {
+      override fun powerButtonPush(laptop: Laptop) {
+          println("ON -> OFF")
+          laptop.setState(OffState)
+      }
+  
+      override fun typeButtonPush() {
+          println("타자 입력")
+      }
+  
+      override fun toString(): String {
+          return "현재 상태 ON"
+      }
+  
+  
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.state
+  
+  class Laptop {
+      private var state: State = OffState
+  
+      fun setState(state: State) {
+          this.state = state
+      }
+  
+      fun powerButtonPush() {
+          state.powerButtonPush(this)
+      }
+  
+      fun typeButtonPush() {
+          state.typeButtonPush()
+      }
+  
+      fun currentState() {
+          println(state.toString())
+      }
+  
+  
+  }
+  ```
+
+</details>

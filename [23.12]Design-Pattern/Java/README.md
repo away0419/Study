@@ -2115,3 +2115,129 @@ public class Main {
 <br/>
 
 
+> ## 상태 (행동)
+
+<details>
+  <summary>상태</summary>
+
+- 상태 관리를 위한 통합 인터페이스가 있음.
+- 해당 상태 인터페이스는 결국 하나의 객체 상태를 뜻하는 것임. 따라서 대상 객체와 의존 관계를 가질 수 밖에 없음.
+- 결국 인터페이스와 해당 객체 클래스를 동시에 만들어야 함.
+
+```java
+package behavioral.state;
+
+public interface PowerState {
+  void powerButtonPush(Laptop laptop);
+  void typeButtonPush();
+}
+```
+
+```java
+package behavioral.state;
+
+public class OnState implements PowerState {
+
+    private OnState() {
+    }
+
+    private static class SingleInstanceHolder {
+        private static final OnState INSTANCE = new OnState();
+    }
+
+    public static OnState getInstance() {
+        return SingleInstanceHolder.INSTANCE;
+    }
+
+    @Override
+    public void powerButtonPush(Laptop laptop) {
+        System.out.println("노트북 전원 OFF");
+        laptop.setPowerState(OffState.getInstance());
+    }
+
+    @Override
+    public void typeButtonPush() {
+        System.out.println("타자 입력");
+    }
+
+    @Override
+    public String toString() {
+        return "전원 상태 ON";
+    }
+}
+```
+
+```java
+package behavioral.state;
+
+public class OffState implements PowerState {
+    private OffState() {
+    }
+
+    private static class SingleInstanceHolder {
+        private static final OffState INSTANCE = new OffState();
+    }
+
+    public static OffState getInstance() {
+        return OffState.SingleInstanceHolder.INSTANCE;
+    }
+
+    @Override
+    public void powerButtonPush(Laptop laptop) {
+        System.out.println("노트북 전원 ON");
+        laptop.setPowerState(OnState.getInstance());
+    }
+
+    @Override
+    public void typeButtonPush() {
+        System.out.println("무반응");
+    }
+
+    @Override
+    public String toString() {
+        return "전원 상태 OFF";
+    }
+}
+```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 인터페이스와 동시에 구현해야 함. 자기 자신을 주어야 하기 때문임.
+
+```java
+package behavioral.state;
+
+public class Laptop {
+    private PowerState powerState;
+
+    public Laptop() {
+        this.powerState = OffState.getInstance();
+    }
+
+    public void setPowerState(PowerState powerState) {
+        this.powerState = powerState;
+    }
+
+    public void powerButtonPush(){
+        powerState.powerButtonPush(this);
+    }
+
+    public void typeButtonPush(){
+        powerState.typeButtonPush();
+    }
+
+    void currentStatePrint(){
+        System.out.println(powerState.toString());
+    }
+
+}
+```
+
+</details>
+
+<br/>
+<br/>
+

@@ -191,3 +191,12 @@ public class Product {
 
 <br/>
 <br/>
+
+
+> ## State (행동)
+
+- 상태 패턴을 적용한 하는 건 명시적으로 없는 듯.
+- Spring Web Flow Project에서 상태 기반 동작을 지원함.
+
+<br/>
+<br/>
