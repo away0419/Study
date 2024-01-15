@@ -182,3 +182,13 @@ R
 "src/behavioral/strategy/Magic.java,4\0\409891e9d9d1cae6ae9f9d9e6b2a25bdde9120b8
 Q
 !src/behavioral/strategy/Main.java,a\4\a4704ae01b550567beebd6d0199460a9a014cce9
+X
+(src/behavioral/templeate/Adventurer.java,d\d\dd7db1d50fa20c8430ca0aaa81bb3bf3bff1feef
+U
+%src/behavioral/templeate/Warrior.java,8\a\8a57dd9be2fc3e478b0a8261f6842da196e76e9f
+T
+$src/behavioral/templeate/Wizard.java,4\b\4b536e232a5b98d7ff4bac042a29f0a27816e61d
+T
+$src/behavioral/templeate/Person.java,9\6\96d95d73cab29f2aa229d296d574bde32203af3d
+R
+"src/behavioral/templeate/Main.java,c\3\c365d29a292a51b10c81c0becee8da46408a63c8
