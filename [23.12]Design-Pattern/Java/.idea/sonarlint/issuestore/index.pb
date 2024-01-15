@@ -170,3 +170,15 @@ R
 "src/behavioral/state/OffState.java,a\2\a232f52361ab691627dc6cbc0749c21615a066f5
 N
 src/behavioral/state/Main.java,f\7\f74f4d37bec261854157e9db094b722fdbd45d5d
+W
+'src/behavioral/strategy/Adventurer.java,a\4\a48d2249bce03f5057b0d45a2088e69ac8dff64b
+R
+"src/behavioral/strategy/Skill.java,a\7\a71d05e01fcfd8bfcf8ff5398c99d68dc6f0755c
+R
+"src/behavioral/strategy/Fence.java,6\6\66d919ab4b519b775892fd4b5a229941adeaf569
+P
+ src/behavioral/strategy/Magic.kt,7\8\7806b19a289e1e40fbe4f4f92e6d64f1d29fd42b
+R
+"src/behavioral/strategy/Magic.java,4\0\409891e9d9d1cae6ae9f9d9e6b2a25bdde9120b8
+Q
+!src/behavioral/strategy/Main.java,a\4\a4704ae01b550567beebd6d0199460a9a014cce9
