@@ -1810,3 +1810,8 @@ data class Drink(val list: List<Int>) {
   ```
 
 </details>
+
+<br/>
+<br/>
+
+> ## 전략 (행동)

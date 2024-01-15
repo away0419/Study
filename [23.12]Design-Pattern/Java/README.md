@@ -2241,3 +2241,70 @@ public class Laptop {
 <br/>
 <br/>
 
+> ## 전략 (행동)
+
+<details>
+  <summary>전략</summary>
+
+- 행동 패턴과 아주 유사함.
+- 알고리즘을 싱글톤으로 만드는게 좋아보임.
+
+  ```java
+  package behavioral.strategy;
+  
+  public interface Skill {
+      public void active();
+  }
+  ```
+
+  ```java
+  package behavioral.strategy;
+  
+  public class Fence implements Skill{
+      @Override
+      public void active() {
+          System.out.println("검술 발동");
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.strategy;
+  
+  public class Magic implements Skill{
+      @Override
+      public void active() {
+          System.out.println("마법 발동");
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 전략을 이용하는 객체.
+
+  ```java
+  package behavioral.strategy;
+  
+  public class Adventurer {
+      private Skill skill;
+  
+      public void setSkill(Skill skill) {
+          this.skill = skill;
+      }
+  
+      public void useSkill(){
+          skill.active();
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+

@@ -200,3 +200,7 @@ public class Product {
 
 <br/>
 <br/>
+
+> ## Strategy (행동)
+
+- CacheManager 다양한 캐시 전략을 사용할 수 있음.
