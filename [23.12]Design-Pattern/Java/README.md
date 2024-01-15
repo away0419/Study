@@ -11,17 +11,17 @@
   - 동기화로 인한 성능 저하 발생.
 
   ```java
-  public class singletone.LazyInitialization {
+  public class creational.singletone.LazyInitialization {
   
-      private static singletone.LazyInitialization instance;
+      private static creational.singletone.LazyInitialization instance;
   
-      private singletone.LazyInitialization() {
+      private creational.singletone.LazyInitialization() {
       }
   
       // 동기화 문제 해결을 위한 synchronized
-      public static synchronized singletone.LazyInitialization getInstance() {
+      public static synchronized creational.singletone.LazyInitialization getInstance() {
           if (instance == null) {
-              instance = new singletone.LazyInitialization();
+              instance = new creational.singletone.LazyInitialization();
           }
   
           return instance;
@@ -39,13 +39,13 @@
   - 인스턴스를 사용하지 않을 경우 메모리 낭비됨.
 
   ```java
-  public class singletone.EagerInaitialization {
-      private static singletone.EagerInaitialization instance = new singletone.EagerInaitialization();
+  public class creational.singletone.EagerInaitialization {
+      private static creational.singletone.EagerInaitialization instance = new creational.singletone.EagerInaitialization();
   
-      private singletone.EagerInaitialization() {
+      private creational.singletone.EagerInaitialization() {
       }
   
-      public static singletone.EagerInaitialization getInstance() {
+      public static creational.singletone.EagerInaitialization getInstance() {
           return instance;
       }
   }
@@ -67,16 +67,16 @@
 - Java 1.5 이상만 가능.
 
   ```java
-  public class singletone.DoubleCheckedLocking {
-      private volatile static singletone.DoubleCheckedLocking instance;
+  public class creational.singletone.DoubleCheckedLocking {
+      private volatile static creational.singletone.DoubleCheckedLocking instance;
   
-      private singletone.DoubleCheckedLocking(){}
+      private creational.singletone.DoubleCheckedLocking(){}
   
-      public static singletone.DoubleCheckedLocking getInstance(){
+      public static creational.singletone.DoubleCheckedLocking getInstance(){
           if (instance == null){
-              synchronized (singletone.DoubleCheckedLocking.class){
+              synchronized (creational.singletone.DoubleCheckedLocking.class){
                   if(instance==null){
-                      instance = new singletone.DoubleCheckedLocking();
+                      instance = new creational.singletone.DoubleCheckedLocking();
                   }
               }
           }
@@ -94,13 +94,13 @@
 - inner class 특징인 호출 되기 전 참조 되지 않는 방식, static 특징인 한번만 호줄 하는 방식, final 키워드를 이용한 불변성 보장 등을 이용함.
 
   ```java
-  public class singletone.LazyHolder {
+  public class creational.singletone.LazyHolder {
   
       private static class LazyHolderInner {
-          private final static singletone.LazyHolder INSTANCE = new singletone.LazyHolder();
+          private final static creational.singletone.LazyHolder INSTANCE = new creational.singletone.LazyHolder();
       }
   
-      public static singletone.LazyHolder getInstance() {
+      public static creational.singletone.LazyHolder getInstance() {
           return LazyHolderInner.INSTANCE;
       }
   }
@@ -119,21 +119,21 @@
 - 해당 클래스들은 Factory의 부모 클래스는 아님.
 
   ```java
-  package factoryMethod;
+  package creational.factoryMethod;
   
   public class Drink {
   }
   ```
-  
+
   ```java
-  package factoryMethod;
+  package creational.factoryMethod;
   
   public class Coffee extends Drink{
   }
   ```
-  
+
   ```java
-  package factoryMethod;
+  package creational.factoryMethod;
   
   public class Tea extends Drink{
   }
@@ -146,7 +146,7 @@
 - 객체 생성 메소드만 가진 [인터페이스, 추상 클래스] 생성.
 
   ```java
-  package factoryMethod;
+  package creational.factoryMethod;
   
   public interface DrinkFactory {
       public Drink makeDrink();
@@ -161,7 +161,7 @@
 - 부모를 상속 받은 서브 클래스 생성 또는 바로 기본 클래스 생성.
 
   ```java
-  package factoryMethod;
+  package creational.factoryMethod;
   
   public class DrinkFactoryImpl implements  DrinkFactory{
       @Override
@@ -170,9 +170,9 @@
       }
   }
   ```
-  
+
   ```java
-  package factoryMethod;
+  package creational.factoryMethod;
   
   public class CoffeeFactoryImpl implements DrinkFactory{
       @Override
@@ -182,9 +182,9 @@
       }
   }
   ```
-  
+
   ```java
-  package factoryMethod;
+  package creational.factoryMethod;
   
   public class TeaFactoryImpl implements DrinkFactory{
       @Override
@@ -208,7 +208,7 @@
 - 버거 세트가 객체 집합임. 매장별 각각 [햄버거, 음료수] 객체가 있음.
 
   ```java
-  package abstractFactory;
+  package creational.abstractFactory;
   
   public class BurgerKingHamburger implements Hamburger{
       public BurgerKingHamburger(){
@@ -216,9 +216,9 @@
       }
   }
   ```
-  
+
   ```java
-  package abstractFactory;
+  package creational.abstractFactory;
   
   public class BurgerKingDrink implements Drink{
       public BurgerKingDrink(){
@@ -226,9 +226,9 @@
       }
   }
   ```
-  
+
   ```java
-  package abstractFactory;
+  package creational.abstractFactory;
   
   public class MacdonaldHamburger implements Hamburger{
       public MacdonaldHamburger(){
@@ -236,9 +236,9 @@
       }
   }
   ```
-  
+
   ```java
-  package abstractFactory;
+  package creational.abstractFactory;
   
   public class MacdonaldDrink implements  Drink{
       public MacdonaldDrink(){
@@ -248,7 +248,7 @@
   ```
 
   ```java
-  package abstractFactory;
+  package creational.abstractFactory;
   
   public class BurgerSet {
       private final Hamburger hamburger;
@@ -280,7 +280,7 @@
 - 결국 팩토리 메소드와 추상 팩토리는 서로 관계가 있음. 그렇다고 동일한 패턴은 아님.
 
   ```java
-  package abstractFactory;
+  package creational.abstractFactory;
   
   public interface BurgerSetFactory {
       public BurgerSet makeSet(String type);
@@ -296,7 +296,7 @@
 - 타입별 버거 세트를 만들어서 반환함.
 
   ```java
-  package abstractFactory;
+  package creational.abstractFactory;
   
   public class BurgerSetFactoryImpl implements BurgerSetFactory{
       @Override
@@ -324,7 +324,7 @@
 - 객체 안에 객체를 반환하는 스태틱 메소드가 있음.
 
   ```java
-  package staticFactoryMethod;
+  package creational.staticFactoryMethod;
   
   public class Drink {
       private Drink(){}
@@ -372,13 +372,13 @@
 - 음식을 상속받은 음료수와 햄버거.
 
   ```java
-  package enumFactoryMethod;
+  package creational.enumFactoryMethod;
   
   public interface Food {
   }
   ```
   ```java
-  package enumFactoryMethod;
+  package creational.enumFactoryMethod;
   
   public class Drink implements Food{
       public Drink(){
@@ -387,7 +387,7 @@
   }
   ```
   ```java
-  package enumFactoryMethod;
+  package creational.enumFactoryMethod;
   
   public class Hamburger implements Food{
       public Hamburger(){
@@ -405,7 +405,7 @@
 - 추상 메소드를 만들어 모든 상수에서 구현하도록 강제함.
 
   ```java
-  package enumFactoryMethod;
+  package creational.enumFactoryMethod;
   
   public enum EnumFoodFactory {
       DRINK("음료수"){
@@ -448,11 +448,11 @@
 - 예외 처리가 중요함.
 
   ```java
-  package dynamicFactory;
+  package creational.dynamicFactory;
   
-  import enumFactoryMethod.Drink;
-  import enumFactoryMethod.Food;
-  import enumFactoryMethod.Hamburger;
+  import creational.enumFactoryMethod.Drink;
+  import creational.enumFactoryMethod.Food;
+  import creational.enumFactoryMethod.Hamburger;
   
   import java.lang.reflect.Constructor;
   import java.lang.reflect.InvocationTargetException;
@@ -518,14 +518,14 @@
 - 생성자를 private 하게 만들 수 없음.
 
 ```java
-package builder;
+package creational.builder;
 
 public class Drink {
-    private String name;
-    private String size;
-    private String price;
+  private String name;
+  private String size;
+  private String price;
 
-// 해당 로직은 setter와 다를바 없으며 불변성을 보장하지 못함. builder 패턴이라 보기 힘듬.
+// 해당 로직은 setter와 다를바 없으며 불변성을 보장하지 못함. creational.builder 패턴이라 보기 힘듬.
 //    public Drink name(String name){
 //        this.name = name;
 //        return this;
@@ -541,20 +541,20 @@ public class Drink {
 //        return this;
 //    }
 
-    public Drink(String name, String size, String price) {
-        this.name = name;
-        this.size = size;
-        this.price = price;
-    }
+  public Drink(String name, String size, String price) {
+    this.name = name;
+    this.size = size;
+    this.price = price;
+  }
 
-    @Override
-    public String toString() {
-        return "Drink{" +
-                "name='" + name + '\'' +
-                ", size='" + size + '\'' +
-                ", price='" + price + '\'' +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "Drink{" +
+            "name='" + name + '\'' +
+            ", size='" + size + '\'' +
+            ", price='" + price + '\'' +
+            '}';
+  }
 }
 ```
 
@@ -566,31 +566,31 @@ public class Drink {
 - Drink 생성 역할을 하는 클래스.
 
 ```java
-package builder;
+package creational.builder;
 
 public class DrinkBuilder {
-    private String name;
-    private String size;
-    private String price;
+  private String name;
+  private String size;
+  private String price;
 
-    public DrinkBuilder name(String name){
-        this.name = name;
-        return this;
-    }
+  public DrinkBuilder name(String name) {
+    this.name = name;
+    return this;
+  }
 
-    public DrinkBuilder size(String size){
-        this.size = size;
-        return this;
-    }
+  public DrinkBuilder size(String size) {
+    this.size = size;
+    return this;
+  }
 
-    public DrinkBuilder price(String price){
-        this.price = price;
-        return this;
-    }
+  public DrinkBuilder price(String price) {
+    this.price = price;
+    return this;
+  }
 
-    public Drink build(){
-        return new Drink(this.name, this.size, this.price);
-    }
+  public Drink build() {
+    return new Drink(this.name, this.size, this.price);
+  }
 }
 ```
 
@@ -602,7 +602,7 @@ public class DrinkBuilder {
 - 객체의 생성자를 private 하게 만들 수 있음.
 
   ```java
-  package builder;
+  package creational.builder;
   
   public class Hamburger {
       private String name;
@@ -665,7 +665,7 @@ public class DrinkBuilder {
 - 깊은 복사.
 
   ```java
-  package prototpye;
+  package creational.prototpye;
   
   import java.util.ArrayList;
   import java.util.List;
@@ -692,5 +692,1679 @@ public class DrinkBuilder {
       }
   }
   ```
+</details>
+
+<br/>
+<br/>
+
+> ## 어댑터 (구조)
+
+<details>
+  <summary>객체</summary>
+
+- 시동 on/off 기능이 있는 자동차 클래스.
+- fly 기능이 있는 날개 인터페이스.
+
+  ```java
+  package structural;
+  
+  public class Car {
+  
+      public Car(){
+          System.out.println("make Car");
+      }
+  
+      public void start(){
+          System.out.println("시동 걸기");
+      }
+  
+      public void end(){
+          System.out.println("시동 끄기");
+      }
+  }
+  ```
+  ```java
+  package structural.adaptor;
+  
+  public interface Wing {
+      public void fly();
+  }
+  ```
 
 </details>
+
+<details>
+  <summary>합성</summary>
+
+- 멤버 변수로 기존 클래스를 가짐.
+- 추가 기능 인터페이스 상속받음.
+
+  ```java
+  package structural.adaptor;
+  
+  import structural.Car;
+  
+  public class FlyCar1 implements Wing{
+      private Car car;
+  
+      public FlyCar1(Car car){
+          this.car = car;
+          System.out.println("make FlyCar1");
+      }
+  
+      public void start(){
+          car.start();
+      }
+  
+      public void end(){
+          car.end();
+      }
+  
+      @Override
+      public void fly() {
+          System.out.println("날기");
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>상속</summary>
+
+- 기존 클래스를 상속 받음.
+- 추가 기능 인터페이스를 상속 받음.
+
+  ```java
+  package structural.adaptor;
+  
+  import structural.Car;
+  
+  public class FlyCar2 extends Car implements Wing {
+  
+      public FlyCar2(){
+          System.out.println("make FlyCar2");
+      }
+  
+      @Override
+      public void fly() {
+          System.out.println("날기");
+      }
+  }
+  ```
+</details>
+
+<br/>
+<br/>
+
+> ## 브릿지 (구조)
+
+<details>
+  <summary>색</summary>
+
+- 색은 버튼의 특징중 하나.
+- 버튼이 Color 인터페이스를 바로 상속 받아도 되며 일반적으로 상속을 추천함.
+- 해당 예시는 상속이 아닌 사용을 이용한 방법을 이용함.
+- interface가 브릿지 역할.
+
+  ```java
+  package structural.bridge;
+  
+  public interface Color {
+      public void getColor();
+  }
+  
+  ```
+  ```java
+  package structural.bridge;
+  
+  public class Red implements Color{
+      @Override
+      public void getColor() {
+          System.out.println("Red");
+      }
+  }
+  
+  ```
+  ```java
+  package structural.bridge;
+  
+  public class Blue implements Color{
+      @Override
+      public void getColor() {
+          System.out.println("Blue");
+      }
+  }
+  
+  ```
+</details>
+
+<details>
+  <summary>버튼</summary>
+
+- 버튼을 종류에 따라 객체로 만들 수 있음.
+- 만약, 기능별 인터페이스를 따로 구현한다면 아래 예시처럼 Start, End 객체를 각각 만들 필요가 없다.
+- 여러 상황을 보여주고자 abstract class를 사용했으며 이를 상속 받는 예시임.
+- 즉, 기능은 상속을 이용하였고 특징은 사용을 이용하였다 볼 수 있음.
+- abstract class가 브릿지 역할.
+
+  ```java
+  package structural.bridge;
+  
+  public abstract class Button {
+      Color color;
+  
+      protected Button(Color color){
+          this.color = color;
+      }
+  
+      public abstract void action();
+  }
+  ```
+  ```java
+  package structural.bridge;
+  
+  public class StartButton extends Button{
+  
+      public StartButton(Color color) {
+          super(color);
+      }
+  
+      @Override
+      public void action() {
+          System.out.println("Start!!!");
+      }
+  }
+  ```
+  ```java
+  package structural.bridge;
+  
+  public class EndButton extends Button{
+      public EndButton(Color color) {
+          super(color);
+      }
+  
+      @Override
+      public void action() {
+          System.out.println("End!!!");
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 컴포지트 (구조)
+
+<details>
+  <summary>인터페이스</summary>
+
+- 공통적인 부분을 추상화.
+- Item이 최상위 공통 부분이며, Box는 상위 공통 부분임.
+
+  ```java
+  package structural.composite;
+  
+  public interface Item {
+      int getPrice();
+      String getName();
+  }
+  ```
+  
+  ```java
+  package structural.composite;
+  
+  public interface Box  extends Item{
+      void addItem(Item item);
+      void removeItem(Item item);
+      int getAllPrice();
+      String getItems();
+  }
+  ```
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 상자 안에 상자 혹은 아이템이 들어갈 수 있음.
+  - List는 최상위 인터페이스 Item을 받을 수 있게 만들었음.
+
+  ```java
+  package structural.composite;
+  
+  public class NormalItem implements Item{
+      private String name;
+      private int price;
+  
+      public NormalItem(String name, int price) {
+          this.name = name;
+          this.price = price;
+      }
+  
+      @Override
+      public int getPrice() {
+          return this.price;
+      }
+  
+      @Override
+      public String getName() {
+          return this.name;
+      }
+  }
+  ```
+
+  ```java
+  package structural.composite;
+  
+  import java.util.ArrayList;
+  import java.util.List;
+  import java.util.stream.Collectors;
+  
+  public class NormalBox implements Box {
+      private final List<Item> list;
+      private String name;
+      private int price;
+  
+      public NormalBox(String name, int price) {
+          this.name = name;
+          this.price = price;
+          this.list = new ArrayList<>();
+      }
+  
+      @Override
+      public void addItem(Item item) {
+          list.add(item);
+      }
+  
+      @Override
+      public void removeItem(Item item) {
+          list.remove(item);
+      }
+  
+      @Override
+      public int getAllPrice() {
+          return list.stream()
+                  .mapToInt(item -> item instanceof Box box ? box.getAllPrice() + item.getPrice() : item.getPrice())
+                  .sum();
+      }
+  
+      @Override
+      public int getPrice() {
+          return this.price;
+      }
+  
+      @Override
+      public String getName() {
+          return this.name;
+      }
+  
+      @Override
+      public String getItems() {
+          return getName() + " = { " + list.stream().map(item -> item instanceof Box box ? box.getItems() : item.getName()).collect(Collectors.joining(", ")) + " }";
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 데코레이터 (구조)
+
+<details>
+  <summary>인터페이스</summary>
+
+- 햄버거가 가지는 기본 기능을 추상화.
+
+  ```java
+  package structural.decorator;
+  
+  public interface Hamburger {
+      public String getName();
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 기본 햄버거 객체.
+
+  ```java
+  package structural.decorator;
+  
+  public class BasicHamBurger implements Hamburger{
+      @Override
+      public String getName() {
+          return "햄버거";
+      }
+  }
+  
+  ```
+
+</details>
+
+<details>
+  <summary>데코레이터</summary>
+
+- 토핑. 즉, 데코레이터 하려는 특징 또는 기능임. 
+- 해당 패턴을 통해 기존 객체에 기능 또는 특징을 더해 새로운 객체로 반환한다.
+- 해당 코드는 완전 새로운 객체가 됨. 기존 객체를 사용할 수는 없을 듯 하다.
+- 결국, 클래스를 만들어야 하는건 동일하나, 종류별로 모두 만들 필요는 없다.
+  - ex) 불고기 불고기 햄버거, 불고기 치즈 햄버거 등 객체 클래스는 불필요.
+- 굳이 추상 클래스로 만들 필요는 없을 것 같기도 하다.
+
+  ```java
+  package structural.decorator;
+  
+  public abstract class HamburgerDecorator implements Hamburger{
+      private Hamburger hamburger;
+  
+      public HamburgerDecorator(Hamburger hamburger) {
+          this.hamburger = hamburger;
+      }
+  
+      @Override
+      public String getName() {
+          return hamburger.getName();
+      }
+  }
+  
+  ```
+
+  ```java
+  package structural.decorator;
+  
+  public class CheeseDecorator extends HamburgerDecorator{
+      public CheeseDecorator(Hamburger hamburger) {
+          super(hamburger);
+      }
+  
+      @Override
+      public String getName() {
+          return "치즈 " + super.getName();
+      }
+  }
+  
+  ```
+
+  ```java
+  package structural.decorator;
+  
+  public class BulgogiDecorator extends HamburgerDecorator{
+      public BulgogiDecorator(Hamburger hamburger) {
+          super(hamburger);
+      }
+  
+      @Override
+      public String getName() {
+          return "불고기 " + super.getName();
+      }
+  }
+  
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 퍼사드 (구조)
+
+<details>
+  <summary>객체</summary>
+
+- 필요한 객체들. (사람, 피자, TV)
+- 각 객체 별 기능이 있음.
+
+  ```java
+  package structural.facade;
+  
+  public class Person {
+      public void move(){
+          System.out.println("움직인다");
+      }
+  
+      public void watch(){
+          System.out.println("본다");
+      }
+  }
+  ```
+
+  ```java
+  package structural.facade;
+  
+  public class Pizza {
+      public void addTopping(){
+          System.out.println("토핑 추가");
+      }
+  
+  }
+  ```
+  
+  ```java
+  package structural.facade;
+  
+  public class Tv {
+      public void ON(){
+          System.out.println("전원 ON");
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>퍼사드</summary>
+
+- 하나의 기능을 위해 필요한 서브 클래스의 기능을 가져와 구현함.
+- 따로 자신만의 기능을 구현하지는 않고 서브 클래스의 기능을 호출하는 용도.
+
+  ```java
+  package structural.facade;
+  
+  public class Facade {
+      public void action(){
+          Person person = new Person();
+          Tv tv = new Tv();
+          Pizza pizza = new Pizza();
+  
+          person.move();
+          pizza.addTopping();
+          person.move();
+          tv.ON();
+          person.watch();
+      }
+  }
+  
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 플라이웨이트 (구조)
+
+<details>
+  <summary>객체</summary>
+
+- 먼저 불변인 공통 부분을 따로 빼서 클래스로 만듬. (Model)
+- Model의 특성이 동일한지 아닌지 판단하기 위해 Factory에서 고유 키값 부여. (Map 변수 이용, FlyWeightFactory 라고도 불림)
+- 해당 Model이 있으면 불러오고 없으면 새로 만듬. 이후 만들어진 Model을 실제 객체의 공통 변수에 넣어줌. (Tree)
+
+  ```java
+  package structural.flyweight;
+  
+  import java.util.HashMap;
+  import java.util.Map;
+  
+  public class Model {
+      String type;
+  
+      private Model(String type) {
+          this.type = type;
+      }
+  
+      public static class Factory {
+          private static final Map<String, Model> cache = new HashMap<>();
+  
+          public static Model getInstance(String type) {
+              if (cache.containsKey(type)) {
+                  System.out.print("[기존 나무 모델 가져오기] ");
+                  return cache.get(type);
+              } else {
+                  Model model = new Model(type);
+                  cache.put(type, model);
+                  System.out.print("[새로운 나무 모델 생성하기] ");
+                  return model;
+              }
+          }
+      }
+  }
+  ```
+
+  ```java
+  package structural.flyweight;
+  
+  public class Tree {
+      Model model;
+      double x;
+      double y;
+  
+      private Tree(Model model, double x, double y) {
+          this.model = model;
+          this.x = x;
+          this.y = y;
+      }
+  
+      public static class Factory {
+          public static Tree getInstance(String type) {
+              Model model = Model.Factory.getInstance(type);
+              double x = Math.random() * 10000;
+              double y = Math.random() * 10000;
+  
+              System.out.println(type + "의 좌표: x=" + x + ", y=" + y);
+              return new Tree(model, x, y);
+          }
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+
+> ## 프록시 (구조&행동)
+
+<details>
+  <summary>가상 프록시</summary>
+
+- 프록시 객체와 실제 객체의 인터페이스를 동일하게 둠.
+- 프록시에서 객체의 메소드를 호출하도록 설계.
+- 실제 객체가 생성되지 않았음에도 프록시 객체를 통해 로직 넘어감.
+
+  ```java
+  package structural.proxy;
+  
+  interface Image {
+      public void showImage();
+  
+  }
+  ```
+
+  ```java
+  package structural.proxy;
+  
+  public class HighImage implements Image{
+      String path;
+  
+      public HighImage(String path) {
+          System.out.println(path + " 경로의 이미지 로딩");
+          this.path = path;
+      }
+  
+  
+      @Override
+      public void showImage() {
+          System.out.println(path+ " 경로의 이미지 출력");
+      }
+  }
+  
+  ```
+
+  ```java
+  package structural.proxy;
+  
+  public class VirtualProxy implements Image {
+      String path;
+  
+  
+      public VirtualProxy(String path) {
+          this.path = path;
+          System.out.println(path +" 경로의 프록시 생성");
+      }
+  
+      @Override
+      public void showImage() {
+          HighImage highImage = new HighImage(this.path);
+          highImage.showImage();
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>보호 프록시</summary>
+
+- 가상 프록시에 권한을 추가한 것.
+- 가상 프록시랑 별 차이가 없다.
+
+  ```java
+  package structural.proxy;
+  
+  public class ProtectiveProxy implements Image{
+      String path;
+      String authority;
+  
+      public ProtectiveProxy(String path, String authority) {
+          this.path = path;
+          this.authority = authority;
+          System.out.println("["+path +" 경로, "+authority+"사용자] 프록시 생성");
+      }
+  
+      @Override
+      public void showImage() {
+          if(this.authority.equals("관리자")){
+              System.out.println("관리자 접근");
+              HighImage highImage = new HighImage(this.path);
+              highImage.showImage();
+          }else {
+              System.out.println(this.authority + "는 접근할 수 없습니다.");
+          }
+      }
+  }
+  ```
+</details>
+
+
+<br/>
+<br/>
+
+> ## 책임 연쇄 (행동)
+
+<details>
+  <summary>인터페이스</summary>
+
+- Handler가 가지는 기본적인 기능을 포함하고 있음.
+- 책임질 다음 Handler Setter와 해당 프로세스에서 진행할 기능 구현을 강제해야 함.
+
+```java
+package behavioral.chainOfResponsibility;
+
+public interface Handler {
+    void setNextHandler(Handler handler);
+    void process(String authority);
+}
+```
+
+</details>
+
+
+<details>
+  <summary>추상 클래스</summary>
+
+- 해당 추상 클래스는 굳이 없어도 됨.
+- 바로 객체에 인터페이스를 상속 받도록 하는게 일반적.
+- 해당 예시는 기능적으로 좀더 세분화 해보고자 작성함.
+
+  ```java
+  package behavioral.chainOfResponsibility;
+  
+  public abstract class LoginHandler implements Handler{
+  
+      Handler handler;
+  
+      @Override
+      public void setNextHandler(Handler handler) {
+          this.handler = handler;
+      }
+  
+      @Override
+      public void process(String authority) {
+          try{
+              this.handler.process(authority);
+          }catch (Exception e){
+              System.out.println("로그인 실패");
+          }
+      }
+  }
+  
+  ```
+
+</details>
+
+
+<details>
+  <summary>객체</summary>
+
+- 각자의 객체가 process를 자신 만의 기능을 넣어 구현해야함.
+
+```java
+package behavioral.chainOfResponsibility;
+
+public class Admin extends LoginHandler {
+
+    @Override
+    public void process(String authority) {
+        if ("Admin".equals(authority)) {
+            System.out.println("관리자 로그인 완료");
+        } else {
+            super.process(authority);
+        }
+    }
+}
+```
+
+```java
+package behavioral.chainOfResponsibility;
+
+public class User extends LoginHandler{
+    @Override
+    public void process(String authority) {
+        if("User".equals(authority)){
+            System.out.println("사용자 로그인 완료");
+        }else {
+            super.process(authority);
+        }
+    }
+}
+```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 커맨드 (행동)
+
+<details>
+  <summary>인터페이스</summary>
+
+- 책임 연쇄와 비슷함.
+- 기본 기능을 추상화.
+
+  ```java
+  package behavioral.command;
+  
+  public interface Command {
+      void run();
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- command를 상속받은 객체와 이를 매개 변수로 받을 수 있는 객체.
+
+  ```java
+  package behavioral.command;
+  
+  public class HeaterCommand implements Command{
+      @Override
+      public void run() {
+          System.out.println("히터 ON");
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.command;
+  
+  public class LampCommand implements Command{
+      @Override
+      public void run() {
+          System.out.println("램프 ON");
+      }
+  }
+  ```
+  
+  ```java
+  package behavioral.command;
+  
+  public class Button {
+      private Command command;
+  
+      public void setCommand(Command command) {
+          this.command = command;
+      }
+  
+      public void action(){
+          command.run();
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 인터프리터 (행동)
+
+<details>
+  <summary>인터페이스</summary>
+
+- 예제로 사칙연산 계산기를 만들 예정.
+- 패턴 개념은 어렵지 않으나 기능 구현 과정이 어려움.
+
+  ```java
+  package behavioral.interpreter;
+  
+  public interface Expression {
+      double interpret();
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 사칙연산자 식에는 크게 두개의 객체가 존재한다 볼 수 있음.
+- 하나는 피연산자, 다른 하나는 연산자.
+- 연산자는 총 4개만 각각의 객체로 구현함.
+- 동일안 인터페이스를 상속 받아 피연산자, 연산자 구분 없이 일단 하나의 stack으로 관리할 수 있음.
+
+  ```java
+  package behavioral.interpreter;
+  
+  public class Number implements Expression{
+      private double value;
+  
+      public Number(double value) {
+          this.value = value;
+      }
+  
+      @Override
+      public double interpret() {
+          return value;
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.interpreter;
+  
+  public class Addition implements Expression{
+  
+      private Expression leftOperand;
+      private Expression rightOperand;
+  
+  
+      public Addition(Expression leftOperand, Expression rightOperand) {
+          this.leftOperand = leftOperand;
+          this.rightOperand = rightOperand;
+      }
+  
+      @Override
+      public double interpret() {
+          return leftOperand.interpret() + rightOperand.interpret();
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.interpreter;
+  
+  public class Subtraction implements Expression{
+      private Expression leftOperand;
+      private Expression rightOperand;
+  
+      public Subtraction(Expression leftOperand, Expression rightOperand) {
+          this.leftOperand = leftOperand;
+          this.rightOperand = rightOperand;
+      }
+  
+      @Override
+      public double interpret() {
+          return leftOperand.interpret() - rightOperand.interpret();
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.interpreter;
+  
+  public class Multiplication implements Expression{
+  
+      private Expression leftOperand;
+      private Expression rightOperand;
+  
+      public Multiplication(Expression leftOperand, Expression rightOperand) {
+          this.leftOperand = leftOperand;
+          this.rightOperand = rightOperand;
+      }
+  
+      @Override
+      public double interpret() {
+          return leftOperand.interpret() * rightOperand.interpret();
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.interpreter;
+  
+  public class Division implements Expression {
+      private Expression leftOperand;
+      private Expression rightOperand;
+  
+      public Division(Expression leftOperand, Expression rightOperand) {
+          this.leftOperand = leftOperand;
+          this.rightOperand = rightOperand;
+      }
+  
+      @Override
+      public double interpret() {
+          if (rightOperand.interpret() == 0) {
+              throw new ArithmeticException("Division by zero");
+          }
+          return leftOperand.interpret() / rightOperand.interpret();
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>기능 구현</summary>
+
+- 사칙연산자는 패턴과 상관 없이 추가적인 기능 구현이 필요하여 추가하였음.
+- 가끔 코딩 테스트에 사칙연산을 구현하는 문제가 나오니 숙지하면 좋을 듯 함.
+
+```java
+package behavioral.interpreter;
+
+import java.util.Scanner;
+import java.util.Stack;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("사칙연산 표현식을 입력하세요:");
+        String userInput = scanner.nextLine();
+
+        Expression expression = buildExpression(userInput);
+
+        try {
+            double result = expression.interpret();
+            System.out.println("결과: " + result);
+        } catch (Exception e) {
+            System.out.println("오류 발생: " + e.getMessage());
+        }
+    }
+
+    private static Expression buildExpression(String userInput) {
+        String[] tokens = userInput.split(" ");
+        Stack<Expression> expressionStack = new Stack<>();
+        Stack<String> operatorStack = new Stack<>();
+
+        for (String token : tokens) {
+            if (isNumeric(token)) {
+                expressionStack.push(new Number(Double.parseDouble(token)));
+            } else if ("+-*/".contains(token)) {
+                while (!operatorStack.isEmpty() && hasPrecedence(token, operatorStack.peek())) {
+                    String topOperator = operatorStack.pop();
+                    Expression rightOperand = expressionStack.pop();
+                    Expression leftOperand = expressionStack.pop();
+                    expressionStack.push(createOperatorExpression(leftOperand, rightOperand, topOperator));
+                }
+                operatorStack.push(token);
+            } else {
+                throw new IllegalArgumentException("잘못된 표현식입니다: " + token);
+            }
+        }
+
+        while (!operatorStack.isEmpty()) {
+            String topOperator = operatorStack.pop();
+            Expression rightOperand = expressionStack.pop();
+            Expression leftOperand = expressionStack.pop();
+            expressionStack.push(createOperatorExpression(leftOperand, rightOperand, topOperator));
+        }
+
+        if (expressionStack.size() == 1) {
+            return expressionStack.pop();
+        } else {
+            throw new IllegalArgumentException("잘못된 표현식입니다.");
+        }
+    }
+
+    private static Expression createOperatorExpression(Expression left, Expression right, String operator) {
+        return switch (operator) {
+            case "+" -> new Addition(left, right);
+            case "-" -> new Subtraction(left, right);
+            case "*" -> new Multiplication(left, right);
+            case "/" -> new Division(left, right);
+            default -> throw new IllegalArgumentException("지원되지 않는 연산자입니다: " + operator);
+        };
+    }
+
+    private static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private static boolean hasPrecedence(String op1, String op2) {
+        return (!op1.equals("*") && !op1.equals("/")) || (!op2.equals("+") && !op2.equals("-"));
+    }
+
+}
+```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 반복자 (행동)
+
+<details>
+  <summary>Iterator</summary>
+
+- 저장소에서 넘어온 배열을 실질적으로 접근할 수 있게 해주는 역할.
+- 공통 코드를 만들어 재사용.
+
+  ```java
+  package behavioral.iterator;
+  
+  public interface Iterator {
+      boolean hasNext();
+      Object next();
+  }
+  ```
+
+  ```java
+  package behavioral.iterator;
+  
+  public class HamburgerIterator implements Iterator{
+      Hamburger[] arr;
+      private int index = 0;
+  
+      public HamburgerIterator(Hamburger[] arr) {
+          this.arr = arr;
+      }
+  
+      @Override
+      public boolean hasNext() {
+          return index < arr.length;
+      }
+  
+      @Override
+      public Hamburger next() {
+          return arr[index++];
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>Collection</summary>
+
+- 여러 객체를 저장하기 위한 저장소.
+- 저장소에 저장된 배열을 Iterator에 넘기는 역할.
+
+  ```java
+  package behavioral.iterator;
+  
+  public interface Collection {
+      Iterator iterator();
+  }
+  
+  ```
+  
+  ```java
+  package behavioral.iterator;
+  
+  public class HamburgerCollection implements Collection{
+      Hamburger[] arr;
+      private int index;
+  
+      public HamburgerCollection(int size) {
+          this.arr = new Hamburger[size];
+      }
+  
+      public void add(Hamburger hamburger){
+          if(index<arr.length){
+              arr[index++] = hamburger;
+          }
+      }
+  
+      @Override
+      public Iterator iterator() {
+          return new HamburgerIterator(this.arr);
+      }
+  
+  }
+  ```
+
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 저장소에 담으려는 객체.
+
+  ```java
+  package behavioral.iterator;
+  
+  public class Hamburger {
+      String name;
+      int price;
+  
+      public Hamburger(String name, int price) {
+          this.name = name;
+          this.price = price;
+      }
+  
+      @Override
+      public String toString() {
+          return "Hamburger{" +
+                  "name='" + name + '\'' +
+                  ", price=" + price +
+                  '}';
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 중재자 (행동)
+
+<details>
+  <summary>중재자</summary>
+
+- 해당 패턴을 작성하며 많은 고민을 하였음.
+- 중재자는 객체간의 연결을 자신을 통해 연결할 수 있도록 도와주는 역할임.
+- 이때, 중재자를 객체의 필드 값으로 넣어 구현할 것인지, 아니면 중재자에서 객체와 메시지를 전달 받아 구현할 것인지는 패턴과 상관없음.
+- 중재자 패턴은 객체가 가지고 있어야 할 다른 객체들의 리스트를 대신 가지고 있는것이 이 패턴의 핵심일 뿐임. 기능을 어떻게 구현할 지는 알아서 판단 해야 함.
+- 현재 예시는 중재자와 객체 클래스간의 의존도를 높이는 대신 기능 별로 구현한 것임.
+  - 의존도가 발생하였기 때문에 중재자와 객체 클래스를 동시에 작성해야 함. 
+
+  ```java
+  package behavioral.mediator;
+  
+  public interface Mediator {
+      void notice();
+      void forwardRequest(String msg);
+  }
+  ```
+  
+  ```java
+  package behavioral.mediator;
+  
+  import java.util.ArrayList;
+  import java.util.List;
+  
+  public class ItemMediator implements Mediator {
+  
+      List<Adventurer> list = new ArrayList<>();
+  
+      public void addAdventurer(Adventurer adventurer) {
+          list.add(adventurer);
+      }
+  
+      public void forwardRequest(String msg) {
+          notice();
+          for (Adventurer adventurer : list
+          ) {
+              System.out.print(adventurer.getName()+"에게 전달 -> ");
+              adventurer.receiveRequestToMediator(msg);
+          }
+      }
+  
+      @Override
+      public void notice() {
+          System.out.println("[중재인 요청 내역 전달]");
+      }
+  }
+  ```
+  
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 해당 객체는 모험가임. 중재인에게 요청을 전달하는 기능, 중재인에게 받은 메시지를 출력하는 기능이 있음.
+- 앞서 말한 것처럼 두 개의 기능을 제거하고 중재인 클래스에서 Adventurer 객체를 받아 처리하면 의존성을 낮출수 있음.
+
+  ```java
+  package behavioral.mediator;
+  
+  import structural.facade.Person;
+  
+  public class Adventurer {
+  
+      private String name;
+      private Mediator mediator;
+  
+  
+      public Adventurer(String name) {
+          this.name = name;
+      }
+  
+      public String getName() {
+          return name;
+      }
+  
+      public void setMediator(ItemMediator mediator) {
+          mediator.addAdventurer(this);
+          this.mediator = mediator;
+      }
+  
+      public void sendRequestToMediator(String msg) {
+          mediator.forwardRequest(msg);
+      }
+  
+      public void receiveRequestToMediator(String msg) {
+          System.out.println("전달 받은 내용: " + msg);
+      }
+  
+  }
+  
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 메멘토 (행동)
+
+<details>
+  <summary>메멘토</summary>
+
+- 정보를 따로 관리하기 위한 클래스.
+
+  ```java
+  package behavioral.memento;
+  
+  public class Memento {
+      String job;
+      int level;
+  
+      public Memento(String job, int level) {
+          this.job = job;
+          this.level = level;
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 기존 정보를 메멘토 클래스로 만드는 기능이 있음.
+
+  ```java
+  package behavioral.memento;
+  
+  public class Adventurer {
+      String job;
+      int level;
+  
+      public Adventurer(String job, int level) {
+          this.job = job;
+          this.level = level;
+      }
+  
+      public Memento createMemento(){
+          return new Memento(job, level);
+      }
+  
+      public void setInfo(Memento memento){
+          this.job = memento.job;
+          this.level = memento.level;
+      }
+  
+      @Override
+      public String toString() {
+          return "Adventurer{" +
+                  "job='" + job + '\'' +
+                  ", level=" + level +
+                  '}';
+      }
+  }
+  ```
+
+</details>
+
+
+<br/>
+<br/>
+
+> ## 옵저버 (행동)
+
+<details>
+  <summary>옵저버</summary>
+
+- 관찰자 객체임.
+- 관찰중인 객체가 알림을 보낼경우 어떤 기능을 수행할지 미리 정하면 됨. 굳이 없어도 되긴 하지만 알림을 받는다는 행위 자체가 목적이 있기 때문에 관련 기능이 있을 것임.
+
+  ```java
+  package behavioral.observer;
+  
+  public interface Observer {
+      void receiveNotice(String msg);
+  }
+  ```
+
+  ```java
+  package behavioral.observer;
+  
+  public class Adventurer implements Observer{
+      private String name;
+  
+      public Adventurer(String name) {
+          this.name = name;
+      }
+  
+      @Override
+      public void receiveNotice(String msg) {
+          System.out.println(name +"님 알람이 도착했습니다. 내용: "+ msg);
+      }
+  }
+  
+  ```
+
+</details>
+
+
+<details>
+  <summary>객체</summary>
+
+- 관찰의 대상이 되는 객체.
+- 기본적으로 옵저버 등록, 삭제, 알림 보내기 기능이 있어야 함.
+- 관찰 대상이 되는 객체는 Subject 라는 인터페이스를 상속 받는게 일반적임.
+
+  ```java
+  package behavioral.observer;
+  
+  public interface Subject {
+      void registerObserver(Observer observer);
+      void removeObserver(Observer observer);
+      void sendNotice(String msg);
+  }
+  
+  ```
+
+  ```java
+  package behavioral.observer;
+  
+  import java.util.ArrayList;
+  import java.util.List;
+  
+  public class Store implements Subject {
+  
+      private List<Observer> subscirbers = new ArrayList<>();
+  
+      @Override
+      public void registerObserver(Observer observer) {
+          subscirbers.add(observer);
+      }
+  
+      @Override
+      public void removeObserver(Observer observer) {
+          subscirbers.remove(observer);
+      }
+  
+      @Override
+      public void sendNotice(String msg) {
+          System.out.println("[구독자 메시지 전달 시작]");
+          for (Observer o :
+                  subscirbers) {
+              o.receiveNotice(msg);
+          }
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+
+> ## 상태 (행동)
+
+<details>
+  <summary>상태</summary>
+
+- 상태 관리를 위한 통합 인터페이스가 있음.
+- 해당 상태 인터페이스는 결국 하나의 객체 상태를 뜻하는 것임. 따라서 대상 객체와 의존 관계를 가질 수 밖에 없음.
+- 결국 인터페이스와 해당 객체 클래스를 동시에 만들어야 함.
+
+```java
+package behavioral.state;
+
+public interface PowerState {
+  void powerButtonPush(Laptop laptop);
+  void typeButtonPush();
+}
+```
+
+```java
+package behavioral.state;
+
+public class OnState implements PowerState {
+
+    private OnState() {
+    }
+
+    private static class SingleInstanceHolder {
+        private static final OnState INSTANCE = new OnState();
+    }
+
+    public static OnState getInstance() {
+        return SingleInstanceHolder.INSTANCE;
+    }
+
+    @Override
+    public void powerButtonPush(Laptop laptop) {
+        System.out.println("노트북 전원 OFF");
+        laptop.setPowerState(OffState.getInstance());
+    }
+
+    @Override
+    public void typeButtonPush() {
+        System.out.println("타자 입력");
+    }
+
+    @Override
+    public String toString() {
+        return "전원 상태 ON";
+    }
+}
+```
+
+```java
+package behavioral.state;
+
+public class OffState implements PowerState {
+    private OffState() {
+    }
+
+    private static class SingleInstanceHolder {
+        private static final OffState INSTANCE = new OffState();
+    }
+
+    public static OffState getInstance() {
+        return OffState.SingleInstanceHolder.INSTANCE;
+    }
+
+    @Override
+    public void powerButtonPush(Laptop laptop) {
+        System.out.println("노트북 전원 ON");
+        laptop.setPowerState(OnState.getInstance());
+    }
+
+    @Override
+    public void typeButtonPush() {
+        System.out.println("무반응");
+    }
+
+    @Override
+    public String toString() {
+        return "전원 상태 OFF";
+    }
+}
+```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 인터페이스와 동시에 구현해야 함. 자기 자신을 주어야 하기 때문임.
+
+```java
+package behavioral.state;
+
+public class Laptop {
+    private PowerState powerState;
+
+    public Laptop() {
+        this.powerState = OffState.getInstance();
+    }
+
+    public void setPowerState(PowerState powerState) {
+        this.powerState = powerState;
+    }
+
+    public void powerButtonPush(){
+        powerState.powerButtonPush(this);
+    }
+
+    public void typeButtonPush(){
+        powerState.typeButtonPush();
+    }
+
+    void currentStatePrint(){
+        System.out.println(powerState.toString());
+    }
+
+}
+```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 전략 (행동)
+
+<details>
+  <summary>전략</summary>
+
+- 행동 패턴과 아주 유사함.
+- 알고리즘을 싱글톤으로 만드는게 좋아보임.
+
+  ```java
+  package behavioral.strategy;
+  
+  public interface Skill {
+      public void active();
+  }
+  ```
+
+  ```java
+  package behavioral.strategy;
+  
+  public class Fence implements Skill{
+      @Override
+      public void active() {
+          System.out.println("검술 발동");
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.strategy;
+  
+  public class Magic implements Skill{
+      @Override
+      public void active() {
+          System.out.println("마법 발동");
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 전략을 이용하는 객체.
+
+  ```java
+  package behavioral.strategy;
+  
+  public class Adventurer {
+      private Skill skill;
+  
+      public void setSkill(Skill skill) {
+          this.skill = skill;
+      }
+  
+      public void useSkill(){
+          skill.active();
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+
+> ## 템플릿 메소드 (행동)
+
+<details>
+  <summary>템플릿 메소드</summary>
+
+- 공통 기능을 구현해야 하기 때문에 abstract class를 사용한다.
+- 공통 기능을 구현한 메소드는 오버라이딩 못하도록 final로 만든다.
+- 이때 구현해야 하는 추가 기능은 protected를 걸어준다. (할리우드 원칙 준수하였기에 action이 있는 것)
+
+  ```java
+  package behavioral.templeate;
+  
+  public abstract class Adventurer {
+  
+      public final void attack() {
+          System.out.println("공격 전 준비 동작");
+          action();
+          System.out.println("공격 시작");
+      }
+  
+      protected abstract void action();
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 상속 받은 기능을 각 클래스에 맞게 구현.
+
+ ```java
+  package behavioral.templeate;
+  
+  public class Warrior extends Adventurer{
+  
+      @Override
+      protected void action() {
+          System.out.println("힘을 모은다.");
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.templeate;
+  
+  public class Wizard extends Adventurer{
+  
+      @Override
+      protected void action() {
+          System.out.println("마나를 모은다.");
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+

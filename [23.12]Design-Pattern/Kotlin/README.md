@@ -1,4 +1,4 @@
-> ## 싱글톤 패턴
+> ## 싱글톤 패턴 (생성)
 
 <details>
     <summary>object</summary>
@@ -105,7 +105,7 @@
 <br/>
 <br/>
 
-> ## 팩토리 메소드
+> ## 팩토리 메소드 (생성)
 
 <details>
   <summary>객체</summary>
@@ -559,7 +559,7 @@ object DynamicFactory {
 <br/>
 <br/>
 
-> ## 프로토타입
+> ## 프로토타입 (생성)
 
 <details>
   <summary>객체</summary>
@@ -587,3 +587,1344 @@ data class Drink(val list: List<Int>) {
 
  <br/>
  <br/>
+
+> ## 어댑터 (구조)
+
+<details>
+  <summary>객체</summary>
+
+- 기본 차 클래스, 날개 인터페이스
+
+  ```kotlin
+  package structural.adapter
+  
+  open class Car {
+      fun start(){
+          println("시동 ON")
+      }
+      fun end(){
+          println("시동 OFF")
+      }
+  }
+  ```
+  ```kotlin
+  package structural.adapter
+  
+  interface Wing {
+      fun fly();
+  
+  }
+  ```
+  
+</details>
+
+<details>
+  <summary>합성</summary>
+
+- 멤버 변수로 차 클래스를 가짐.
+
+  ```kotlin
+  package structural.adapter
+  
+  class FlyCar1(private val car: Car): Wing {
+      override fun fly() {
+              println("날기")
+      }
+  
+      fun start(){
+          car.start()
+      }
+  
+      fun end(){
+          car.end()
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>상속</summary>
+
+- 차 클래스와 인터페이스를 둘 다 상속 받음.
+
+  ```kotlin
+  package structural.adapter
+  
+  class FlyCar2():Car(), Wing {
+      override fun fly() {
+              println("날기")
+      }
+  }
+  ```
+
+</details>
+
+
+<br/>
+<br/>
+
+
+> ## 브릿지 (구조)
+
+<details>
+  <summary>색</summary>
+
+- 자바와 동일.
+
+  ```kotlin
+  package structural.bridge
+  
+  interface Color {
+      fun getColor()
+  }
+  ```
+  
+  ```kotlin
+  package structural.bridge
+  
+  class Red: Color {
+      override fun getColor() {
+          println("Red")
+      }
+  }
+  ```
+
+  ```kotlin
+  package structural.bridge
+  
+  class Blue: Color {
+      override fun getColor() {
+          println("Blue")
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>버튼</summary>
+
+- 자바와 동일.
+
+  ```kotlin
+  package structural.bridge
+  
+  abstract class Button(val color: Color) {
+      abstract fun action()
+  }
+  ```
+
+  ```kotlin
+  package structural.bridge
+  
+  class StartButton(
+      color: Color
+  ): Button(color) {
+      override fun action() {
+          println("Start!!")
+      }
+  }
+  ```
+  
+  ```kotlin
+  package structural.bridge
+  
+  class EndButton(color: Color): Button(color) {
+      override fun action() {
+          println("End!!!")
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 컴포지트 (구조)
+
+<details>
+  <summary>인터페이스</summary>
+
+- 자바와 동일.
+
+  ```kotlin
+  package structural.composite
+  
+  interface Item {
+      fun getPrice():Int
+      fun getName():String
+  }
+  ```
+
+  ```kotlin
+  package structural.composite
+  
+  interface Box:Item {
+      fun getAllPrice(): Int
+      fun getItems(): String
+      fun addItem(item: Item)
+      fun removeItem(item: Item)
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+  ```kotlin
+  package structural.composite
+  
+  class NormalItem(private val name: String, private val price: Int): Item {
+      override fun getPrice():Int {
+          return this.price
+      }
+  
+      override fun getName(): String {
+          return this.name
+      }
+  }
+  ```
+
+  ```kotlin
+  package structural.composite
+  
+  class NormalBox(private val name: String, private val price: Int) : Box {
+      private val list = mutableListOf<Item>()
+  
+      override fun getAllPrice(): Int = list.sumOf {
+          when (it) {
+              is Box -> it.getAllPrice() + it.getPrice()
+              else -> it.getPrice()
+          }
+      }
+  
+      override fun getItems(): String = "$name = { ${list.joinToString(", ") { item ->
+          when (item) {
+              is Box -> item.getItems()
+              else -> item.getName()
+          }
+      }} }"
+  
+      override fun addItem(item: Item) {
+          list.add(item)
+      }
+  
+      override fun removeItem(item: Item) {
+          list.remove(item)
+      }
+  
+      override fun getPrice(): Int = price
+  
+      override fun getName(): String = name
+  }
+  
+  ```
+
+</details>
+
+
+<br/>
+<br/>
+
+> ## 데코레이터 (구조)
+
+<details>
+  <summary>인터페이스</summary>
+
+- 햄버거가 가지고 있어야 하는 기본 기능.
+
+  ```kotlin
+  package structural.decorator
+  
+  interface Hamburger {
+      fun getName(): String
+  }
+  ```
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 실제 기본 햄버거 객체.
+
+  ```kotlin
+  package structural.decorator
+  
+  class BasicHamburger(): Hamburger{
+      override fun getName(): String {
+          return "햄버거"
+      }
+  }
+  ```
+
+</details>
+
+
+<details>
+  <summary>데코레이터</summary>
+
+- 토핑 추가 기능
+- 기존 객체에 기능을 더해 새로운 객체로 변환.
+- 구현 시 기존 객체를 담는 변수의 타입은 최상위 타입이어야 함. 즉, 햄버거 인터페이스
+
+  ```kotlin
+  package structural.decorator
+  
+  abstract class HamburgerDecorator(private val hamburger: Hamburger): Hamburger {
+      override fun getName(): String {
+         return hamburger.getName()
+      }
+  }
+  ```
+
+  ```kotlin
+  package structural.decorator
+  
+  class CheeseDecorator(
+      val hamburger: Hamburger
+  ): HamburgerDecorator(hamburger) {
+      override fun getName(): String {
+          return "치즈 ${super.getName()}"
+      }
+  }
+  ```
+  
+  ```kotlin
+  package structural.decorator
+  
+  class BulgogiDecorator(private val hamburger: Hamburger): HamburgerDecorator(hamburger){
+      override fun getName(): String {
+          return "불고기 ${hamburger.getName()}"
+      }
+  }
+  
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 퍼사드 (구조)
+
+<details>
+  <summary>객체</summary>
+
+- 객체별 기능 구현
+
+  ```kotlin
+  package structural.facade
+  
+  class Person() {
+      fun move(){
+          println("움직인다")
+      }
+  
+      fun watch(){
+          println("본다")
+      }
+  }
+  ```
+
+  ```kotlin
+  package structural.facade
+  
+  class Tv {
+      fun on(){
+          println("TV ON")
+      }
+  }
+  ```
+  
+  ```kotlin
+  package structural.facade
+  
+  class Pizza {
+      fun addTopping(){
+          println("토핑 추가")
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>퍼사드</summary>
+
+- 서브 객체 기능 호출 집합.
+
+  ```kotlin
+  package structural.facade
+  
+  class Facade {
+      fun action(){
+          val person = Person()
+          val tv = Tv()
+          val pizza = Pizza()
+  
+          person.move()
+          pizza.addTopping()
+          person.move()
+          tv.on()
+          person.watch()
+  
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 플라이웨이트 (구조)
+
+<details>
+  <summary>객체</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package structural.flyweight
+  
+  class Model private constructor(
+      val type:String
+  ) {
+      companion object Factory{
+          private val cache = mutableMapOf<String,Model>()
+          fun getInstance(type: String): Model{
+  
+              if(cache.containsKey(type)){
+                  print("[기존 나무] ")
+              }else{
+                  print("[새로운 나무] ")
+                  cache[type] = Model(type)
+              }
+  
+              return cache[type]!!
+          }
+      }
+  }
+  ```
+
+  ```kotlin
+  package structural.flyweight
+  
+  class Tree private constructor(
+      val type: Model,
+      val x: Double,
+      val y: Double
+  ) {
+      companion object Factory {
+          fun getInstance(type: String): Tree {
+              val model = Model.Factory.getInstance(type)
+              val x = Math.random() * 10000
+              val y = Math.random() * 10000
+  
+              println("$type 위치: x=${x}, y=${y}")
+              return Tree(model, x, y)
+          }
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 프록시 (구조&행동)
+
+<details>
+  <summary>가상 프록시</summary>
+
+- java와 동일.
+
+  ```kotlin
+  package structural.proxy
+  
+  fun interface Image {
+      fun showImage()
+  }
+  ```
+
+  ```kotlin
+  package structural.proxy
+  
+  class HighImage(
+      val path:String
+  ): Image {
+  
+      init {
+          println("$path 경로 이미지 로딩")
+      }
+  
+      override fun showImage() {
+          println("$path 경로 이미지 출력")
+      }
+  }
+  ```
+
+  ```kotlin
+  package structural.proxy
+  
+  class VirtualProxy(val path:String): Image {
+  
+      init{
+          println("$path 경로 프록시 생성")
+      }
+      
+      override fun showImage() {
+          val highImage = HighImage(this.path)
+          highImage.showImage()    
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>보호 프록시</summary>
+  
+- java와 동일.
+
+  ```kotlin
+  package structural.proxy
+  
+  class ProtectiveProxy(val path: String, val user: String): Image{
+      init{
+          println("$path 경로 프록시 생성")
+      }
+  
+      override fun showImage() {
+          when(this.user){
+              "관리자" -> {
+                  println("$user 접근 성공")
+                  val highImage = HighImage(this.path)
+                  highImage.showImage()
+              }
+              else -> println("$user 접근 불가")
+          }
+  
+  
+      }
+  
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 책임 연쇄 (행동)
+
+<details>
+  <summary>인터페이스</summary>
+
+- 자바와 동일.
+
+  ```kotlin
+  package behavioral.chainOfResponsibility
+  
+  interface Handler {
+      fun setNextHandler(handler: Handler)
+      fun process(authority: String)
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>추상 클래스</summary>
+
+- java와 동일
+
+  ```kotlin
+  package behavioral.chainOfResponsibility
+  
+  abstract class LoginHandler(): Handler {
+      lateinit var handler: Handler
+      override fun setNextHandler(handler: Handler) {
+          this.handler=handler
+      }
+  
+      override fun process(authority: String) {
+          try{
+              this.handler.process(authority)
+          }catch (exception: Exception){
+              println("로그인 실패")
+          }
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- java와 동일
+
+  ```kotlin
+  package behavioral.chainOfResponsibility
+  
+  class Admin(): LoginHandler() {
+      override fun process(authority: String) {
+          if("Admin" == authority){
+              println("관리자 로그인 성공")
+          }else{
+              super.process(authority)
+          }
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.chainOfResponsibility
+  
+  class User(): LoginHandler() {
+      override fun process(authority: String) {
+          if("User" == authority){
+              println("User 로그인 성공")
+          }else{
+              super.process(authority)
+          }
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 커맨드 (행동)
+
+<details>
+  <summary>인터페이스</summary>
+
+- java와 동일
+
+  ```kotlin
+  package behavioral.command
+  
+  fun interface Command {
+      fun run()
+  }
+  ```
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- java와 동일.
+
+  ```kotlin
+  package behavioral.command
+  
+  class Button (private var command: Command? = null){
+      fun setCommand(command: Command){
+          this.command = command
+      }
+  
+      fun action(){
+          this.command?.run()
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.command
+  
+  class HeaterCommand: Command {
+      override fun run() {
+          println("히터 ON")
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.command
+  
+  class LampCommand: Command {
+      override fun run() {
+          println("램프 ON")
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 인터프리터 (행동)
+
+<details>
+  <summary>인터페이스</summary>
+
+- java와 동일.
+
+  ```kotlin
+  package behavioral.interpreter
+  
+  fun interface Expression {
+      fun interpret(): Double
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+  
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.interpreter
+  
+  class Number(private val double: Double): Expression {
+  
+      override fun interpret(): Double {
+          return this.double
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.interpreter
+  
+  class Addition(private val leftExpression: Expression, private val rightExpression: Expression): Expression {
+  
+      override fun interpret(): Double {
+          return leftExpression.interpret() + rightExpression.interpret();
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.interpreter
+  
+  class Division(private val leftExpression: Expression, private val rightExpression: Expression): Expression {
+  
+      override fun interpret(): Double {
+          if (rightExpression.interpret() == 0.0) throw ArithmeticException("Division by zero")
+          return leftExpression.interpret() / rightExpression.interpret()
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.interpreter
+  
+  class Multiplication(private val leftExpression: Expression, private val rightExpression: Expression): Expression {
+      override fun interpret(): Double {
+          return leftExpression.interpret() * rightExpression.interpret()
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.interpreter
+  
+  class Subtraction(private val leftExpression: Expression, private val rightExpression: Expression): Expression {
+      override fun interpret(): Double {
+          return leftExpression.interpret() - rightExpression.interpret()
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>기능 구현</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.interpreter
+  
+  import java.util.*
+  
+  fun main() {
+      println("사칙연산 표현식을 입력하세요")
+      val userInput = readln()
+  
+      val expression = buildExpression(userInput)
+  
+      try {
+          val result = expression.interpret()
+          println("결과: $result")
+      } catch (e: Exception) {
+          println("오류 발생: ${e.message}")
+      }
+  }
+  
+  private fun buildExpression(userInput: String): Expression {
+      val tokens = userInput.split(" ")
+      val expressionStack = Stack<Expression>()
+      val operatorStack = Stack<String>()
+  
+      for (token in tokens) {
+          if (isNumeric(token)) {
+              expressionStack.push(Number(token.toDouble()))
+          } else if ("+-*/".contains(token)) {
+              while (operatorStack.isNotEmpty() && hasPrecedence(token, operatorStack.peek())) {
+                  val topOperator = operatorStack.pop()
+                  val rightOperand = expressionStack.pop()
+                  val leftOperand = expressionStack.pop()
+                  expressionStack.push(createOperatorExpression(leftOperand, rightOperand, topOperator))
+              }
+              operatorStack.push(token)
+          } else {
+              throw IllegalArgumentException("잘못된 표현식입니다: $token")
+          }
+      }
+  
+      while (operatorStack.isNotEmpty()) {
+          val topOperator = operatorStack.pop()
+          val rightOperand = expressionStack.pop()
+          val leftOperand = expressionStack.pop()
+          expressionStack.push(createOperatorExpression(leftOperand, rightOperand, topOperator))
+      }
+  
+      return if (expressionStack.size == 1) {
+          expressionStack.pop()
+      } else {
+          throw IllegalArgumentException("잘못된 표현식입니다.")
+      }
+  }
+  
+  private fun createOperatorExpression(left: Expression, right: Expression, operator: String): Expression {
+      return when (operator) {
+          "+" -> Addition(left, right)
+          "-" -> Subtraction(left, right)
+          "*" -> Multiplication(left, right)
+          "/" -> Division(left, right)
+          else -> throw IllegalArgumentException("지원되지 않는 연산자입니다: $operator")
+      }
+  }
+  
+  private fun isNumeric(str: String): Boolean {
+      return try {
+          str.toDouble()
+          true
+      } catch (e: NumberFormatException) {
+          false
+      }
+  }
+  
+  private fun hasPrecedence(op1: String, op2: String): Boolean {
+      return (!op1.equals("*") && !op1.equals("/")) || (!op2.equals("+") && !op2.equals("-"))
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+
+> ## 반복자 (행동)
+
+<details>
+  <summary>Iterator</summary>
+
+- Java와 동일.
+- 참고로 next()의 경우 null일 수 있기 때문에 nullable 해주어야 함.
+  - 배열을 원하는 사이즈로 초기화 하고 값은 주지 않을 경우 null 이기 때문임. 
+
+  ```kotlin
+  package behavioral.iterator
+  
+  
+  interface Iterator {
+      fun hasNext(): Boolean
+      fun next(): Any?
+  }
+  ```
+
+  ```kotlin
+  package behavioral.iterator
+  
+  class HamburgerIterator(private val arr: Array<Hamburger?>): Iterator {
+      private var index = 0
+  
+      override fun hasNext(): Boolean {
+          return index < arr.size
+      }
+  
+      override fun next(): Any? {
+          return arr[index++]
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>Collection</summary>
+
+- Java와 동일.
+- 실제 객체를 담을 그릇.
+
+  ```kotlin
+  package behavioral.iterator
+  
+  
+  fun interface Collection {
+      fun iterator(): Iterator
+  }
+  ```
+
+  ```kotlin
+  package behavioral.iterator
+  
+  class HamburgerCollection(private val size: Int) : Collection {
+      private val arr = arrayOfNulls<Hamburger>(size)
+      private var index = 0
+  
+      fun add(hamburger: Hamburger) {
+          if (index < arr.size) {
+              arr[index++] = hamburger
+          }
+      }
+  
+      override fun iterator(): Iterator {
+          return HamburgerIterator(arr)
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.iterator
+  
+  class Hamburger(private val price:Int, private val name: String) {
+      override fun toString(): String {
+          return "Hamburger(price=$price, name='$name')"
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+
+> ## 중재자 (행동)
+
+<details>
+  <summary>중재자</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.mediator
+  
+  interface Mediactor {
+      fun forwardRequest(msg: String)
+      fun notice()
+  }
+  ```
+
+  ```kotlin
+  package behavioral.mediator
+  
+  class ItemMediactor : Mediactor {
+  
+      private val list = mutableListOf<Adventurer>();
+  
+      fun addAdventurer(adventurer: Adventurer) {
+          list.add(adventurer)
+      }
+  
+      override fun forwardRequest(msg: String) {
+          notice()
+          list.forEach {
+              print("${it.name} 에게 전달 -> ")
+              it.receiveRequestToMediactor(msg)
+          }
+      }
+  
+      override fun notice() {
+          println("[중재인 요청 전달 목록]")
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.mediator
+  
+  class Adventurer(val name: String) {
+      private var itemMediactor: ItemMediactor? = null
+  
+      fun setMediactor(itemMediactor: ItemMediactor) {
+          this.itemMediactor = itemMediactor
+          itemMediactor.addAdventurer(this)
+      }
+  
+      fun sendRequestToMediactor(msg: String) {
+          itemMediactor?.forwardRequest(msg)
+      }
+  
+      fun receiveRequestToMediactor(msg: String) {
+          println("전달 받은 내용: $msg")
+      }
+  
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 메멘토 (행동)
+
+<details>
+  <summary>메멘토</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.memento
+  
+  class Memento(val job: String, val level: Int) {
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.memento
+  
+  class Adventurer(
+      var job: String,
+      var level: Int
+  ) {
+  
+      fun setData(memento: Memento) {
+          this.job = memento.job
+          this.level = memento.level
+      }
+  
+      fun createMemento(): Memento{
+          return Memento(job,level)
+      }
+  
+      override fun toString(): String {
+          return "Adventurer(job='$job', level=$level)"
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 옵저버 (행동)
+
+<details>
+  <summary>옵저버</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.obsever
+  
+  fun interface Observer {
+      fun receiveNotice(msg: String);
+  }
+  ```
+
+  ```kotlin
+  package behavioral.obsever
+  
+  class Adventurer(private val name: String): Observer {
+      override fun receiveNotice(msg: String) {
+          println("${name}님 메시지가 도작했습니다. 내용: $msg")
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.obsever
+  
+  interface Subject {
+  
+      fun registerObserver(observer: Observer)
+      fun removeObserver(observer: Observer)
+      fun sendNotice(msg: String)
+  }
+  ```
+
+  ```kotlin
+  package behavioral.obsever
+  
+  class Store: Subject {
+      private val subscribers = mutableListOf<Observer>()
+  
+      override fun registerObserver(observer: Observer) {
+          subscribers.add(observer)
+      }
+  
+      override fun removeObserver(observer: Observer) {
+          subscribers.remove(observer)
+      }
+  
+      override fun sendNotice(msg: String) {
+          println("[구독자 송신 목록]")
+          subscribers.forEach{
+              it.receiveNotice(msg)
+          }
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 상태 (행동)
+
+<details>
+  <summary>상태</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.state
+  
+  interface State {
+      fun powerButtonPush(laptop: Laptop)
+      fun typeButtonPush()
+  }
+  ```
+
+  ```kotlin
+  package behavioral.state
+  
+  object OffState : State {
+      override fun powerButtonPush(laptop: Laptop) {
+          println("OFF -> ON")
+          laptop.setState(OnState)
+      }
+  
+      override fun typeButtonPush() {
+          println("무반응")
+      }
+  
+      override fun toString(): String {
+          return "현재 상태 OFF"
+      }
+  
+  
+  }
+  ```
+
+  ```kotlin
+  package behavioral.state
+  
+  object OnState : State {
+      override fun powerButtonPush(laptop: Laptop) {
+          println("ON -> OFF")
+          laptop.setState(OffState)
+      }
+  
+      override fun typeButtonPush() {
+          println("타자 입력")
+      }
+  
+      override fun toString(): String {
+          return "현재 상태 ON"
+      }
+  
+  
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.state
+  
+  class Laptop {
+      private var state: State = OffState
+  
+      fun setState(state: State) {
+          this.state = state
+      }
+  
+      fun powerButtonPush() {
+          state.powerButtonPush(this)
+      }
+  
+      fun typeButtonPush() {
+          state.typeButtonPush()
+      }
+  
+      fun currentState() {
+          println(state.toString())
+      }
+  
+  
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
+> ## 전략 (행동)
+
+<details>
+  <summary>전략</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.strategy
+  
+  fun interface Skill {
+      fun active()
+  }
+  ```
+
+  ```kotlin
+  package behavioral.strategy
+  
+  class Magic: Skill {
+      override fun active() {
+          println("마법 스킬 발동")
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.strategy
+  
+  class Fence: Skill {
+      override fun active() {
+          println("검술 스킬 발동")
+      }
+  }
+  ```
+
+</details>
+
+
+<details>
+  <summary>객체</summary>
+
+- Java 와 동일.
+
+  ```kotlin
+  package behavioral.strategy
+  
+  class Adventurer(var skill: Skill) {
+      fun useSkill(){
+          skill.active()
+      }
+  }
+  ```
+
+</details>
+
+
+<br/>
+<br/>
+
+> ## 템플릿 메소드 (행동)
+
+<details>
+  <summary>템플릿 메소드</summary>
+
+- Java 동일.
+
+```kotlin
+package behavioral.template
+
+abstract class Adventurer {
+    fun attack(){
+        println("공격 전 준비 자세")
+        action()
+        println("공격 시작")
+    }
+
+    protected abstract fun action()
+}
+```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- Java 동일.
+
+  ```kotlin
+  package behavioral.template
+  
+  class Warrior:Adventurer() {
+  
+    override fun action() {
+      println("힘을 모은다.")
+    }
+  
+  }
+  ```
+
+  ```kotlin
+  package behavioral.template
+  
+  class Wizard: Adventurer() {
+      override fun action() {
+          println("마나를 모은다.")
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+
