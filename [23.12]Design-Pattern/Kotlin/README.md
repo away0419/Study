@@ -1815,3 +1815,116 @@ data class Drink(val list: List<Int>) {
 <br/>
 
 > ## 전략 (행동)
+
+<details>
+  <summary>전략</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package behavioral.strategy
+  
+  fun interface Skill {
+      fun active()
+  }
+  ```
+
+  ```kotlin
+  package behavioral.strategy
+  
+  class Magic: Skill {
+      override fun active() {
+          println("마법 스킬 발동")
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.strategy
+  
+  class Fence: Skill {
+      override fun active() {
+          println("검술 스킬 발동")
+      }
+  }
+  ```
+
+</details>
+
+
+<details>
+  <summary>객체</summary>
+
+- Java 와 동일.
+
+  ```kotlin
+  package behavioral.strategy
+  
+  class Adventurer(var skill: Skill) {
+      fun useSkill(){
+          skill.active()
+      }
+  }
+  ```
+
+</details>
+
+
+<br/>
+<br/>
+
+> ## 템플릿 메소드 (행동)
+
+<details>
+  <summary>템플릿 메소드</summary>
+
+- Java 동일.
+
+```kotlin
+package behavioral.template
+
+abstract class Adventurer {
+    fun attack(){
+        println("공격 전 준비 자세")
+        action()
+        println("공격 시작")
+    }
+
+    protected abstract fun action()
+}
+```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- Java 동일.
+
+  ```kotlin
+  package behavioral.template
+  
+  class Warrior:Adventurer() {
+  
+    override fun action() {
+      println("힘을 모은다.")
+    }
+  
+  }
+  ```
+
+  ```kotlin
+  package behavioral.template
+  
+  class Wizard: Adventurer() {
+      override fun action() {
+          println("마나를 모은다.")
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+

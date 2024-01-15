@@ -2308,3 +2308,63 @@ public class Laptop {
 <br/>
 
 
+> ## 템플릿 메소드 (행동)
+
+<details>
+  <summary>템플릿 메소드</summary>
+
+- 공통 기능을 구현해야 하기 때문에 abstract class를 사용한다.
+- 공통 기능을 구현한 메소드는 오버라이딩 못하도록 final로 만든다.
+- 이때 구현해야 하는 추가 기능은 protected를 걸어준다. (할리우드 원칙 준수하였기에 action이 있는 것)
+
+  ```java
+  package behavioral.templeate;
+  
+  public abstract class Adventurer {
+  
+      public final void attack() {
+          System.out.println("공격 전 준비 동작");
+          action();
+          System.out.println("공격 시작");
+      }
+  
+      protected abstract void action();
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>객체</summary>
+
+- 상속 받은 기능을 각 클래스에 맞게 구현.
+
+ ```java
+  package behavioral.templeate;
+  
+  public class Warrior extends Adventurer{
+  
+      @Override
+      protected void action() {
+          System.out.println("힘을 모은다.");
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.templeate;
+  
+  public class Wizard extends Adventurer{
+  
+      @Override
+      protected void action() {
+          System.out.println("마나를 모은다.");
+      }
+  }
+  ```
+
+</details>
+
+<br/>
+<br/>
+

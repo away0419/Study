@@ -204,3 +204,12 @@ public class Product {
 > ## Strategy (행동)
 
 - CacheManager 다양한 캐시 전략을 사용할 수 있음.
+
+<br/>
+<br/>
+
+
+> ## Template Method (행동)
+
+- @Configuration 에서 사용함.
+
