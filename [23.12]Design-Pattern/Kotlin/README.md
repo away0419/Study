@@ -1928,3 +1928,72 @@ abstract class Adventurer {
 <br/>
 <br/>
 
+> ## 비지터 (행동)
+
+<details>
+  <summary>방문 대상</summary>
+
+- Java 동일.
+
+  ```kotlin
+  package behavioral.visitor
+  
+  fun interface Element {
+      fun accept(visitor: Visitor)
+  }
+  ```
+
+  ```kotlin
+  package behavioral.visitor
+  
+  class Company: Element{
+      override fun accept(visitor: Visitor) {
+          println("회사 : 사람이 방문했습니다.")
+          visitor.visitor(this)
+      }
+  }
+  ```
+
+  ```kotlin
+  package behavioral.visitor
+  
+  class School:Element {
+      override fun accept(visitor: Visitor) {
+          println("회사 : 방문자가 왔습니다.")
+          visitor.visitor(this)
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>방문자</summary>
+
+- Java 동일.
+
+  ```kotlin
+  package behavioral.visitor
+  
+  interface Visitor {
+      fun visitor(company: Company)
+      fun visitor(school: School)
+  
+  }
+  ```
+
+  ```kotlin
+  package behavioral.visitor
+  
+  class Person:Visitor {
+      override fun visitor(company: Company) {
+          println("사람 : 일을 합니다.")
+      }
+  
+      override fun visitor(school: School) {
+          println("사람 : 공부를 합니다.")
+      }
+  }
+  ```
+
+</details>
