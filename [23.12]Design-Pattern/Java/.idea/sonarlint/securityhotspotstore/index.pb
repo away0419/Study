@@ -176,8 +176,6 @@ R
 "src/behavioral/strategy/Skill.java,a\7\a71d05e01fcfd8bfcf8ff5398c99d68dc6f0755c
 R
 "src/behavioral/strategy/Fence.java,6\6\66d919ab4b519b775892fd4b5a229941adeaf569
-P
- src/behavioral/strategy/Magic.kt,7\8\7806b19a289e1e40fbe4f4f92e6d64f1d29fd42b
 R
 "src/behavioral/strategy/Magic.java,4\0\409891e9d9d1cae6ae9f9d9e6b2a25bdde9120b8
 Q
@@ -188,7 +186,17 @@ U
 %src/behavioral/templeate/Warrior.java,8\a\8a57dd9be2fc3e478b0a8261f6842da196e76e9f
 T
 $src/behavioral/templeate/Wizard.java,4\b\4b536e232a5b98d7ff4bac042a29f0a27816e61d
-T
-$src/behavioral/templeate/Person.java,9\6\96d95d73cab29f2aa229d296d574bde32203af3d
 R
 "src/behavioral/templeate/Main.java,c\3\c365d29a292a51b10c81c0becee8da46408a63c8
+S
+#src/behavioral/visitor/Element.java,f\a\fac9a32260d26fc8811492fb6bb8e5d75f591e45
+S
+#src/behavioral/visitor/Visitor.java,e\b\eb4bdb43ed224c6b2c28330dc74a3fdb627d1f79
+R
+"src/behavioral/visitor/School.java,c\3\c3605e7d5e7db322e72e334b9469a6df83853ea9
+S
+#src/behavioral/visitor/Company.java,f\0\f0f06df78f447266786b2d5ea95ac0399221c5a5
+R
+"src/behavioral/visitor/Person.java,7\c\7c33be4c25cab01373f485b7c1fc4dca4e4fb91d
+P
+ src/behavioral/visitor/Main.java,b\1\b18bcb5b89c0207a46204e615b63126d8581a03f
