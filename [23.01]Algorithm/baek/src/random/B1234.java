@@ -15,10 +15,10 @@ public class B1234 {
         int[][][][] dp = new int[N + 1][r + 1][g + 1][b + 1];
 
 
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < r; j++) {
-                for (int k = 0; k < g; k++) {
-                    for (int l = 0; l < b; l++) {
+        for (int i = 0; i <= N; i++) {
+            for (int j = 0; j <= r; j++) {
+                for (int k = 0; k <= g; k++) {
+                    for (int l = 0; l <= b; l++) {
                         if (i == 0) {
                             dp[i][j][k][l] = 1;
                             continue;
@@ -44,6 +44,8 @@ public class B1234 {
                 }
             }
         }
+
+        System.out.println(dp[N][r][g][b]);
     }
 
     public static int fn(int n, int r) {
