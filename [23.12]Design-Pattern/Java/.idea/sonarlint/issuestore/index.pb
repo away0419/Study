@@ -192,17 +192,3 @@ T
 $src/behavioral/templeate/Person.java,9\6\96d95d73cab29f2aa229d296d574bde32203af3d
 R
 "src/behavioral/templeate/Main.java,c\3\c365d29a292a51b10c81c0becee8da46408a63c8
-c
-3src/creational/abstractFactory/BurgerKingDrink.java,7\d\7d2461509b40d7bec110141e434b42e66760b4d7
-g
-7src/creational/abstractFactory/BurgerKingHamburger.java,5\b\5bb57635c6949aa94fd649b068ba9ac037812dec
-]
--src/creational/abstractFactory/BurgerSet.java,3\6\366628e63312292cea416c065bdfb27d7d22fed3
-d
-4src/creational/abstractFactory/BurgerSetFactory.java,3\0\3005247c3dbfa1c81b85d5cea5149bb7c0ae70ed
-h
-8src/creational/abstractFactory/BurgerSetFactoryImpl.java,7\5\75436ec6c57a4166446474c2fe9ecad31f34f887
-Y
-)src/creational/abstractFactory/Drink.java,1\3\139e978ba74b816fc2ced2585ed75b8e557cbca0
-]
--src/creational/abstractFactory/Hamburger.java,6\7\67d095c026acc3c2a6eee229eaaea0f67557619c

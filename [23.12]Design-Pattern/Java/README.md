@@ -2368,3 +2368,78 @@ public class Laptop {
 <br/>
 <br/>
 
+
+> ## 비지터 (행동)
+
+<details>
+  <summary>방문자</summary>
+
+- 방문자가 방문 대상을 매개변수로 받아서 해당 상황에서의 행동을 구현하는 방식.
+- 오버로딩을 이용.
+
+  ```java
+  package behavioral.visitor;
+  
+  interface Visitor {
+      public void visit(School school);
+      public void visit(Company company);
+  }
+  ```
+
+  ```java
+  package behavioral.visitor;
+  
+  public class Person implements Visitor {
+      @Override
+      public void visit(School school) {
+          System.out.println("학교에 도착하니 게임이 하고 싶어집니다.");
+      }
+  
+      @Override
+      public void visit(Company company) {
+          System.out.println("회사에 도착하니 퇴사가 하고 싶어집니다.");
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>방문 장소</summary>
+
+- accept 메소드가 굳이 있을 필요는 없는것 같음.
+- 인터페이스가 있는 이유도 instaceOf를 사용하지 않고  더블 디스패치 방법을 적용하기 위함인듯 함.
+
+  ```java
+  package behavioral.visitor;
+  
+  public interface Element {
+      public void accept(Visitor visitor);
+  }
+  ```
+
+  ```java
+  package behavioral.visitor;
+  
+  public class School implements Element{
+      @Override
+      public void accept(Visitor visitor) {
+          System.out.println("학교에 방문자가 왔습니다.");
+          visitor.visit(this);
+      }
+  }
+  ```
+
+  ```java
+  package behavioral.visitor;
+  
+  public class Company implements Element{
+      @Override
+      public void accept(Visitor visitor) {
+          System.out.println("회사에 방문자가 왔습니다.");
+          visitor.visit(this);
+      }
+  }
+  ```
+
+</details>

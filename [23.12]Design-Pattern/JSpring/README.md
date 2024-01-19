@@ -213,3 +213,10 @@ public class Product {
 
 - @Configuration 에서 사용함.
 
+<br/>
+<br/>
+
+> ## Visitor (행동)
+
+- 직접적으로 사용하는 것은 드물고 유사한 아이디어가 적용된 것은 있음.
+- Spring AOP, Spring Data JPA, 이벤트 리스너에서 유사하게 사용함.
