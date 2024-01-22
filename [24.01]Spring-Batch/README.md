@@ -8,6 +8,8 @@
 - 중복 실행을 막기 위해 성공 이력이 있는 배치는 동일한 파라미터로 실행 시 예외 발생함.
 - Scheduler & Quartz -> Batch Job 실행 시키기 위한 용도.
 - Spring Batch는 Scheduler가 아님. Batch Job 관리 용도.
+  - 배치는 대량의 데이터를 일괄적으로 처리하는 것.
+  - 스케줄링은 특정 주기마다 자동으로 돌아가게 해주는 것.
 
 <br/>
 <br/>
@@ -114,5 +116,53 @@
 
 - Reader에서 읽어온 Item 처리하는 역할.
 - 배치를 처리하는데 필수 요소는 아님.
+
+</details>
+
+<br/>
+<br/>
+
+> ## Spring Batch Step 동작 방식
+
+<details>
+    <summary>Tasklet</summary>
+
+- Step 단계에서 '단일 레코드', '파일' 등 하나의 작업만 처리하는 방식.
+- 각각의 처리를 하나의 트랜잭션에서 처리함.
+- 파일을 읽고 처리한 다음 결과를 데이터베이스에 쓰는 등의 작업을 수행함.
+- 단일 작업으로 작업이 끝날 때까지 대기 해야함.
+- 대용량 데이터 처리에 적합하지 않음.
+
+</details>
+
+<details>
+    <summary>Chunk</summary>
+
+- Chunk: 데이터를 일정한 크기로 나눈 데이터 셋.
+  - Chunk 단위로 나누면 전체 데이터를 한 번에 처리하지 않아도 되어 메모리 부하를 줄이고 성능을 향상시킬 수 있음.
+- Step 단계에서 '단일 레코드를 묶어서' 여러 작업을 처리하는 방식.
+- 묶인 레코드를 하나의 트랜잭션으로 처리하며 실패 시 롤백.
+- 병렬 처리를 위해 Chunk 사용하되, 순차적으로 처리하는 방식임.
+- 대용량 데이터를 처리할 때 사용하며, 중복 처리나 실패한 레코드 처리 등 예외 상황에 대한 대처가 용이함.
+
+</details>
+
+<details>
+    <summary>Parallel Chunk</summary>
+
+![Alt text](image/image-1.png)
+
+- Chunk 방식의 처리에서 더욱 빠른 처리 속도를 위해 Chunk를 독립적으로 처리하여 여러 개의 Chunk를 병렬로 처리 하는 방식.
+- 여러 대의 서버에서 동시에 작업을 처리할 때 사용할 수 있음.
+
+</details>
+
+<details>
+    <summary>Remote Chunking</summary>
+
+![Alt text](image/image-2.png)
+
+- 여러 대의 서버에서 대용량 데이터 처리를 수행할 때 사용함.
+- 서버 간에 데이터를 공유하고 각 서버에서 병렬로 처리함.
 
 </details>
