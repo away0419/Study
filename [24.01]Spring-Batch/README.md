@@ -14,6 +14,15 @@
 <br/>
 <br/>
 
+> ## Spring Batch 특징
+
+- 대용량 데이터 처리.
+- 트랜잭션 관리.
+- 재시도 기능.
+
+<br/>
+<br/>
+
 > ## Spring Batch 구성
 
 ![Alt text](image/image.png)
@@ -166,3 +175,12 @@
 - 서버 간에 데이터를 공유하고 각 서버에서 병렬로 처리함.
 
 </details>
+
+<br/>
+<br/>
+
+> ## Scheduler
+
+- Batch Job을 실행 시키기 위한 방법.
+- Quartz, Scheduler, Jenkins 등이 있음.
+- Spring에서 Quartz Scheduler 지원함.
