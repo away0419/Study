@@ -119,3 +119,87 @@
 
 <br/>
 <br/>
+
+
+> ## Multi Step
+
+<details>
+  <summary>설정</summary>
+
+- Spring Boot 3은 다중 작업을 지원하지 않음. 즉, Job이 여러 개일 경우 하나만 작업할 수 있음. 
+- 설정 파일에서 어떤 작업을 실행할지 설정해야 함.
+
+  ```yaml
+  spring:
+    batch:
+      job:
+        enabled: true # default true. false 하면 모든 job 비활성화.
+        name: multiJob # 해당 이름으로 된 job만 실행.
+  ```
+
+</details>
+
+<details>
+  <summary>MultiJobConfiguration</summary>
+
+- 단일 스텝과 동일한 구조.
+- next() 함수를 통해 다음 Step을 설정.
+
+  ```java
+  package com.example.java.batch;
+  
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.core.step.tasklet.Tasklet;
+  import org.springframework.batch.repeat.RepeatStatus;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  @Slf4j
+  @Configuration
+  public class MultiJobConfiguration {
+  
+      @Bean
+      public Tasklet multiTaskLet(){
+          return (contribution, chunkContext) -> {
+              log.info(">>>> multiTaskLet");
+              return RepeatStatus.FINISHED;
+          };
+      }
+  
+      @Bean
+      public Step multiStep1(JobRepository jobRepository, Tasklet multiTaskLet, PlatformTransactionManager platformTransactionManager){
+          log.info(">>>> multiStep1");
+          return new StepBuilder("multiStep1", jobRepository).tasklet(multiTaskLet, platformTransactionManager).build();
+      }
+  
+      @Bean
+      public Step multiStep2(JobRepository jobRepository, Tasklet multiTaskLet, PlatformTransactionManager platformTransactionManager){
+          log.info(">>>> multiStep2");
+          return new StepBuilder("multiStep2", jobRepository).tasklet(multiTaskLet, platformTransactionManager).build();
+      }
+  
+      @Bean
+      public Step multiStep3(JobRepository jobRepository, Tasklet multiTaskLet, PlatformTransactionManager platformTransactionManager) {
+          log.info(">>>> multiStep3");
+          return new StepBuilder("multiStep3", jobRepository).tasklet(multiTaskLet, platformTransactionManager).build();
+      }
+  
+      @Bean
+      public Job multiJob(JobRepository jobRepository, Step multiStep1, Step multiStep2, Step multiStep3) {
+          log.info(">>>> multiJob");
+          return new JobBuilder("multiJob", jobRepository)
+                  .start(multiStep1)
+                  .next(multiStep2)
+                  .next(multiStep3)
+                  .build();
+      }
+  }
+  ```
+
+</details>
