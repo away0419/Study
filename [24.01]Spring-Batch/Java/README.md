@@ -203,3 +203,200 @@
   ```
 
 </details>
+
+<br/>
+<br/>
+
+> ## Flow
+
+<details>
+  <summary>설정</summary>
+
+- 딱히 없음.
+
+  ```yaml
+  spring:
+    batch:
+      job:
+        enabled: true
+        name: flowJob
+  ```
+
+</details>
+
+<details>
+  <summary>FlowJobConfiguration</summary>
+
+- flow 설정은 Job에서 할 수 있음.
+- 현재 스텝의 결과 상태에 따라 분기를 나누어 설정하는 방식임. 
+  - BatchStatus가 아닌 ExitStatus 결과에 따라 분기가 나뉘어 지는 것임.
+  - ExitStatus 코드는 StepExecutionListenerSupport 상속 받아 커스텀이 가능함. (Spring Batch5는 StepExecutionListenerSupport를 더이상 사용 하지 않음. 다른 방법을 찾아 봐야할 듯.)
+
+  ```java
+  package com.example.java.batch;
+  
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.batch.core.ExitStatus;
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.core.step.tasklet.Tasklet;
+  import org.springframework.batch.repeat.RepeatStatus;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  @Slf4j
+  @Configuration
+  public class FlowJobConfiguration {
+      @Bean
+      public Tasklet flowTasklet(){
+          return (contribution, chunkContext) -> {
+              log.info(">>>> flowTaskLet");
+              contribution.setExitStatus(ExitStatus.FAILED); // Step 실행 후 상태. 기본적으로 BatchStatus와 ExitStatus 값이 동일하도록 설정되어 있음.
+              return RepeatStatus.FINISHED;
+          };
+      }
+  
+      @Bean
+      public Step flowStep1(JobRepository jobRepository, Tasklet flowTasklet, PlatformTransactionManager platformTransactionManager){
+          log.info(">>>> flowStep1");
+          return new StepBuilder("flowStep1", jobRepository).tasklet(flowTasklet, platformTransactionManager).build();
+      }
+  
+      @Bean
+      public Step flowStep2(JobRepository jobRepository, Tasklet flowTasklet, PlatformTransactionManager platformTransactionManager){
+          log.info(">>>> flowStep2");
+          return new StepBuilder("flowStep2", jobRepository).tasklet(flowTasklet, platformTransactionManager).build();
+      }
+  
+      @Bean
+      public Step flowStep3(JobRepository jobRepository, Tasklet flowTasklet, PlatformTransactionManager platformTransactionManager) {
+          log.info(">>>> flowStep3");
+          return new StepBuilder("flowStep3", jobRepository).tasklet(flowTasklet, platformTransactionManager).build();
+      }
+  
+      @Bean
+      public Job flowJob(JobRepository jobRepository, Step flowStep1, Step flowStep2, Step flowStep3) {
+          log.info(">>>> flowJob");
+          return new JobBuilder("flowJob", jobRepository)
+                  .start(flowStep1)
+                      .on("FAILED") // FAILED 일 경우 -> 이때 FAILED BatchStatus 결과가 아니라 ExitStatus 결과 값임.
+                      .to(flowStep2) // step2로 이동.
+                      .on("*") // step2의 (모든 결과)일 때
+                      .end() // flow 종료
+                  .from(flowStep1) // 만약 step1의 결과가
+                      .on("*") // *(모든 결과) 일 경우 -> 위에서 이미 FAILED Flow가 있어 걸러지므로 결국 FAILED 제외한 결과로 볼 수 있음.
+                      .to(flowStep3) // step3으로 이동.
+                      .next(flowStep2) // step3 이후 step2로 이동.
+                      .on("*") // step2의 결과가 *(모든 결과) 일 경우
+                      .end() // flow 종료
+                  .end()// job 종료
+                  .build();
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>customFlowConfiguration</summary>
+
+- 직접 ExitStatus 만들어 flow 처리하는 방법임.
+- Step에서 ExitStatus 설정을 하지 않고 분기 처리 로직을 따로 만드는 방법.
+
+  ```java
+  package com.example.java.batch;
+  
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.batch.core.*;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.job.flow.FlowExecutionStatus;
+  import org.springframework.batch.core.job.flow.JobExecutionDecider;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.core.step.tasklet.Tasklet;
+  import org.springframework.batch.repeat.RepeatStatus;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  import java.util.Random;
+  
+  @Slf4j
+  @Configuration
+  public class CustomFlowJobConfiguration {
+      @Bean
+      public Tasklet customFlowTasklet(){
+          return (contribution, chunkContext) -> {
+              log.info(">>>> customFlowTaskLet");
+              return RepeatStatus.FINISHED;
+          };
+      }
+  
+      @Bean
+      public Step customFlowStep1(JobRepository jobRepository, Tasklet customFlowTasklet, PlatformTransactionManager platformTransactionManager){
+          log.info(">>>> customFlowStep1");
+          return new StepBuilder("customFlowStep1", jobRepository).tasklet(customFlowTasklet, platformTransactionManager).build();
+      }
+  
+      @Bean
+      public Step customFlowStep2(JobRepository jobRepository, Tasklet customFlowTasklet, PlatformTransactionManager platformTransactionManager){
+          log.info(">>>> customFlowStep2");
+          return new StepBuilder("customFlowStep2", jobRepository).tasklet(customFlowTasklet, platformTransactionManager).build();
+      }
+  
+      @Bean
+      public Step customFlowStep3(JobRepository jobRepository, Tasklet customFlowTasklet, PlatformTransactionManager platformTransactionManager) {
+          log.info(">>>> customFlowStep3");
+          return new StepBuilder("customFlowStep3", jobRepository).tasklet(customFlowTasklet, platformTransactionManager).build();
+      }
+  
+      @Bean
+      public JobExecutionDecider decider() {
+          return new OddDecider();
+      }
+  
+      public static class OddDecider implements JobExecutionDecider {
+          @Override
+          public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
+              Random rand = new Random();
+  
+              int randomNumber = rand.nextInt(50) + 1;
+              log.info("랜덤숫자: {}", randomNumber);
+  
+              if(randomNumber % 2 == 0) {
+                  return new FlowExecutionStatus("EVEN");
+              } else {
+                  return new FlowExecutionStatus("ODD");
+              }
+          }
+      }
+  
+      @Bean
+      public Job customFlowJob(JobRepository jobRepository, Step customFlowStep1, Step customFlowStep2, Step customFlowStep3) {
+          log.info(">>>> customFlowJob");
+          return new JobBuilder("customFlowJob", jobRepository)
+                  .start(customFlowStep1)// step1 시작.
+                  .next(decider()) // step1 이후 decider 시작.
+                  .on("EVEN") // decider 결과가 EVEN 일 경우
+                  .to(customFlowStep2) // step2로 이동.
+                  .on("*") // step2의 (모든 결과)일 때
+                  .end() // customFlow 종료
+                  .from(decider()) // 만약 decider 결과가
+                  .on("*") // *(모든 결과) 일 경우
+                  .to(customFlowStep3) // step3으로 이동.
+                  .next(customFlowStep2) // step3 이후 step2로 이동.
+                  .on("*") // step2의 결과가 *(모든 결과) 일 경우
+                  .end() // customFlow 종료
+                  .end()// job 종료
+                  .build();
+      }
+  
+  
+  }
+  ```
+
+</details>
