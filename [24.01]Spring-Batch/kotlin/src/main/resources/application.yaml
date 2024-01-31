@@ -2,4 +2,4 @@ spring:
   batch:
     job:
       enabled: true # default true. false 하면 모든 job 비활성화.
-      name: multiJob # 해당 이름으로 된 job만 실행.
+      name: customFlowJob # 해당 이름으로 된 job만 실행.
