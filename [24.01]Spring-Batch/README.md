@@ -130,6 +130,35 @@
 
 </details>
 
+<details>
+    <summary>BatchStatus</summary>
+
+- JobExecution과 StepExecution의 속성.
+- Job과 Step의 종료 후 최종 결과 상태.
+- COMPLETED, STARTING, STARTED, STOPPING, STOPPED, FAILED, ABANDONED, UNKNOWN.
+
+</details>
+
+<details>
+    <summary>ExitStatus</summary>
+
+- JobExecution과 StepExecution의 속성.
+- Job과 Step의 실행 후 종료 되었을때의 상태.
+- 기본적으로 BatchStatus와 동일한 값으로 설정함.
+- UNKNOWN, EXECUTING, COMPLETED, NOOP, FAILED, STOPPED.
+
+</details>
+
+<details>
+    <summary>FlowExecutionStatus</summary>
+
+- FlowExecution의 속성.
+- Flow 실행 후 최종 결과 상태.
+- Flow 내 Step의 ExitStatus 값을 FlowExecutionStatus 값으로 저장.
+- COMPLETED, STOPPED, FAILED, UNKNOWN.
+
+</details>
+
 <br/>
 <br/>
 
