@@ -50,6 +50,7 @@
 
 - JobInstance 구별 역할 및 JobInstance에 보내는 매개변수 역할.
 - String, Double, Long, Date 4가지 형식만 지원함.
+- Spring Batch 전용 Scope를 선언하여 사용할 수 있음.
 
 </details>
 
@@ -156,6 +157,26 @@
 - Flow 실행 후 최종 결과 상태.
 - Flow 내 Step의 ExitStatus 값을 FlowExecutionStatus 값으로 저장.
 - COMPLETED, STOPPED, FAILED, UNKNOWN.
+
+</details>
+
+<details>
+    <summary>Scope</summary>
+
+- 해당 어노테이션을 추가하면 해당 함수의 파라미터에 데이터 추가 가능.
+- 해당 어노테이션을 사용하면 Bean의 생성 지점을 지정된 Scope가 실해오디는 시점으로 지연시킴.
+- 장점
+  - Bean 생성 지연을 통해 Application 실행되는 시점이 아닌 비즈니스 로직 처리 단계에서 Job Parameter를 할당 할 수 있음.
+  - 동일한 컴포넌트 병렬 혹은 동시에 사용 시 유용함.
+    - ex) 서로 다른 Step에서 하나의 Tasklet을 두고 마구잡이로 상태를 변경하는 것을 막을 수 있음.
+- @JobScope
+  - 해당 어노테이션과 @Bean을 사용하면 해당 컴포넌트 Job 실행 시점에 Spring Bean 생성함.
+  - JobParameters, JobExecutionContext 사용 가능.
+  - Step 선언문에 적용.
+- @StepScope
+  - 해당 어노테이션과 @Bean을 사용하면 해당 컴포넌트 Step 실행 시점에 Spring Bean으로 생성함.
+  - JobParameters, JobExecutionContext, StepExecutionContext 사용 가능.
+  - Tasklet, ItemReader, ItemWriter, ItemProcessor 선언문에 적용.
 
 </details>
 
