@@ -400,3 +400,171 @@
   ```
 
 </details>
+
+
+<br/>
+<br/>
+
+> ## Scope
+
+<details>
+  <summary>JobParameterConfiguration</summary>
+
+- JobParameter를 가져오는 방법이 여러개임.
+  - Bean 등록, 환경 변수 설정, ApplicationRunner Interface 구현 등.
+- 사용법은 StepScope와 동일함.
+
+  ```java
+  package com.example.java.batch;
+  
+  import lombok.RequiredArgsConstructor;
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.JobParameters;
+  import org.springframework.batch.core.JobParametersBuilder;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.configuration.annotation.JobScope;
+  import org.springframework.batch.core.configuration.annotation.StepScope;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.launch.JobLauncher;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.core.step.tasklet.Tasklet;
+  import org.springframework.batch.repeat.RepeatStatus;
+  import org.springframework.beans.factory.annotation.Value;
+  import org.springframework.boot.ApplicationArguments;
+  import org.springframework.boot.ApplicationRunner;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.stereotype.Component;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  @Slf4j
+  @Configuration
+  @RequiredArgsConstructor
+  public class JobParameterConfiguration {
+  
+      private final StepScopeParameter stepScopeParameter;
+  
+      @Bean
+      @StepScope
+      public Tasklet parameterTasklet() {
+          return (contribution, chunkContext) -> {
+              log.info(">>>> parameterTaskLet");
+              log.info(">>>> stepScopeParameter: {}", stepScopeParameter.getDate());
+              return RepeatStatus.FINISHED;
+          };
+      }
+  
+      // Bean 등록 하여 해당 Parameter 사용하기.
+      @Bean
+      public String jobScopeParameter(){
+          return "jobScopeParameter";
+      }
+      @Bean
+      @JobScope
+      public Step parameterStep(String jobScopeParameter, JobRepository jobRepository, Tasklet parameterTasklet, PlatformTransactionManager platformTransactionManager) {
+          log.info(">>>> parameterStep");
+          log.info(">>>> jobScopeParameter: {}", jobScopeParameter);
+          return new StepBuilder("parameterStep", jobRepository).tasklet(parameterTasklet, platformTransactionManager).build();
+      }
+  
+  //    두 번째 방법. 환경 변수에 등록하여 사용하기.
+  //    @Bean
+  //    @JobScope
+  //    public Step parameterStep(@Value("#{jobParameters[jobScopeParameter]}")String jobScopeParameter, JobRepository jobRepository, Tasklet parameterTasklet, PlatformTransactionManager platformTransactionManager) {
+  //        log.info(">>>> parameterStep");
+  //        log.info(">>>> jobScopeParameter: {}", jobScopeParameter);
+  //        return new StepBuilder("parameterStep", jobRepository).tasklet(parameterTasklet, platformTransactionManager).build();
+  //    }
+  
+  
+  // 세 전째 방법은 ApplicationRunner를 상속 받은 클래스를 구현하여 직접 파라미터를 주입해 job을 실행 시키는 방법.
+  //    @Component
+  //    @RequiredArgsConstructor
+  //    public class JobRunner implements ApplicationRunner {
+  //
+  //        private final JobLauncher jobLauncher;
+  //        private final Job job;
+  //
+  //        @Override
+  //        public void run(ApplicationArguments args) throws Exception {
+  //
+  //            JobParameters jobParameters = new JobParametersBuilder()
+  //                    .addString("name", "user1")
+  //                    .addLong("seq", 2L)
+  //                    .addDate("date", new Date())
+  //                    .addDouble("age", 16.5)
+  //                    .toJobParameters();
+  //
+  //            jobLauncher.run(job, jobParameters);
+  //        }
+  //    }
+  
+      @Bean
+      public Job parameterJob(JobRepository jobRepository, Step parameterStep) {
+          log.info(">>>> parameterJob");
+          return new JobBuilder("parameterJob", jobRepository)
+                  .start(parameterStep)
+                  .build();
+      }
+  
+  }
+  ```
+
+
+</details>
+
+<details>
+  <summary>StepScopeParameter</summary>
+
+- 따로 Bean에 등록할 클래스를 구현함.
+- 이때, 필요한 값은 환경 변수에서 가져올 수 있도록 함.
+
+```java
+package com.example.java.batch;
+
+import lombok.Getter;
+import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+@Component
+@Getter
+@StepScope
+public class StepScopeParameter {
+    private LocalDate date;
+
+    @Value("${date}")
+    public void setDate(String date){
+        this.date = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
+    }
+
+}
+```
+
+</details>
+
+<details>
+  <summary>환경 변수 설정</summary>
+
+- yaml 파일에 직접 변수를 넣거나, jar 실행할 때 아규먼트로 넣어주면 됨.
+- @Value() 어노테이션 사용시 주의점은 다음과 같음.
+  - @Value("${date}") 처럼 $일 경우, yaml에서 설정한 값이나 아래 사진처럼 설정한 값에서 찾아서 가져옴. (동일한 키가 있을 경우, 아래 사진에 적용한 값을 불러옴.)
+  - @Value("#{jobParameters[jobScopeParameter]}") 처럼 #일 경우, yaml에 있는 값이 아닌 아래 사진 처럼 적용 해야 값을 불러옴.
+  
+![img.png](img.png)
+
+```yaml
+spring:
+  batch:
+    job:
+      enabled: true
+      name: parameterJob
+#date: 2024-02-06
+```
+
+</details>
