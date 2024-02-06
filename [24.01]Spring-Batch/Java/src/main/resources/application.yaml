@@ -2,4 +2,7 @@ spring:
   batch:
     job:
       enabled: true
-      name: customFlowJob
+      name: parameterJob
+job:
+  jobScopeParameter: jobScopeParameter
+#date: 2024-02-06
