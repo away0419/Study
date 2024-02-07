@@ -241,6 +241,8 @@
   - ex) 특정 Step은 전혀 실행되지 않게 구성해야 하는 경우.
 - Flow와 Job은 흐름을 구성하는데만 관여함. 실제 로직은 Step에서 구현함.
 - 내부적으로 SimpleFlow 객체를 포함하고 있으며 Job 실행시 호출함.
+- 분기 처리만 담당하는 JobExecutionDecider가 있음.
+  - JobExecutionDecider를 상속 받는 클래스를 따로 만들어 분기 처리 로직을 분리함.
 
 <br/>
 <br/>
