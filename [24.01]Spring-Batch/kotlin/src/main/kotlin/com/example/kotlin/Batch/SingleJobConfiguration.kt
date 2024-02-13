@@ -17,6 +17,7 @@ import org.springframework.transaction.PlatformTransactionManager
 @Configuration
 class SingleJobConfiguration {
     private val log = LoggerFactory.getLogger(this.javaClass)!!
+
     @Bean
     fun singleTaskLet(): Tasklet {
         return Tasklet { contribution: StepContribution?, chunkContext: ChunkContext? ->
@@ -28,18 +29,23 @@ class SingleJobConfiguration {
     @Bean
     fun singleStep(
         jobRepository: JobRepository,
+        singleTaskLet: Tasklet,
         platformTransactionManager: PlatformTransactionManager,
     ): Step {
         log.info(">>>> SingleStep")
         return StepBuilder("singleStep", jobRepository)
-            .tasklet(singleTaskLet(), platformTransactionManager).build()
+            .tasklet(singleTaskLet, platformTransactionManager).build()
     }
 
     @Bean
-    fun job(jobRepository: JobRepository, platformTransactionManager: PlatformTransactionManager): Job {
+    fun job(
+        jobRepository: JobRepository,
+        singleStep: Step,
+        platformTransactionManager: PlatformTransactionManager
+    ): Job {
         log.info(">>>> SingleJob")
         return JobBuilder("singleJob", jobRepository)
-            .start(singleStep(jobRepository,platformTransactionManager))
+            .start(singleStep)
             .build()
     }
 
