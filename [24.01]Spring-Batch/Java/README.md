@@ -568,3 +568,220 @@ spring:
 ```
 
 </details>
+
+<br/>
+<br/>
+
+
+> ## Tasklet
+<details>
+  <summary>Lambda</summary>
+
+- 비즈니스 로직을 람다로 구현함.
+
+
+  ```java
+  package com.example.java.batch;
+  
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.core.step.tasklet.Tasklet;
+  import org.springframework.batch.repeat.RepeatStatus;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  // 람다 형식
+  @Slf4j
+  @Configuration
+  public class TaskLetJobConfig1 {
+  
+      @Bean
+      public Step taskStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager) {
+          log.info(">>>> SingleStep");
+          return new StepBuilder("taskStep", jobRepository).tasklet(((contribution, chunkContext) -> {
+              for(int i =0; i<10; i++){
+                  log.info(i+": 비즈니스 로직");
+              }
+              return RepeatStatus.FINISHED;
+          }), platformTransactionManager).build();
+      }
+  
+      @Bean
+      public Job taskJob(JobRepository jobRepository, Step taskStep) {
+          log.info(">>>> SingleJob");
+          return new JobBuilder("taskJob", jobRepository)
+                  .start(taskStep)
+                  .build();
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>MethodInvokingAdapter</summary>
+
+- 먼저 비즈니스 로직을 구현한 서비스 클래스 생성. (Bean 등록)
+- methodInvokingTaskletAdapter 생성하는 메소드 구현. (Bean 등록)
+  - 이때 생성한 methodInvokingTaskletAdapter는 구현한 service를 가지고 있지 않음.
+  - 따라서, 서비스 객체를 직접 주입하고 해당 서비스 객체의 어떤 메소드를 사용할 지 Set 해주어야함. 
+- Bean에 등록된 methodInvokingTaskletAdapter를 Tasklet에 넣어 사용.
+
+  ```java
+  package com.example.java.batch;
+  
+  import lombok.extern.slf4j.Slf4j;
+  
+  @Slf4j
+  public class CustomService {
+      public void businessLogic(){
+          for(int i =0; i<10; i++){
+              log.info(i+": 비즈니스 로직");
+          }
+      }
+  }
+  ```
+  
+  ```java
+  package com.example.java.batch;
+  
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter;
+  import org.springframework.batch.core.step.tasklet.Tasklet;
+  import org.springframework.batch.repeat.RepeatStatus;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  // 람다 형식
+  @Slf4j
+  @Configuration
+  public class TaskLetJobConfig2 {
+  
+      @Bean
+      public CustomService businessLogic() {
+          return new CustomService();
+      }
+  
+      @Bean
+      public MethodInvokingTaskletAdapter myTasklet() {
+          MethodInvokingTaskletAdapter adapter = new MethodInvokingTaskletAdapter();
+  
+          adapter.setTargetObject(businessLogic());
+          adapter.setTargetMethod("businessLogic");
+  
+          return adapter;
+      }
+  
+      @Bean
+      public Step task2Step(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager) {
+          log.info(">>>> task2Step");
+          return new StepBuilder("task2Step", jobRepository).tasklet(myTasklet(), platformTransactionManager).build();
+      }
+  
+      @Bean
+      public Job task2Job(JobRepository jobRepository, Step task2Step) {
+          log.info(">>>> task2Job");
+          return new JobBuilder("task2Job", jobRepository)
+                  .start(task2Step)
+                  .build();
+      }
+  }
+  
+  ```
+
+</details>
+
+<details>
+  <summary>Tasklet</summary>
+
+- Tasklet을 상속받는 클래스를 직접 구현.
+
+  ```java
+  package com.example.java.batch;
+  
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.batch.core.ExitStatus;
+  import org.springframework.batch.core.StepContribution;
+  import org.springframework.batch.core.StepExecution;
+  import org.springframework.batch.core.StepExecutionListener;
+  import org.springframework.batch.core.scope.context.ChunkContext;
+  import org.springframework.batch.core.step.tasklet.Tasklet;
+  import org.springframework.batch.repeat.RepeatStatus;
+  
+  @Slf4j
+  public class BusinessTasklet implements Tasklet, StepExecutionListener {
+  
+      @Override
+      public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+  
+          for(int i =0; i<10; i++){
+              log.info(i+": 비즈니스 로직");
+          }
+  
+          return RepeatStatus.FINISHED;
+  
+      }
+  
+      @Override
+      public void beforeStep(StepExecution stepExecution) {
+          log.info("Before Step");
+          StepExecutionListener.super.beforeStep(stepExecution);
+      }
+  
+      @Override
+      public ExitStatus afterStep(StepExecution stepExecution) {
+          log.info("after Step");
+          return StepExecutionListener.super.afterStep(stepExecution);
+      }
+  }
+  
+  ```
+
+  ```java
+  package com.example.java.batch;
+  
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  // 외부 클래스에 Tasklet 구현
+  @Slf4j
+  @Configuration
+  public class TaskLetJobConfig3 {
+  
+      @Bean
+      public Step task3Step(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager) {
+          log.info(">>>> task3Step");
+          return new StepBuilder("task3Step", jobRepository).tasklet(new BusinessTasklet(), platformTransactionManager).build();
+      }
+  
+      @Bean
+      public Job task3Job(JobRepository jobRepository, Step task3Step) {
+          log.info(">>>> task3Job");
+          return new JobBuilder("task3Job", jobRepository)
+                  .start(task3Step)
+                  .build();
+      }
+  }
+  
+  ```
+
+</details>

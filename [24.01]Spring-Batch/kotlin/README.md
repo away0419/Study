@@ -107,7 +107,7 @@
 <br/>
 <br/>
 
-> ## MultiJob
+> ## MultiStep
 
 <details>
   <summary>설정</summary>
@@ -213,7 +213,7 @@ class MultiJobConfiguration {
 <br/>
 <br/>
 
-> ## FlowJob
+> ## Flow
 
 <details>
   <summary>설정</summary>
@@ -435,7 +435,7 @@ class MultiJobConfiguration {
 <br/>
 <br/>
 
-> ## JobParameter 
+> ## Scope 
 
 <details>
   <summary>설정</summary>
@@ -524,3 +524,218 @@ class MultiJobConfiguration {
 
 </details>
 
+<br/>
+<br/>
+
+> ## details
+
+<details>
+  <summary>Lambda</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package com.example.kotlin.tasklet
+  
+  import org.slf4j.LoggerFactory
+  import org.springframework.batch.core.Job
+  import org.springframework.batch.core.Step
+  import org.springframework.batch.core.job.builder.JobBuilder
+  import org.springframework.batch.core.repository.JobRepository
+  import org.springframework.batch.core.step.builder.StepBuilder
+  import org.springframework.batch.repeat.RepeatStatus
+  import org.springframework.context.annotation.Bean
+  import org.springframework.context.annotation.Configuration
+  import org.springframework.transaction.PlatformTransactionManager
+  
+  @Configuration
+  class TaskletJobConfig1 {
+      private val log = LoggerFactory.getLogger(this.javaClass)!!
+  
+      @Bean
+      fun taskletStep(
+          jobRepository: JobRepository,
+          platformTransactionManager: PlatformTransactionManager
+      ): Step {
+          log.info(">>>> taskletStep1")
+          return StepBuilder("flowStep1", jobRepository).tasklet({ contribution, chunkContext ->
+              for (i in 0..10) {
+                  log.info("람다식 ${i}번째 비지니스 로직");
+              }
+              RepeatStatus.FINISHED
+          }, platformTransactionManager).build()
+      }
+  
+      @Bean
+      fun taskletJob(jobRepository: JobRepository, taskletStep: Step): Job {
+          log.info(">>>> taskletJob1")
+          return JobBuilder("taskletJob1", jobRepository)
+              .start(taskletStep)
+              .build()
+      }
+  
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>MethodInvokingTaskletAdapter</summary>
+
+- Java와 동일함.
+
+  ```kotlin
+  package com.example.kotlin.tasklet
+  
+  import org.slf4j.LoggerFactory
+  
+  class MethodInvokingTaskletAdapterService {
+      private val log = LoggerFactory.getLogger(this.javaClass)!!
+      fun businessLogic(){
+          for (i in 1.. 10){
+              log.info("MethodInvokingTaskletAdapterService : ${i}번째 비즈니스 로직")
+          }
+      }
+  }
+  ```
+
+  ```kotlin
+  package com.example.kotlin.tasklet
+  
+  import org.slf4j.LoggerFactory
+  import org.springframework.batch.core.Job
+  import org.springframework.batch.core.Step
+  import org.springframework.batch.core.job.builder.JobBuilder
+  import org.springframework.batch.core.repository.JobRepository
+  import org.springframework.batch.core.step.builder.StepBuilder
+  import org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter
+  import org.springframework.context.annotation.Bean
+  import org.springframework.context.annotation.Configuration
+  import org.springframework.transaction.PlatformTransactionManager
+  
+  @Configuration
+  class TaskletJobConfig2 {
+      private val log = LoggerFactory.getLogger(this.javaClass)!!
+  
+      @Bean
+      fun methodInvokingTaskletAdapterService(): MethodInvokingTaskletAdapterService{
+          return MethodInvokingTaskletAdapterService()
+      }
+  
+      @Bean
+      fun methodInvokingTaskletAdapter() : MethodInvokingTaskletAdapter{
+          val methodInvokingTaskletAdapter = MethodInvokingTaskletAdapter()
+  
+          methodInvokingTaskletAdapter.setTargetObject(methodInvokingTaskletAdapterService())
+          methodInvokingTaskletAdapter.setTargetMethod("businessLogic")
+  
+          return methodInvokingTaskletAdapter
+      }
+  
+      @Bean
+      fun taskletStep2(
+          jobRepository: JobRepository,
+          platformTransactionManager: PlatformTransactionManager
+      ): Step {
+          log.info(">>>> taskletStep2")
+          return StepBuilder("flowStep1", jobRepository).tasklet(methodInvokingTaskletAdapter(), platformTransactionManager).build()
+      }
+  
+      @Bean
+      fun taskletJob2(jobRepository: JobRepository, taskletStep2: Step): Job {
+          log.info(">>>> taskletJob2")
+          return JobBuilder("taskletJob2", jobRepository)
+              .start(taskletStep2)
+              .build()
+      }
+  
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>CustomTasklet</summary>
+
+- Tasklet을 커스텀 하여 사용하는 방법.
+- Java와 동일함.
+
+  ```kotlin
+  package com.example.kotlin.tasklet
+  
+  import org.slf4j.LoggerFactory
+  import org.springframework.batch.core.ExitStatus
+  import org.springframework.batch.core.StepContribution
+  import org.springframework.batch.core.StepExecution
+  import org.springframework.batch.core.StepExecutionListener
+  import org.springframework.batch.core.scope.context.ChunkContext
+  import org.springframework.batch.core.step.tasklet.Tasklet
+  import org.springframework.batch.repeat.RepeatStatus
+  
+  class CustomTasklet (): Tasklet, StepExecutionListener{
+      private val log = LoggerFactory.getLogger(this.javaClass)!!
+  
+      override fun execute(contribution: StepContribution, chunkContext: ChunkContext): RepeatStatus? {
+          for (i in 1.. 10){
+              log.info("CustomTasklet ${i}번째 비즈니스 로직")
+          }
+  
+          return RepeatStatus.FINISHED
+      }
+  
+      override fun beforeStep(stepExecution: StepExecution) {
+          log.info("Before Step")
+          super.beforeStep(stepExecution)
+      }
+  
+      override fun afterStep(stepExecution: StepExecution): ExitStatus? {
+          log.info("After Step")
+          return super.afterStep(stepExecution)
+      }
+  }
+  ```
+
+  ```kotlin
+  package com.example.kotlin.tasklet
+  
+  import org.slf4j.LoggerFactory
+  import org.springframework.batch.core.Job
+  import org.springframework.batch.core.Step
+  import org.springframework.batch.core.job.builder.JobBuilder
+  import org.springframework.batch.core.repository.JobRepository
+  import org.springframework.batch.core.step.builder.StepBuilder
+  import org.springframework.context.annotation.Bean
+  import org.springframework.context.annotation.Configuration
+  import org.springframework.transaction.PlatformTransactionManager
+  
+  @Configuration
+  class TaskletJobConfig3 {
+      private val log = LoggerFactory.getLogger(this.javaClass)!!
+  
+      @Bean
+      fun customTasklet(): CustomTasklet{
+          return CustomTasklet()
+      }
+  
+      @Bean
+      fun taskletStep3(
+          jobRepository: JobRepository,
+          platformTransactionManager: PlatformTransactionManager,
+          customTasklet: CustomTasklet
+      ): Step {
+          log.info(">>>> taskletStep3")
+          return StepBuilder("flowStep1", jobRepository).tasklet(customTasklet, platformTransactionManager).build()
+      }
+  
+      @Bean
+      fun taskletJob3(jobRepository: JobRepository, taskletStep3: Step): Job {
+          log.info(">>>> taskletJob3")
+          return JobBuilder("taskletJob3", jobRepository)
+              .start(taskletStep3)
+              .build()
+      }
+  
+  }
+  ```
+
+</details>
