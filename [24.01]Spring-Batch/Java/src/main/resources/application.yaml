@@ -2,7 +2,7 @@ spring:
   batch:
     job:
       enabled: true
-      name: task3Job
+      name: chunkJob
 job:
   jobScopeParameter: jobScopeParameter
 #date: 2024-02-06
