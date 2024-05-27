@@ -109,7 +109,7 @@
     <summary>ItemReader</summary>
 
 - Step에서 Item 읽어오는 인터페이스.
-- 다양한 인터페이스가 존재하며 다양한 방법으로 Item 읽어올 수 있음.
+- 다양한 인터페이스가 존재하며 다양한 형식의 데이터(XML, Json, DB, MQ) Item 읽어올 수 있음.
 
 </details>
 
@@ -128,6 +128,15 @@
 
 - Reader에서 읽어온 Item 처리하는 역할.
 - 배치를 처리하는데 필수 요소는 아님.
+
+</details>
+
+<details>
+  <summary>ItemStream</summary>
+
+- ItemReader와 ItemWriter 처리 과정 중 상태를 저장하고 오류가 발생하면 해당 상태를 참조하여 실패한 곳에서 재시작 하도록 지원함.
+- ExecutionContext를 매개변수로 받아 상태 정보를 업데이트함.
+- ItemReader, ItemWriter에서 ItemStream을 구현하고 있음.
 
 </details>
 
@@ -183,6 +192,22 @@
 <br/>
 <br/>
 
+> ## 조건 별 흐름 제어 (Flow)
+
+![Alt text](image/image-3.png)
+
+- Step을 순차적으로만 구성하는 것이 아닌 특정한 상태에 따라 흐름을 전환하도록 구성하는 것.
+  - ex) Step이 실패하더라도 Job은 실패로 끝나지 않아야 하는 경우.
+  - ex) Step이 성공했을 때 다음에 실행 해야 할 Step을 구분해서 실행해야 하는 경우.
+  - ex) 특정 Step은 전혀 실행되지 않게 구성해야 하는 경우.
+- Flow와 Job은 흐름을 구성하는데만 관여함. 실제 로직은 Step에서 구현함.
+- 내부적으로 SimpleFlow 객체를 포함하고 있으며 Job 실행시 호출함.
+- 분기 처리만 담당하는 JobExecutionDecider가 있음.
+  - JobExecutionDecider를 상속 받는 클래스를 따로 만들어 분기 처리 로직을 분리함.
+
+<br/>
+<br/>
+
 > ## Spring Batch Step 동작 방식
 
 <details>
@@ -199,12 +224,18 @@
 <details>
     <summary>Chunk</summary>
 
+![alt text](image/image-4.png)
+
 - Chunk: 데이터를 일정한 크기로 나눈 데이터 셋.
   - Chunk 단위로 나누면 전체 데이터를 한 번에 처리하지 않아도 되어 메모리 부하를 줄이고 성능을 향상시킬 수 있음.
-- Step 단계에서 '단일 레코드를 묶어서' 여러 작업을 처리하는 방식.
-- 묶인 레코드를 하나의 트랜잭션으로 처리하며 실패 시 롤백.
+- Step 단계에서 '단일 레코드를 묶어서' Chunk로 만들고 여러 Chunk 작업을 처리하는 방식.
+- 묶인 레코드 Chunk를 각각 하나의 트랜잭션으로 처리하므로 실패시 해당 Chunk만 롤백.
 - 병렬 처리를 위해 Chunk 사용하되, 순차적으로 처리하는 방식임.
 - 대용량 데이터를 처리할 때 사용하며, 중복 처리나 실패한 레코드 처리 등 예외 상황에 대한 대처가 용이함.
+- Reader로 하나의 데이터를 읽어옴.
+- 읽어온 데이터를 Processor에서 가공.
+- 가공된 데이터들을 별도의 공간에 Chunk 단위 만큼 모음.
+- 다 쌓이면 Writer에 전달하고 Writer는 해당 데이터들을 일괄 저장함.
 
 </details>
 
@@ -227,22 +258,6 @@
 - 서버 간에 데이터를 공유하고 각 서버에서 병렬로 처리함.
 
 </details>
-
-<br/>
-<br/>
-
-> ## 조건 별 흐름 제어 (Flow)
-
-![Alt text](image/image-3.png)
-
-- Step을 순차적으로만 구성하는 것이 아닌 특정한 상태에 따라 흐름을 전환하도록 구성하는 것.
-  - ex) Step이 실패하더라도 Job은 실패로 끝나지 않아야 하는 경우.
-  - ex) Step이 성공했을 때 다음에 실행 해야 할 Step을 구분해서 실행해야 하는 경우.
-  - ex) 특정 Step은 전혀 실행되지 않게 구성해야 하는 경우.
-- Flow와 Job은 흐름을 구성하는데만 관여함. 실제 로직은 Step에서 구현함.
-- 내부적으로 SimpleFlow 객체를 포함하고 있으며 Job 실행시 호출함.
-- 분기 처리만 담당하는 JobExecutionDecider가 있음.
-  - JobExecutionDecider를 상속 받는 클래스를 따로 만들어 분기 처리 로직을 분리함.
 
 <br/>
 <br/>
