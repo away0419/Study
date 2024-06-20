@@ -218,6 +218,7 @@
 - 파일을 읽고 처리한 다음 결과를 데이터베이스에 쓰는 등의 작업을 수행함.
 - 단일 작업으로 작업이 끝날 때까지 대기 해야함.
 - 대용량 데이터 처리에 적합하지 않음.
+- Step은 Tasklet 단위로 처리되고, Tasklet 중에서 ChunkOrientedTasklet을 통해 Chunk를 처리함.
 
 </details>
 
@@ -225,6 +226,7 @@
     <summary>Chunk</summary>
 
 ![alt text](image/image-4.png)
+![alt text](image/image-5.png)
 
 - Chunk: 데이터를 일정한 크기로 나눈 데이터 셋.
   - Chunk 단위로 나누면 전체 데이터를 한 번에 처리하지 않아도 되어 메모리 부하를 줄이고 성능을 향상시킬 수 있음.
@@ -236,6 +238,13 @@
 - 읽어온 데이터를 Processor에서 가공.
 - 가공된 데이터들을 별도의 공간에 Chunk 단위 만큼 모음.
 - 다 쌓이면 Writer에 전달하고 Writer는 해당 데이터들을 일괄 저장함.
+- Chunk Size vs Page Size
+  - Chunk Size는 트랜잭션 범위를 설정하는 방법. 즉, 한 번에 처리할(커밋) 데이터의 수를 의미함.
+  - Page Size는 처리할 데이터의 수를 설정하는 방법. 즉, 한 번에 몇개의 데이터를 처리할지 의미함.
+  - 예를 들어, Chunk Size = 10, Page Size = 2 일 경우, Reader, Processor, Writer가 한번에 2개의 데이터 처리를 5번 반복하여 총 10개의 데이터를 처리해야 한번의 커밋이 발생함.
+  - 따라서, 효과적인 성능 향상은 Page Size를 크게하고 해당 사이즈에 동일한 Chunk Size를 설정하여 대용량 처리 후 한번에 커밋하는 것이 좋음.
+- PagingReader 주의사항
+  - 페이징 처리 시 각 쿼리에 Offset, Limit를 지정해야함. 이때, 순서가 보장될 수 있도록 Order By를 사용해야 함.
 
 </details>
 
@@ -258,6 +267,17 @@
 - 서버 간에 데이터를 공유하고 각 서버에서 병렬로 처리함.
 
 </details>
+
+<br/>
+<br/>
+
+> ## ItemReader
+
+- DB, File, XML, JSON, JMS(Java Message Service) 등 다양한 데이터 소스를 읽어오는 역할.
+- Spring Batch에서 지원하지 않는 Reader가 필요할 경우 인터페이스를 활용하여 직접 만들 수 있음.
+- Spring의 JdbcTemplate는 분할 처리를 지원하지 않으므로 개발자가 직접 limit, offset 작업을 해주어야 함. 이를 해결하기 위한 방법으로 Cursor, Paging가 있음.
+  - Cursor: Streaming 형식으로 데이터를 처리.
+  - Paging: 한번에 Page 단위로 데이터를 처리.
 
 <br/>
 <br/>
