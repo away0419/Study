@@ -5,17 +5,6 @@ import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
 public class B14722 {
-    public static class Info {
-        int x;
-        int y;
-        int prev;
-
-        public Info(int x, int y, int prev) {
-            this.x = x;
-            this.y = y;
-            this.prev = prev;
-        }
-    }
 
     public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
