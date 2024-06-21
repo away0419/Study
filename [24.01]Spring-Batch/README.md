@@ -275,9 +275,17 @@
 
 - DB, File, XML, JSON, JMS(Java Message Service) 등 다양한 데이터 소스를 읽어오는 역할.
 - Spring Batch에서 지원하지 않는 Reader가 필요할 경우 인터페이스를 활용하여 직접 만들 수 있음.
-- Spring의 JdbcTemplate는 분할 처리를 지원하지 않으므로 개발자가 직접 limit, offset 작업을 해주어야 함. 이를 해결하기 위한 방법으로 Cursor, Paging가 있음.
-  - Cursor: Streaming 형식으로 데이터를 처리.
-  - Paging: 한번에 Page 단위로 데이터를 처리.
+- Spring의 JdbcTemplate는 분할 처리를 지원하지 않으므로(기본적으로 select만 사용할 경우 조건에 맞는 모든 데이터를 가져오므로) 개발자가 직접 limit, offset 작업을 해주어야 함. 이를 해결하기 위한 방법으로 Cursor, Paging가 있음.
+- Cursor
+  - Streaming 형식으로 데이터를 처리함.
+  - JdbcCursorItemReader 사용하여 DB와 커넥션을 맺은 경우 fetchSize 만큼 조회 후 (하나씩 select하면 성능이 안좋아서 그런듯.) 조회한 데이터에서 하나씩 읽아옴.
+  - CursorItemReader 사용 시 DB와의 SocketTimeout을 충분히 큰 값으로 설정해야 함. (하나의 Connection으로 Batch가 끝날때까지 사용되기 때문에 중간에 연결이 끊길 수 있음. 따라서 오래 걸리는 Batch는 PagingItemReader를 사용하는게 더 나음.)
+- Paging
+  - 한번에 Page 단위로 데이터를 처리.
+  - 한번에 설정한 Page Size 만큼 데이터를 읽어옴.
+  - 페이지를 읽을 때 마다 Connection을 맺고 끊음.
+  - Spring Batch는 offset과 limit을 PageSize에 맞게 자동으로 생성해줌. 단, 쿼리는 개별적으로 실행함.
+  - 각 페이지마다 새로운 쿼리를 실행하므로 페이징시 결과를 정렬하는 것이 중요함. 따라서, Order By 사용 권장됨.
 
 <br/>
 <br/>
