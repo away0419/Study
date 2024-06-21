@@ -867,3 +867,177 @@ spring:
 
 > ## ItemReader
 
+<details>
+  <summary>Data 설정.</summary>
+
+- 테스트를 위한 H2에 초기 데이터 입력 설정 및 Entity 생성.
+
+  ```java
+  package com.example.java.itemReader.cursor;
+  
+  import jakarta.persistence.Entity;
+  import jakarta.persistence.GeneratedValue;
+  import jakarta.persistence.GenerationType;
+  import jakarta.persistence.Id;
+  import lombok.Getter;
+  import lombok.NoArgsConstructor;
+  import lombok.Setter;
+  import lombok.ToString;
+  
+  import java.time.LocalDateTime;
+  import java.time.format.DateTimeFormatter;
+  
+  @Entity
+  @ToString
+  @Getter
+  @Setter
+  @NoArgsConstructor
+  public class Pay {
+      private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+  
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      private Long id;
+      private Long amount;
+      private String txName;
+      private LocalDateTime txDateTime;
+  
+      public Pay(Long id, Long amount, LocalDateTime txDateTime) {
+          this.id = id;
+          this.amount = amount;
+          this.txDateTime = txDateTime;
+      }
+  
+      public Pay(Long id, Long amount, String txName, LocalDateTime txDateTime) {
+          this.id = id;
+          this.amount = amount;
+          this.txName = txName;
+          this.txDateTime = txDateTime;
+      }
+  }
+  
+  ```
+
+  ```yaml
+  spring:
+    batch:
+      job:
+        enabled: true
+        name: jdbcCursorItemReaderJob
+  
+    datasource:
+      url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      driverClassName: org.h2.Driver
+      username: sa
+      password:
+  
+    jpa:
+      database-platform: org.hibernate.dialect.H2Dialect
+      hibernate:
+        ddl-auto: update
+      defer-datasource-initialization: true
+  
+    h2:
+      console:
+        enabled: true
+        path: /h2-console
+  
+    sql:
+      init:
+        data-locations: classpath:test.sql
+  
+  logging:
+    level:
+      org:
+        springframework:
+          batch: DEBUG
+  
+  job:
+    jobScopeParameter: jobScopeParameter
+  #date: 2024-02-06
+  
+  ```
+  
+  ```sql
+  insert into pay (amount, tx_name, tx_date_time) VALUES (1000, 'trade1', '2018-09-10 00:00:00');
+  insert into pay (amount, tx_name, tx_date_time) VALUES (2000, 'trade2', '2018-09-10 00:00:00');
+  insert into pay (amount, tx_name, tx_date_time) VALUES (3000, 'trade3', '2018-09-10 00:00:00');
+  insert into pay (amount, tx_name, tx_date_time) VALUES (4000, 'trade4', '2018-09-10 00:00:00');
+  ```
+
+</details>
+<details>
+  <summary>JdbcCursorItemReaderJobConfiguration</summary>
+
+- 읽은 데이터를 크게 변경하는 로직이 없어 processor 생략함.
+- fetchSize: Paging은 실제 쿼리를 limit, offset을 이용하여 분할 처리함. Cursor은 분할 처리 없이 실행되지만, 내부적으로 FetchSize만큼 데이터를 가져와 read()를 통해 하나씩 읽어옴. 
+- rowMapper: 조회한 데이터를 Java 인스턴스로 매핑하기 위한 Mapper. Mapper 클래스를 커스텀 생성하여 사용할 수 있지만 보편적으로 Spring에서 공식 지원하는 mapper 클래스를 사용함.
+
+  ```java
+  package com.example.java.itemReader.cursor;
+  
+  
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.item.ItemWriter;
+  import org.springframework.batch.item.database.JdbcCursorItemReader;
+  import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.jdbc.core.BeanPropertyRowMapper;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  import javax.sql.DataSource;
+  
+  @Slf4j
+  @Configuration
+  public class JdbcCursorItemReaderJobConfiguration {
+  
+      private ItemWriter<Pay> jdbcCursorItemWriter() {
+          return list -> {
+              for (Pay pay :
+                      list) {
+                  log.info("Current Pay={}", pay);
+              }
+          };
+      }
+  
+      @Bean
+      public JdbcCursorItemReader<Pay> jdbcCursorItemReader(DataSource dataSource) {
+          return new JdbcCursorItemReaderBuilder<Pay>()
+                  .fetchSize(10) // DB에서 한번에 사져올 데이터 양. PagingSize랑은 다름.
+                  .dataSource(dataSource) // DB 객체
+                  .rowMapper(new BeanPropertyRowMapper<>(Pay.class)) // 쿼리 결과를 Java 인스턴스로 매핑하기 위한 Mapper
+                  .sql("SELECT id, amount, tx_name, tx_date_time FROM pay")
+                  .name("jdbcCursorItemReader") // Bean의 이름이 아니며 Spring Batch의 ExecutionContext에서 저장되어질 이름
+                  .build();
+      }
+  
+  
+      @Bean
+      public Step jdbcCursorItemReaderStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager, JdbcCursorItemReader<Pay> jdbcCursorItemReader) {
+          log.info(">>>> jdbcCursorItemReaderStep");
+          return new StepBuilder("chunkStep", jobRepository)
+                  .<Pay, Pay>chunk(10, platformTransactionManager)
+                  .reader(jdbcCursorItemReader)
+  //                .processor(processor())
+                  .writer(jdbcCursorItemWriter())
+                  .build();
+      }
+  
+      @Bean
+      public Job jdbcCursorItemReaderJob(JobRepository jobRepository, Step jdbcCursorItemReaderStep) {
+          log.info(">>>> jdbcCursorItemReaderJob");
+          return new JobBuilder("jdbcCursorItemReaderJob", jobRepository)
+                  .start(jdbcCursorItemReaderStep)
+                  .build();
+      }
+  }
+  
+  ```
+
+</details>
