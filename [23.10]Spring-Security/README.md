@@ -464,6 +464,9 @@
 - 흐름은 다음과 같음.
   - 사용자가 요청 했을 때, Access Token 기간 만료시 기간 만료 에러 응답.
   - 사용자가 에러 코드 확인 후 Refresh Token, Access Token 함께 보내 Access Token 재발급 요청
+    - 굳이 Access token을 함께 보낼 필요는 없음.
+    - Jwts 라이브러리 사용 시 Access Token 검증에서 복호화 할 경우 기간만료 예외가 발생함.
+    - 따라서, 직접 처음부터 복호화 기능을 구현하는 것이 아니라면 Refresh Token에서 User 식별 ID를 복호화 하고, 해당 ID를 통해 User 정보를 DB에서 읽어오고 이를 다시 Access Token으로 발급해야 함.
   - 서버에서 Refresh Token 확인 결과 유효하다면, Access Token 재발급.
     - 만약, Refresh Token 남은 만료 시간이 1주일 이하라면, RefreshToken 함께 재발급.
   - 사용자는 재발급 받은 Access Token으로 다시 요청.
