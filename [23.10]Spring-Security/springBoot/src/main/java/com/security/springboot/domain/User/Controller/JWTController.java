@@ -34,13 +34,14 @@ public class JWTController {
 //            refreshToken = JWTProvider.generateRefreshToken();
 //        }
 
-        String header = Optional.ofNullable(request.getHeader(AuthConstants.AUTH_HEADER)).orElseThrow(()-> new CustomException(CustomErrorCode.AUTH_HEADER_NULL));
-        String accessToken = Optional.ofNullable(JWTProvider.getTokenFromHeader(header)).orElseThrow(() -> new CustomException(CustomErrorCode.TOKEN_NULL));
-        String userEmail = Optional.ofNullable(JWTProvider.getUserEmailFromToken(accessToken)).orElseThrow(() -> new CustomException(CustomErrorCode.USER_INFO_NULL));
+//        현재 access token의 시간이 만료되어 있기 때문에 에러가 발생함. 따라서 Refresh Token에서 사용자 식별 ID를 추출해야 함. 즉 Access Token을 받을 필요가 없다.
+//        String header = Optional.ofNullable(request.getHeader(AuthConstants.AUTH_HEADER)).orElseThrow(()-> new CustomException(CustomErrorCode.AUTH_HEADER_NULL));
+//        String accessToken = Optional.ofNullable(JWTProvider.getTokenFromHeader(header)).orElseThrow(() -> new CustomException(CustomErrorCode.TOKEN_NULL));
+        String userEmail = Optional.ofNullable(JWTProvider.getUserEmailFromToken(refreshToken)).orElseThrow(() -> new CustomException(CustomErrorCode.USER_INFO_NULL));
         UserDetailsVO userDetailsVO = (UserDetailsVO) Optional.ofNullable(userDetailsService.loadUserByUsername(userEmail)).orElseThrow(() -> new CustomException(CustomErrorCode.USER_INFO_NULL));
 
-        accessToken = JWTProvider.generateJwtToken(userDetailsVO);
-        refreshToken = JWTProvider.generateRefreshToken(); // RTR 전략 적용
+        String accessToken = JWTProvider.generateJwtToken(userDetailsVO);
+        refreshToken = JWTProvider.generateRefreshToken(userDetailsVO); // RTR 전략 적용
         ResponseCookie responseCookie  =JWTProvider.generateRefreshTokenCookie(refreshToken); // refresh token 담은 cookie 생성
         response.addHeader(AuthConstants.AUTH_HEADER, AuthConstants.TOKEN_TYPE +accessToken);
         response.addHeader(AuthConstants.COOKIE_HEADER, responseCookie.toString());

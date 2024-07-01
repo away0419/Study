@@ -16,9 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
@@ -30,13 +28,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        // 1. Token이 필요하지 않은 API URL. (필요 없음. securityConfig에서 설정하면 됨.)
+//         1. Token이 필요하지 않은 API URL. (필요 없음. securityConfig에서 설정하면 됨.)
 //        List<String> list = Arrays.asList(
-//                "/api/v1/user/login",
-//                "/api/v1/user/generateToken"
+//                "/api/v1/jwt/token/update"
 //        );
 
-        // 2. 토큰이 필요하지 않은 API URL 다음 필터로 넘기기 (필요 없음. securityConfig에서 설정하면 됨.)
+//         2. 토큰이 필요하지 않은 API URL 다음 필터로 넘기기 (필요 없음. securityConfig에서 설정하면 됨.)
 //        if (list.contains(request.getRequestURI())) {
 //            filterChain.doFilter(request, response);
 //        }

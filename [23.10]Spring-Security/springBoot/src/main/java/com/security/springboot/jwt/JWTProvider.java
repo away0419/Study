@@ -156,8 +156,11 @@ public class JWTProvider {
      * @return Claims
      */
     private static Claims getClaimsFormToken(String token) {
-        return Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(jwtSecretKey))
-                .parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder()
+                .setSigningKey(DatatypeConverter.parseBase64Binary(jwtSecretKey))
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
 
@@ -193,14 +196,24 @@ public class JWTProvider {
         return c.getTime();
     }
 
+    private static Map<String, Object> createRefreshClaims(UserDetailsVO userDetailsVO) {
+        Map<String, Object> claims = new HashMap<>();
+
+        // 비공개 클레임, User 식별 ID (DB에 저장된 Refresh Token 확인하기용 & AccessToken 재발급 시 사용자 정보를 가져오기 위한 용도)
+        claims.put("userEmail", userDetailsVO.getUserEmail());
+
+        return claims;
+    }
+
     /**
      * refresh token 만들기
      *
      * @return refresh token
      */
-    public static String generateRefreshToken() {
+    public static String generateRefreshToken(UserDetailsVO userDetailsVO) {
         return Jwts.builder()
                 .setHeader(createHeader())  // JWT Header
+                .setClaims(createRefreshClaims(userDetailsVO))
                 .setExpiration(createRefreshTokenExpiredDate()) // JWT Payload 등록 클레임
                 .setIssuedAt(new Date()) // JWT Payload claims 등록 클레임
                 .signWith(createSignature(), SignatureAlgorithm.HS256)  // JWT Signature 매개변수 순서는 바뀌어도 상관 없는듯

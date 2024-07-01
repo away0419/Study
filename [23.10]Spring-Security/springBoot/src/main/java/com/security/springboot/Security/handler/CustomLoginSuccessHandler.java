@@ -33,7 +33,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
         UserEntity userEntity = userDetailsVO.getUserEntity(); // 사용자와 관련된 정보 조회
         JSONObject userEntityJson = (JSONObject) ConvertUtil.convertObjectToJsonObject(userEntity); // 사용자 정보 Json 객체로 변환
         String accessToken = JWTProvider.generateJwtToken(userDetailsVO); // accessToken 생성
-        String refreshToken = JWTProvider.generateRefreshToken(); // refreshToken 생성
+        String refreshToken = JWTProvider.generateRefreshToken(userDetailsVO); // refreshToken 생성
         ResponseCookie responseCookie = JWTProvider.generateRefreshTokenCookie(refreshToken); // refreshCookie 만들기
 
         if (userEntity.getRole() == UserRole.ROLE_ADMIN) {
