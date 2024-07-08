@@ -45,7 +45,7 @@ public class JdbcCursorItemReaderJobConfiguration {
     @Bean
     public Step jdbcCursorItemReaderStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager, JdbcCursorItemReader<Pay> jdbcCursorItemReader) {
         log.info(">>>> jdbcCursorItemReaderStep");
-        return new StepBuilder("chunkStep", jobRepository)
+        return new StepBuilder("jdbcCursorItemReaderStep", jobRepository)
                 .<Pay, Pay>chunk(10, platformTransactionManager)
                 .reader(jdbcCursorItemReader)
 //                .processor(processor())
