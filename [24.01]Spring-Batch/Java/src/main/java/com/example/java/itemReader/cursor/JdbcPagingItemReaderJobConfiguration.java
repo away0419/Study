@@ -37,8 +37,8 @@ public class JdbcPagingItemReaderJobConfiguration {
         SqlPagingQueryProviderFactoryBean queryProviderFactoryBean = new SqlPagingQueryProviderFactoryBean();
         queryProviderFactoryBean.setDataSource(dataSource);
         queryProviderFactoryBean.setSelectClause("id, amount, tx_name, tx_date_time");
-        queryProviderFactoryBean.setFromClause("FROM pay");
-        queryProviderFactoryBean.setWhereClause("WHERE amount >= :amount");
+        queryProviderFactoryBean.setFromClause("pay");
+        queryProviderFactoryBean.setWhereClause("amount >= :amount");
 
         Map<String, Order> sortKeys = new HashMap<>();
         sortKeys.put("id", Order.ASCENDING);
