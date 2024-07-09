@@ -1052,6 +1052,7 @@ spring:
 
 - JPA 구현체를 이용하기 위해선 EntityManagerFactory 객체가 필요함.
 - JPQL을 사용함. (안해도 실행 되는듯)
+- fetchSize 정하지 않아도 JDBC의 FetchSize 따름. (설정 안해도 자동으로 적절한 크기로 조절된다함. 만약 바꾸고 싶다면 추가 설정이 필요.)
 
   ```java
   package com.example.java.itemReader.cursor;
