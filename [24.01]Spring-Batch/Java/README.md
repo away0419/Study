@@ -969,13 +969,13 @@ spring:
 <details>
   <summary>JdbcCursorItemReaderJobConfiguration</summary>
 
+- Thread safe 하지 않음. (read 시 중복 row 가져올 수도 있음.)
 - 읽은 데이터를 크게 변경하는 로직이 없어 processor 생략함.
 - fetchSize: Paging은 실제 쿼리를 limit, offset을 이용하여 분할 처리함. Cursor은 분할 처리 없이 실행되지만, 내부적으로 FetchSize만큼 데이터를 가져와 read()를 통해 하나씩 읽어옴. 
 - rowMapper: 조회한 데이터를 Java 인스턴스로 매핑하기 위한 Mapper. Mapper 클래스를 커스텀 생성하여 사용할 수 있지만 보편적으로 Spring에서 공식 지원하는 mapper 클래스를 사용함.
 
   ```java
   package com.example.java.itemReader.cursor;
-  
   
   import lombok.extern.slf4j.Slf4j;
   import org.springframework.batch.core.Job;
@@ -1009,11 +1009,16 @@ spring:
       @Bean
       public JdbcCursorItemReader<Pay> jdbcCursorItemReader(DataSource dataSource) {
           return new JdbcCursorItemReaderBuilder<Pay>()
-                  .fetchSize(10) // DB에서 한번에 사져올 데이터 양. PagingSize랑은 다름.
+                  .name("jdbcCursorItemReader") // Bean의 이름이 아니며 Spring Batch의 ExecutionContext에서 저장되어질 이름
+                  .fetchSize(10) // DB에서 한번에 가져올 데이터 양. PagingSize랑은 다름.
                   .dataSource(dataSource) // DB 객체
                   .rowMapper(new BeanPropertyRowMapper<>(Pay.class)) // 쿼리 결과를 Java 인스턴스로 매핑하기 위한 Mapper
                   .sql("SELECT id, amount, tx_name, tx_date_time FROM pay")
-                  .name("jdbcCursorItemReader") // Bean의 이름이 아니며 Spring Batch의 ExecutionContext에서 저장되어질 이름
+  //                .beanRowMapper(Class<T>) // 별도의 rowMapper 설정하지 않을 때, 클래스 타입을 설정하면 자동으로 객체와 매핑.
+  //                .queryArguments(Object... args) // 쿼리 파라미터 설정. sql에서 ? 있는 경우 해당 순서에 맞는 곳에 자동으로 들어감.
+  //                .maxItemCount(int count) // 조회 할 최대 Item 수
+  //                .currentItemCount(int conunt) // 조회 Item의 시작 지점
+  //                .maxRows(int maxRows) // ResultSet 오브젝트가 포함 할 수 있는 최대 행 수
                   .build();
       }
   
@@ -1021,7 +1026,7 @@ spring:
       @Bean
       public Step jdbcCursorItemReaderStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager, JdbcCursorItemReader<Pay> jdbcCursorItemReader) {
           log.info(">>>> jdbcCursorItemReaderStep");
-          return new StepBuilder("chunkStep", jobRepository)
+          return new StepBuilder("jdbcCursorItemReaderStep", jobRepository)
                   .<Pay, Pay>chunk(10, platformTransactionManager)
                   .reader(jdbcCursorItemReader)
   //                .processor(processor())
@@ -1034,6 +1039,265 @@ spring:
           log.info(">>>> jdbcCursorItemReaderJob");
           return new JobBuilder("jdbcCursorItemReaderJob", jobRepository)
                   .start(jdbcCursorItemReaderStep)
+                  .build();
+      }
+  }
+  
+  ```
+
+</details>
+
+<details>
+  <summary>JpaCursorItemReaderJobConfiguration</summary>
+
+- JPA 구현체를 이용하기 위해선 EntityManagerFactory 객체가 필요함.
+- JPQL을 사용함. (안해도 실행 되는듯)
+- fetchSize 정하지 않아도 JDBC의 FetchSize 따름. (설정 안해도 자동으로 적절한 크기로 조절된다함. 만약 바꾸고 싶다면 추가 설정이 필요.)
+
+  ```java
+  package com.example.java.itemReader.cursor;
+  
+  import jakarta.persistence.EntityManager;
+  import jakarta.persistence.EntityManagerFactory;
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.item.ItemWriter;
+  import org.springframework.batch.item.database.JpaCursorItemReader;
+  import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  import javax.sql.DataSource;
+  
+  @Slf4j
+  @Configuration
+  public class JpaCursorItemReaderJobConfiguration {
+  
+      private ItemWriter<Pay> jpaCursorItemWriter() {
+          return list -> {
+              for (Pay pay :
+                      list) {
+                  log.info("Current Pay={}", pay);
+              }
+          };
+      }
+  
+      @Bean
+      public JpaCursorItemReader<Pay> jpaCursorItemReader(EntityManagerFactory entityManagerFactory) {
+          return new JpaCursorItemReaderBuilder<Pay>()
+                  .name("jpaCursorItemReader") // Bean의 이름이 아니며 Spring Batch의 ExecutionContext에서 저장되어질 이름
+                  .queryString("SELECT id, amount, tx_name, tx_date_time FROM pay") // 조회 시 사용할 JPQL 문장 설정.
+                  .entityManagerFactory(entityManagerFactory) // JPQL 실행을 위한 EntityManager 생성 팩토리.
+  //                .parameterValues(Map<String,Object> parameters) // 쿼리 파라미터 설정
+  //                .maxItemCount(int count) // 조회 할 최대 Item 수
+  //                .currentItemCount(int count) // 조회 Item 시작 지점.
+                  .build();
+      }
+  
+  
+      @Bean
+      public Step jpaCursorItemReaderStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager, JpaCursorItemReader<Pay> jpaCursorItemReader) {
+          log.info(">>>> jpaCursorItemReaderStep");
+          return new StepBuilder("jpaCursorItemReaderStep", jobRepository)
+                  .<Pay, Pay>chunk(10, platformTransactionManager)
+                  .reader(jpaCursorItemReader)
+  //                .processor(processor())
+                  .writer(jpaCursorItemWriter())
+                  .build();
+      }
+  
+      @Bean
+      public Job jpaCursorItemReaderJob(JobRepository jobRepository, Step jdbcCursorItemReaderStep) {
+          log.info(">>>> jpaCursorItemReaderJob");
+          return new JobBuilder("jpaCursorItemReaderJob", jobRepository)
+                  .start(jdbcCursorItemReaderStep)
+                  .build();
+      }
+  
+  }
+  ```
+</details>
+
+<details>
+  <summary>JdbcPagingItemReaderJobConfiguration</summary>
+
+- Paging 기반으로 자동적으로 PagingSize에 맞게 offset, limit 지정되어 실행.
+- 순서 보장을 위해서 Order By 구문이 필요함.
+- Thread 안정성 보장하므로 동기화 따로 필요 없음.
+- PagingQueryProvider
+  - 쿼리 실행에 필요한 쿼리문을 제공하는 클래스.
+  - DB마다 Paging 전략이 다르므로 유형마다 다른 PagingQueryProvider 사용해야함.
+    - 구현할 때 SqlPagingQueryProviderFactoryBean 객체에 현재 DB 객체를 넣어주면 자동으로 알맞은 Paging 전략을 선택해 줌.
+  - Select, From, sortKey는 필수. where, group by는 선택.
+
+  ```java
+  package com.example.java.itemReader.cursor;
+  
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.item.ItemWriter;
+  import org.springframework.batch.item.database.JdbcCursorItemReader;
+  import org.springframework.batch.item.database.JdbcPagingItemReader;
+  import org.springframework.batch.item.database.Order;
+  import org.springframework.batch.item.database.PagingQueryProvider;
+  import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
+  import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
+  import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.jdbc.core.BeanPropertyRowMapper;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  import javax.sql.DataSource;
+  import java.util.HashMap;
+  import java.util.Map;
+  
+  @Slf4j
+  @Configuration
+  public class JdbcPagingItemReaderJobConfiguration {
+  
+      private ItemWriter<Pay> jdbcPagingItemWriter() {
+          return list -> {
+              for (Pay pay :
+                      list) {
+                  log.info("Current Pay={}", pay);
+              }
+          };
+      }
+  
+      private PagingQueryProvider createQueryProvider(DataSource dataSource) throws Exception{
+          SqlPagingQueryProviderFactoryBean queryProviderFactoryBean = new SqlPagingQueryProviderFactoryBean();
+          queryProviderFactoryBean.setDataSource(dataSource);
+          queryProviderFactoryBean.setSelectClause("id, amount, tx_name, tx_date_time");
+          queryProviderFactoryBean.setFromClause("FROM pay");
+          queryProviderFactoryBean.setWhereClause("WHERE amount >= :amount");
+  
+          Map<String, Order> sortKeys = new HashMap<>();
+          sortKeys.put("id", Order.ASCENDING);
+  
+          queryProviderFactoryBean.setSortKeys(sortKeys);
+  
+          return queryProviderFactoryBean.getObject();
+      }
+  
+      @Bean
+      public JdbcPagingItemReader<Pay> jdbcPagingItemReader(DataSource dataSource) throws Exception {
+          Map<String, Object> parameterValues = new HashMap<>();
+          parameterValues.put("amount", 2000);
+  
+          return new JdbcPagingItemReaderBuilder<Pay>()
+                  .name("jdbcPagingItemReader")
+                  .pageSize(10) // 쿼리당 요청할 레코드 수
+                  .dataSource(dataSource) // 접근할 DB 객체
+                  .beanRowMapper(Pay.class) // 쿼리 결과 데이터 매핑
+                  .parameterValues(parameterValues) // 쿼리 파라미터 설정
+                  .queryProvider(createQueryProvider(dataSource)) // DB 페이징 전략에 따른 설정
+  //                .selectClause(String selectClause) // select 절 설정 (PagingQueryProvider 에서 설정 가능)
+  //                .fromClause(String fromClause) // from 절 설정 (PagingQueryProvider 에서 설정 가능)
+  //                .whereClause(String whereClause) // where 절 설정 (PagingQueryProvider 에서 설정 가능)
+  //                .groupClause(String groupClause) // group 절 설정 (PagingQueryProvider 에서 설정 가능)
+  //                .sortKeys(Map<String, Order> sortKeys) // 정렬을 위한 유니크 키 설정
+  //                .maxItemCount(int count) // 조회 할 최대 item 수
+  //                .currentItemCount(int count) // 조회 Item의 시작지점
+                  .build();
+      }
+  
+  
+      @Bean
+      public Step jdbcPagingItemReaderStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager, JdbcPagingItemReader<Pay> jdbcPagingItemReader) {
+          log.info(">>>> jdbcPagingItemReaderStep");
+          return new StepBuilder("jdbcPagingItemReaderStep", jobRepository)
+                  .<Pay, Pay>chunk(10, platformTransactionManager)
+                  .reader(jdbcPagingItemReader)
+  //                .processor(processor())
+                  .writer(jdbcPagingItemWriter())
+                  .build();
+      }
+  
+      @Bean
+      public Job jdbcPagingItemReaderJob(JobRepository jobRepository, Step jdbcPagingItemReaderStep) {
+          log.info(">>>> jdbcPagingItemReaderJob");
+          return new JobBuilder("jdbcPagingItemReaderJob", jobRepository)
+                  .start(jdbcPagingItemReaderStep)
+                  .build();
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>JpaPagingItemReaderJobConfiguration</summary>
+
+- JQLD 사용해야함. 테이블명도 대소문자 일치해야 작동함.
+
+  ```java
+  package com.example.java.itemReader.cursor;
+  
+  
+  import jakarta.persistence.EntityManagerFactory;
+  import lombok.RequiredArgsConstructor;
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.item.ItemWriter;
+  import org.springframework.batch.item.database.JpaPagingItemReader;
+  import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  @Slf4j
+  @Configuration
+  @RequiredArgsConstructor
+  public class JpaPagingItemReaderJobConfiguration {
+      private ItemWriter<Pay> jpaPagingItemWriter() {
+          return list -> {
+              for (Pay pay :
+                      list) {
+                  log.info("Current Pay={}", pay);
+              }
+          };
+      }
+  
+      @Bean
+      public JpaPagingItemReader<Pay> jpaPagingItemReader(EntityManagerFactory entityManagerFactory) {
+          return new JpaPagingItemReaderBuilder<Pay>()
+                  .name("jpaPagingItemReader")
+                  .pageSize(10)
+                  .queryString("SELECT p FROM Pay p")
+                  .entityManagerFactory(entityManagerFactory)
+                  .build();
+      }
+  
+      @Bean
+      public Step jpaPagingItemReaderStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager, JpaPagingItemReader<Pay> jpaPagingItemReader) {
+          log.info(">>>> jpaPagingItemReaderStep");
+          return new StepBuilder("jpaPagingItemReaderStep", jobRepository)
+                  .<Pay, Pay>chunk(10, platformTransactionManager)
+                  .reader(jpaPagingItemReader)
+  //                .processor(processor())
+                  .writer(jpaPagingItemWriter())
+                  .build();
+      }
+  
+      @Bean
+      public Job jpaPagingItemReaderJob(JobRepository jobRepository, Step jpaPagingItemReaderStep) {
+          log.info(">>>> jpaPagingItemReaderJob");
+          return new JobBuilder("jpaPagingItemReaderJob", jobRepository)
+                  .start(jpaPagingItemReaderStep)
                   .build();
       }
   }

@@ -808,3 +808,379 @@ class MultiJobConfiguration {
   ```
 
 </details>
+
+<br/>
+<br/>
+
+> ## ItemReader
+
+<details>
+  <summary>Data 설정</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package com.example.kotlin.itemReader.cursor
+  
+  import jakarta.persistence.Column
+  import jakarta.persistence.Entity
+  import jakarta.persistence.GeneratedValue
+  import jakarta.persistence.GenerationType
+  import jakarta.persistence.Id
+  import jakarta.persistence.Table
+  import java.time.LocalDateTime
+  import java.time.format.DateTimeFormatter
+  
+  @Entity
+  @Table(name = "PAY")
+  class Pay(
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      var id: Long? = null,
+      var amount: Long? = null,
+      var txName: String? = null,
+      @Column(columnDefinition = "TIMESTAMP")
+      var txDateTime: LocalDateTime? = null
+  ) {
+      companion object {
+          private val FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+      }
+  
+      constructor(id: Long?, amount: Long?, txDateTime: LocalDateTime?) : this() {
+          this.id = id
+          this.amount = amount
+          this.txDateTime = txDateTime
+      }
+  
+      override fun toString(): String {
+          return "Pay(id=$id, amount=$amount, txName=$txName, txDateTime=$txDateTime)"
+      }
+  
+  }
+  
+  ```
+  
+  ```yaml
+  spring:
+    batch:
+      job:
+        enabled: true # default true. false 하면 모든 job 비활성화.
+        name: jdbcCursorItemReaderJob # 해당 이름으로 된 job만 실행.
+  
+    datasource:
+      url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      driverClassName: org.h2.Driver
+      username: sa
+      password:
+  
+    jpa:
+      database-platform: org.hibernate.dialect.H2Dialect
+      hibernate:
+        ddl-auto: update
+      defer-datasource-initialization: true
+  
+    h2:
+      console:
+        enabled: true
+        path: /h2-console
+  
+    sql:
+      init:
+        data-locations: classpath:test.sql
+  ```
+
+  ```sql
+  insert into pay (amount, tx_name, tx_date_time) VALUES (1000, 'trade1', '2018-09-10 00:00:00');
+  insert into pay (amount, tx_name, tx_date_time) VALUES (2000, 'trade2', '2018-09-10 00:00:00');
+  insert into pay (amount, tx_name, tx_date_time) VALUES (3000, 'trade3', '2018-09-10 00:00:00');
+  insert into pay (amount, tx_name, tx_date_time) VALUES (4000, 'trade4', '2018-09-10 00:00:00');
+  ```
+
+</details>
+
+
+<details>
+  <summary>JdbcCursorItemReaderJobConfiguration</summary>
+
+- Java와 동일.
+
+  ```kotlin
+  package com.example.kotlin.itemReader.cursor
+  
+  import org.slf4j.LoggerFactory
+  import org.springframework.batch.core.Job
+  import org.springframework.batch.core.Step
+  import org.springframework.batch.core.job.builder.JobBuilder
+  import org.springframework.batch.core.repository.JobRepository
+  import org.springframework.batch.core.step.builder.StepBuilder
+  import org.springframework.batch.item.ItemWriter
+  import org.springframework.batch.item.database.JdbcCursorItemReader
+  import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder
+  import org.springframework.context.annotation.Bean
+  import org.springframework.context.annotation.Configuration
+  import org.springframework.jdbc.core.BeanPropertyRowMapper
+  import org.springframework.transaction.PlatformTransactionManager
+  import javax.sql.DataSource
+  
+  @Configuration
+  class JdbcCursorItemReaderJobConfiguration {
+      private val log = LoggerFactory.getLogger(this.javaClass)!!
+  
+      @Bean
+      fun jdbcCursorItemReader(dataSource: DataSource): JdbcCursorItemReader<Pay> = JdbcCursorItemReaderBuilder<Pay>()
+          .fetchSize(10)
+          .dataSource(dataSource)
+          .rowMapper(BeanPropertyRowMapper(Pay::class.java))
+          .sql("SELECT id, amount, tx_name, tx_date_time FROM pay")
+          .name("jdbcCursorItemReader")
+          .build()
+  
+      @Bean
+      fun jdbcCursorItemWriter(): ItemWriter<Pay> =
+          ItemWriter { items -> items.forEach { log.info("Current com.example.kotlin.itemReader.cursor.Pay={}", it.toString()) } }
+  
+      @Bean
+      fun jdbcCursorItemReaderStep(
+          jobRepository: JobRepository,
+          platformTransactionManager: PlatformTransactionManager,
+          jdbcCursorItemReader: JdbcCursorItemReader<Pay>
+      ): Step {
+          log.info(">>>> jdbcCursorItemReaderStep")
+          return StepBuilder("jdbcCursorItemReaderStep", jobRepository)
+              .chunk<Pay, Pay>(10, platformTransactionManager)
+              .reader(jdbcCursorItemReader)
+              .writer(jdbcCursorItemWriter())
+              .build()
+      }
+  
+      @Bean
+      fun jdbcCursorItemReaderJob(jobRepository: JobRepository, jdbcCursorItemReaderStep: Step): Job {
+          log.info(">>>> jdbcCursorItemReaderJob")
+          return JobBuilder("jdbcCursorItemReaderJob", jobRepository)
+              .start(jdbcCursorItemReaderStep)
+              .build()
+      }
+  
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>JpaCursorItemReaderJobConfiguration</summary>
+
+- Java와 대부분 동일.
+- Java와 달리 JPQL 사용해야 실행 됨.
+
+  ```kotlin
+  package com.example.kotlin.itemReader.cursor
+  
+  import jakarta.persistence.EntityManagerFactory
+  import org.slf4j.LoggerFactory
+  import org.springframework.batch.core.Job
+  import org.springframework.batch.core.Step
+  import org.springframework.batch.core.job.builder.JobBuilder
+  import org.springframework.batch.core.repository.JobRepository
+  import org.springframework.batch.core.step.builder.StepBuilder
+  import org.springframework.batch.item.ItemWriter
+  import org.springframework.batch.item.database.JpaCursorItemReader
+  import org.springframework.batch.item.database.builder.JpaCursorItemReaderBuilder
+  import org.springframework.context.annotation.Bean
+  import org.springframework.context.annotation.Configuration
+  import org.springframework.transaction.PlatformTransactionManager
+  
+  @Configuration
+  class JpaCursorItemReaderJobConfiguration {
+      private val log = LoggerFactory.getLogger(this.javaClass)!!
+  
+      @Bean
+      fun jpaCursorItemReader(entityManagerFactory: EntityManagerFactory): JpaCursorItemReader<Pay> =
+          JpaCursorItemReaderBuilder<Pay>()
+              .name("jpaCursorItemReader")
+              .queryString("SELECT p FROM Pay p")
+              .entityManagerFactory(entityManagerFactory)
+              .build()
+  
+      @Bean
+      fun jpaCursorItemWriter(): ItemWriter<Pay> =
+          ItemWriter { items -> items.forEach { log.info("Current Pay={}", it.toString()) } }
+  
+      @Bean
+      fun jpaCursorItemReaderStep(
+          jobRepository: JobRepository,
+          platformTransactionManager: PlatformTransactionManager,
+          jpaCursorItemReader: JpaCursorItemReader<Pay>
+      ): Step {
+          log.info(">>>> jdbcCursorItemReaderStep")
+          return StepBuilder("jdbcCursorItemReaderStep", jobRepository)
+              .chunk<Pay, Pay>(10, platformTransactionManager)
+              .reader(jpaCursorItemReader)
+              .writer(jpaCursorItemWriter())
+              .build()
+      }
+  
+      @Bean
+      fun jpaCursorItemReaderJob(jobRepository: JobRepository, jpaCursorItemReaderStep: Step): Job {
+          log.info(">>>> jpaCursorItemReaderJob")
+          return JobBuilder("jpaCursorItemReaderJob", jobRepository)
+              .start(jpaCursorItemReaderStep)
+              .build()
+      }
+  
+  }
+  ```
+</details>
+
+<details>
+  <summary>JdbcPagingItemReaderConfiguration</summary>
+
+- java와 동일.
+
+  ```kotlin
+  package com.example.kotlin.itemReader.cursor
+  
+  import org.slf4j.LoggerFactory
+  import org.springframework.batch.core.Job
+  import org.springframework.batch.core.Step
+  import org.springframework.batch.core.job.builder.JobBuilder
+  import org.springframework.batch.core.repository.JobRepository
+  import org.springframework.batch.core.step.builder.StepBuilder
+  import org.springframework.batch.item.ItemWriter
+  import org.springframework.batch.item.database.JdbcPagingItemReader
+  import org.springframework.batch.item.database.Order
+  import org.springframework.batch.item.database.PagingQueryProvider
+  import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder
+  import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean
+  import org.springframework.context.annotation.Bean
+  import org.springframework.context.annotation.Configuration
+  import org.springframework.jdbc.core.BeanPropertyRowMapper
+  import org.springframework.transaction.PlatformTransactionManager
+  import javax.sql.DataSource
+  
+  @Configuration
+  class JdbcPagingItemReaderConfiguration {
+      private val log = LoggerFactory.getLogger(this.javaClass)!!
+  
+      private fun createQueryProvider(dataSource: DataSource): PagingQueryProvider {
+          val queryProviderFactoryBean = SqlPagingQueryProviderFactoryBean()
+          val map = HashMap<String, Order>()
+          map["id"] = Order.ASCENDING
+  
+          queryProviderFactoryBean.setDataSource(dataSource)
+          queryProviderFactoryBean.setSelectClause("id, amount, tx_name, tx_date_time")
+          queryProviderFactoryBean.setFromClause("pay")
+          queryProviderFactoryBean.setWhereClause("amount >= :amount")
+          queryProviderFactoryBean.setSortKeys(map)
+  
+          return queryProviderFactoryBean.`object`
+      }
+  
+      @Bean
+      fun jdbcPagingItemReader(dataSource: DataSource): JdbcPagingItemReader<Pay> {
+          val parameterValues = HashMap<String, Any>()
+          parameterValues["amount"] = 2000
+  
+          return JdbcPagingItemReaderBuilder<Pay>()
+              .name("jdbcPagingItemReader")
+              .pageSize(10)
+              .dataSource(dataSource)
+              .rowMapper(BeanPropertyRowMapper(Pay::class.java))
+              .parameterValues(parameterValues)
+              .queryProvider(createQueryProvider(dataSource))
+              .build()
+      }
+  
+      @Bean
+      fun jdbcPagingItemWriter(): ItemWriter<Pay> =
+          ItemWriter { items -> items.forEach { log.info("Current Pay={}", it.toString()) } }
+  
+      @Bean
+      fun jdbcPagingItemReaderStep(
+          jobRepository: JobRepository,
+          platformTransactionManager: PlatformTransactionManager,
+          jdbcPagingItemReader: JdbcPagingItemReader<Pay>
+      ): Step {
+          log.info(">>>> jdbcPagingItemReaderStep")
+          return StepBuilder("jdbcPagingItemReaderStep", jobRepository)
+              .chunk<Pay, Pay>(10, platformTransactionManager)
+              .reader(jdbcPagingItemReader)
+              .writer(jdbcPagingItemWriter())
+              .build()
+      }
+  
+      @Bean
+      fun jdbcPagingItemReaderJob(jobRepository: JobRepository, jdbcPagingItemReaderStep: Step): Job {
+          log.info(">>>> jdbcPagingItemReaderJob")
+          return JobBuilder("jdbcPagingItemReaderJob", jobRepository)
+              .start(jdbcPagingItemReaderStep)
+              .build()
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>JpaPagingItemReaderJobConfiguration</summary>
+
+- java 동일
+
+  ```kotlin
+  package com.example.kotlin.itemReader.cursor
+  
+  import jakarta.persistence.EntityManagerFactory
+  import org.slf4j.LoggerFactory
+  import org.springframework.batch.core.Job
+  import org.springframework.batch.core.Step
+  import org.springframework.batch.core.job.builder.JobBuilder
+  import org.springframework.batch.core.repository.JobRepository
+  import org.springframework.batch.core.step.builder.StepBuilder
+  import org.springframework.batch.item.ItemWriter
+  import org.springframework.batch.item.database.JpaPagingItemReader
+  import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder
+  import org.springframework.context.annotation.Bean
+  import org.springframework.context.annotation.Configuration
+  import org.springframework.transaction.PlatformTransactionManager
+  
+  @Configuration
+  class JpaPagingItemReaderJobConfiguration {
+      private val log = LoggerFactory.getLogger(this.javaClass)!!
+  
+      @Bean
+      fun jpaPagingItemReader(entityManagerFactory: EntityManagerFactory): JpaPagingItemReader<Pay> =
+          JpaPagingItemReaderBuilder<Pay>()
+              .name("jpaPagingItemReader")
+              .pageSize(10)
+              .queryString("SELECT p FROM Pay p")
+              .entityManagerFactory(entityManagerFactory)
+              .build()
+  
+      @Bean
+      fun jpaPagingItemWriter(): ItemWriter<Pay> =
+          ItemWriter { items -> items.forEach { log.info("Current Pay={}", it.toString()) } }
+  
+      @Bean
+      fun jpaPagingItemReaderStep(
+          jobRepository: JobRepository,
+          platformTransactionManager: PlatformTransactionManager,
+          jpaPagingItemReader: JpaPagingItemReader<Pay>
+      ): Step {
+          log.info(">>>> jpaPagingItemReaderStep")
+          return StepBuilder("jpaPagingItemReaderStep", jobRepository)
+              .chunk<Pay, Pay>(10, platformTransactionManager)
+              .reader(jpaPagingItemReader)
+              .writer(jpaPagingItemWriter())
+              .build()
+      }
+  
+      @Bean
+      fun jpaPagingItemReaderJob(jobRepository: JobRepository, jpaPagingItemReaderStep: Step): Job {
+          log.info(">>>> jpaPagingItemReaderJob")
+          return JobBuilder("jpaPagingItemReaderJob", jobRepository)
+              .start(jpaPagingItemReaderStep)
+              .build()
+      }
+  }
+  ```
+
+</details>
