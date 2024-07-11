@@ -320,7 +320,7 @@
   - FlatFileItemReader (2차원 데이터로 표현된 유형의 파일 처리)
   - StaxEventItemReader (XML 유형 파일 처리)
   - JsonItemReader (JSON 유형 파일 처리)
-  - 자세한 사항은 필요할 때 찾아보면 될 듯 [링크](https://tonylim.tistory.com/434)
+  - 자세한 사항은 필요할 때 찾아보기 [링크](https://tonylim.tistory.com/434)
 - Spring Batch에서 지원하지 않는 Reader가 필요할 경우 인터페이스를 활용하여 직접 만들 수 있음.
 - Spring의 JdbcTemplate는 분할 처리를 지원하지 않으므로(기본적으로 select만 사용할 경우 조건에 맞는 모든 데이터를 가져오므로) 개발자가 직접 limit, offset 작업을 해주어야 함. 이를 해결하기 위한 방법으로 Cursor, Paging가 있음.(DB 처리 방식)
 - Cursor
@@ -336,6 +336,18 @@
   - 각 페이지마다 새로운 쿼리를 실행하므로 페이징시 결과를 정렬하는 것이 중요함. 따라서, Order By 사용 권장됨.
 
 ![alt text](image/image-6.png)
+
+<br/>
+<br/>
+
+> ## ItemWriter
+
+- DB, File, XML, JSON, JMS(Java Message Service) 등 다양한 형태로 데이터를 쓰는 역할.
+  - FlatFileItemWriter (2차원 데이터 유형의 파일 처리)
+  - StaxEventItemWriter (XML 유형 파일 처리)
+  - JsonFileItemWriter (JSON 유형 파일 처리)
+  - 자세한 사항은 필요할 때 찾아보기 [링크](https://tonylim.tistory.com/435)
+- DB의 경우 ChunkSize 만큼 쌓아서 일괄 처리함.
 
 <br/>
 <br/>
