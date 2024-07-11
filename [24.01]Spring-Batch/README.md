@@ -352,6 +352,14 @@
 <br/>
 <br/>
 
+> ## ItemProcessor
+
+- Writer, Reader 사이에서 비즈니스 로직을 처리하는 역할.
+- 필수는 아니며 비즈니스 로직을 따로 정리하기 위해 사용함.
+
+<br/>
+<br/>
+
 > ## Scheduler
 
 - Batch Job을 실행 시키기 위한 방법.
