@@ -39,7 +39,10 @@ public class MultiJobConfiguration {
     @Bean
     public Step multiStep3(JobRepository jobRepository, Tasklet multiTaskLet, PlatformTransactionManager platformTransactionManager) {
         log.info(">>>> multiStep3");
-        return new StepBuilder("multiStep3", jobRepository).tasklet(multiTaskLet, platformTransactionManager).build();
+        return new StepBuilder("multiStep3", jobRepository).tasklet(multiTaskLet, platformTransactionManager)
+//                .startLimit() // Step의 실행 횟수. 기본값 Integer.MAX_VALUE. 실행 횟수 초과해서 다시 실행하려하는 경우 예외 발생.
+//                .allowStartIfComplete() // 재시작 가능한 Job에서 Step 이전 성공 여부와 상관없이 항상 실행하기 위한 설정. True여야 항상 실행. 실행마다 유효성 검증이 필요하거나 사전 작업이 필요한 Step일 경우 사용.
+                .build();
     }
 
     @Bean

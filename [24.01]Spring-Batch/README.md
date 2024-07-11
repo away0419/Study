@@ -28,80 +28,123 @@
 > ## Spring Batch 구성
 
 ![Alt text](image/image.png)
+![alt text](image/image-16.png)
 
 <details>
     <summary>Job</summary>
 
 - 배치 처리 과정을 하나의 단위로 만들어 놓은 객체.
 - 배치 처리 과정에 있어 전체 계층 최상단에 위치.
+- SimpleJob (순차적으로 step 실행 시키는 job)
+- FlowJob (특정한 조건과 흐름에 따라 Step 구성하여 실행 시키는 job)
+
+  ![alt text](image/image-7.png)
 
 </details>
 
 <details>
     <summary>JobInstance</summary>
 
-- Job의 실행 단위.
-- Job 실행 시 하나의 JobInstance 발생.
-
-</details>
+- Job 실행 될 때 생성되는 하나의 Job 논리 실행 단위이며, Job의 상태정보를 가짐.
+- Job 실행 시점이 다르므로 Job 실행을 구분해야함.
+- DB에서 저장된 캐시 ((Job + JobParameter)해싱) 확인 후 기존 캐시된 instance 없으면 새로 만듬.
+- 기본적으로 SpringBoot는 job을 모두 실행함. 설정을 통해 ApplicationRunner 구현체를 통해 실행할 수 있도록 하기. (spring.batch.job.enabled = false)
+- </details>
 
 <details>
     <summary>JobParameters</summary>
 
 - JobInstance 구별 역할 및 JobInstance에 보내는 매개변수 역할.
 - String, Double, Long, Date 4가지 형식만 지원함.
-- Spring Batch 전용 Scope를 선언하여 사용할 수 있음.
+- 생성 및 바인딩 방법.
+  - 앱 실행시 주입 (Java -jar LogBatch.jar requestDate=20210101)
+  - 코드로 생성 (JobParameterBuilder, DefaultJobParametersConvertor)
+  - SpEL 이용 (@Value("#{jobParameter[requestDate]}"), @JobScope, @StepScope)
+- Step에서 사용가능.
 
 </details>
 
 <details>
     <summary>JobExecution</summary>
 
-- JobInstance 실행 시 생기는 객체.
-  - 실패한 Job을 재실행할 경우 새로운 객체가 생성됨.
-- JobInstance 상태, 시작시간, 종료시간, 생성시간 등의 정보를 담고 있음.
+- JobInstance 실행 결과 상태, 시작시간, 종료시간, 생성시간 등의 정보를 담고 있음.
+- FAILED, COMPLETED 등 실행 결과 상태를 가지며, COMPLETED는 실행 완료로 간주되어 재실행 불가능. FAILED는 재실행 가능. 즉, 하나의 JobInstance 실행 결과가 COMPLETED가 될 때까지 JobInstance 재실행 가능.
+- 캐시된 JobInstance가 있는 경우, Failed 경우에만 동일한 JobInstance 실행 가능.
+
+  ![alt text](image/image-8.png)
+  ![alt text](image/image-9.png)
 
 </details>
 
 <details>
     <summary>Step</summary>
 
-- Job의 배치처리를 정의하고 순차적인 단계를 캡슐화 한 것.
-- 최소 1개의상의 step을 가져야하며 job의 실제 일괄 처리 제어하는 정보가 들어있음.
+- Job의 배치처리를 정의하고 컨트롤하는데 필요한 모든 정보를 가지고 있는 도메인 객체.
+- 배치작업을 어떻게 구성하고 실행할 것인지 Job의 세부작업을 Task 기반으로 설정하고 명세한 객체.
+- Job은 최소 1개 이상의 step을 가져야함.
+- 기본 구현체
+  - TaskletStep (가장 기본이 되는 클래스. Tasklet 타입의 구현체 제어)
+  - PartitionStep (멀티스레드 방식으로 Step을 여러개로 분리해서 실행)
+  - JobStep (Step 내에서 Job 실행. job->step->job->step)
+  - FlowStep (Step 안에서 Flow 실행)
+- 기본적으로 Job은 여러 Step으로 구성되며, 각 Step은 실제 해야할 일들이 정의되어 있음.
+
+  ![alt text](image/image-10.png)
 
 </details>
 
 <details>
     <summary>StepExecution</summary>
 
-- Step 실행 시 새로운 StepExecution 객체 생성됨.
-  - Job 하나에 여러 Step이 있을 때, 실패한 Step 이후의 Step은 실행 되지 않으므로 실패 이후의 Step은 StepExecution 생성 안됨.
-- JobExecution에 저장되는 정보 외에 Read Count, Write Count, Commit Count, Skip Count 등의 정보를 담고 있음.
+- Step 실행 시도를 의미하며 실행 중 발생한 정도들을 저장하는 객체.
+- Step의 시작, 종료, 상태 등의 정보, JobExecution에 저장되는 정보 외에 Read Count, Write Count, Commit Count, Skip Count 등의 정보를 가짐.
+- Job이 재실행 되더라도 이미 성공한 Step은 재실행하지 않으며 실패한 Step부터 실행됨.
+- Job 하나에 여러 Step이 있을 때, 실패한 Step 이후의 Step은 실행 되지 않으므로 실패 이후의 Step은 StepExecution 생성 안됨.
+- StepExecution 하나라도 실패한다면 JobExecution 실패함.
+
+  ![alt text](image/image-11.png)
+
+</details>
+
+<details>
+  <summary>StepContribution</summary>
+
+- 청크 프로세스의 변경사항을 버퍼링 한 후 StepExecution 업데이트하는 도메인 객체.
+- 청크 커밋 직전 StepExecution의 apply 메서드를 호출하여 상태를 업데이트 함.
+
+  ![alt text](image/image-12.png)
 
 </details>
 
 <details>
     <summary>ExecutionContext</summary>
 
-- 공유 데이터 저장소.
-- JobExecutionContext, StepExecutionContext 2가지가 있음.
-  - JobExecutionContext: Commit 시점에 데이터 저장.
-  - StepExecutionContext: 실행 사이에 데이터 저장.
+- 키 값으로 된 컬렉션으로 StepExecution, JobExecution 객체 상태를 저장하고 공유하는 객체.
+
+  - JobExecutionContext: Commit 시점에 데이터 저장. 각 Job별 하나씩 가짐. Job 간 공유 안됨. 해당 Job의 Step간 공유 가능.
+  - StepExecutionContext: 실행 사이에 데이터 저장. 각 Step별 하나씩 가짐. Step 간 공유 안됨.
+
+  ![alt text](image/image-13.png)
 
 </details>
 
 <details>
     <summary>JobRepository</summary>
 
-- 위에서 설명한 모든 용어의 처리 정보를 담고 있는 매커니즘.
-- Job 실행 시 JobRepository에 JobExecution, StepExecution 생성하고 ExecutionContext 정보들을 저장, 조회, 사용할 수 있는 공간이 되어줌.
+- 위에서 설명한 모든 용어의 처리 정보와 배치 작업 정보를 저장하는 저장소.
+
+  ![alt text](image/image-14.png)
 
 </details>
 
 <details>
     <summary>JobLauncher</summary>
 
-- Job과 JobParameter 사용하여 Job 실행하는 객체.
+- Job과 JobParameter 인자를 받아 Job 실행하고 최종 Client에게 JobExecution 반환.
+- 동기적 실행. (기본값으로 JobExecution 획득하고 배치 처리를 완료한 이후 Client에게 JobExecution 반환. 스케줄러 배치 처리에 적합.)
+- 비동기적 실행. (TaskExecutor를 SimpleAsyncTaskExecutor로 설정. JobExecution 획득 후 바로 Client에게 JobExecution 반환. http 요청에 의한 배치처리에 적합.)
+
+  ![alt text](image/image-15.png)
 
 </details>
 
@@ -274,6 +317,10 @@
 > ## ItemReader
 
 - DB, File, XML, JSON, JMS(Java Message Service) 등 다양한 데이터 소스를 읽어오는 역할.
+  - FlatFileItemReader (2차원 데이터로 표현된 유형의 파일 처리)
+  - StaxEventItemReader (XML 유형 파일 처리)
+  - JsonItemReader (JSON 유형 파일 처리)
+  - 자세한 사항은 필요할 때 찾아보면 될 듯 [링크](https://tonylim.tistory.com/434)
 - Spring Batch에서 지원하지 않는 Reader가 필요할 경우 인터페이스를 활용하여 직접 만들 수 있음.
 - Spring의 JdbcTemplate는 분할 처리를 지원하지 않으므로(기본적으로 select만 사용할 경우 조건에 맞는 모든 데이터를 가져오므로) 개발자가 직접 limit, offset 작업을 해주어야 함. 이를 해결하기 위한 방법으로 Cursor, Paging가 있음.(DB 처리 방식)
 - Cursor
