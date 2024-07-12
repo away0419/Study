@@ -1580,4 +1580,159 @@ spring:
 
 </details>
 
+<br/>
+<br/>
+
+> ## repeat
+
+<details>
+  <summary>repeatJobConfiguration</summary>
+
+- tasklet이 두개인 이유는 다음과 같음.
+  - repeatTemplate가 로직을 반복 시키기위한 객체임.
+  - repeatTemplate는 할당받은 tasklet의 리턴값을 보고 반복할지 완료되었는지 판단함.
+  - Step은 할당받은 tasklet의 리턴값이 완료여야지 끝남.
+  - 즉, Step안의 첫번째 tasklet은 return으로 Finished를 받아야하고 repeatTemplate는 실제 비즈니스를 처리하는 tasklet이 필요함.
+  - 여기서 repeatTemplate.itater는 기본적으로 Finished를 받거나 횟수를 채울때까지 반복함.
+  - repeatBusinessTasklet().execute(contribution, chunkContext) 는 비즈니스를 함수로 정의한 것뿐 바로 구현해도 됨.
+
+  ```java
+  package com.example.java.repeat;
   
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.core.step.tasklet.Tasklet;
+  import org.springframework.batch.repeat.RepeatStatus;
+  import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+  import org.springframework.batch.repeat.support.RepeatTemplate;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  @Slf4j
+  @Configuration
+  public class repeatJobConfiguration {
+      public Tasklet repeatBusinessTasklet() {
+          return (contribution, chunkContext) -> {
+              log.info("businessTasklet 실행");
+  
+              return RepeatStatus.CONTINUABLE;
+          };
+      }
+  
+      @Bean
+      public Tasklet repeatTasklet() {
+          return (contribution, chunkContext) -> {
+              log.info(">>>> repeatTasklet");
+              RepeatTemplate repeatTemplate = new RepeatTemplate();
+              repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(3));
+              repeatTemplate.iterate((repeatCallBack) -> repeatBusinessTasklet().execute(contribution, chunkContext));
+  
+              return RepeatStatus.FINISHED;
+          };
+      }
+  
+      @Bean
+      public Step repeatStep(JobRepository jobRepository, Tasklet repeatTasklet, PlatformTransactionManager platformTransactionManager) {
+          log.info(">>>> repeatStep");
+          return new StepBuilder("repeatStep", jobRepository)
+                  .tasklet(repeatTasklet, platformTransactionManager)
+                  .build();
+      }
+  
+      @Bean
+      public Job repeatJob(JobRepository jobRepository, Step repeatStep) {
+          log.info(">>>> repeatJob");
+          return new JobBuilder("repeatJob", jobRepository)
+                  .start(repeatStep)
+                  .build();
+      }
+  }
+  
+  ```
+
+</details>
+
+<details>
+  <summary>repeatChunkJobConfiguration</summary>
+
+- 비즈니스 로직을 담당하는 ItemProcessor에서 구현함.
+
+  ```java
+  package com.example.java.repeat;
+  
+  import lombok.extern.slf4j.Slf4j;
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.item.ItemProcessor;
+  import org.springframework.batch.item.ItemReader;
+  import org.springframework.batch.item.ItemWriter;
+  import org.springframework.batch.item.support.ListItemReader;
+  import org.springframework.batch.repeat.RepeatCallback;
+  import org.springframework.batch.repeat.RepeatContext;
+  import org.springframework.batch.repeat.RepeatStatus;
+  import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+  import org.springframework.batch.repeat.support.RepeatTemplate;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  import java.util.Arrays;
+  
+  @Slf4j
+  @Configuration
+  public class repeatChunkJobConfiguration {
+  
+      @Bean
+      public ItemReader<String> repeatItemReader() {
+          return new ListItemReader<>(Arrays.asList("one", "two", "Three"));
+  
+      }
+  
+      @Bean
+      public ItemProcessor<String, String> repeatItemProcessor() {
+          RepeatTemplate repeatTemplate = new RepeatTemplate();
+          repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(3));
+          repeatTemplate.iterate(repeatCallBack -> {
+              log.info("repeatChunk Test");
+              return RepeatStatus.CONTINUABLE;
+          });
+  
+          return String::toUpperCase;
+      }
+  
+      @Bean
+      public ItemWriter<String> repeatItemWriter() {
+          return items -> items.forEach(log::info);
+      }
+  
+      @Bean
+      public Step repeatChunkStep(JobRepository jobRepository, PlatformTransactionManager platformTransactionManager) {
+          log.info("chunk Step");
+          return new StepBuilder("chunkStep", jobRepository)
+                  .<String, String>chunk(10, platformTransactionManager)
+                  .reader(repeatItemReader())
+                  .processor(repeatItemProcessor())
+                  .writer(repeatItemWriter())
+                  .build();
+      }
+  
+      @Bean
+      public Job repeatChunkJob(JobRepository jobRepository, Step repeatChunkStep) {
+          log.info(">>>> repeatChunkJob");
+          return new JobBuilder("repeatChunkJob", jobRepository)
+                  .start(repeatChunkStep)
+                  .build();
+      }
+  
+  }
+  ```
+
+</details>

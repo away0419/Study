@@ -1458,3 +1458,151 @@ class MultiJobConfiguration {
 </details>
 
 
+<br/>
+<br/>
+
+> ## repeat
+
+<details>
+  <summary>RepeatTakletJobConfiguration</summary>
+
+- java와 동일.
+
+  ```kotlin
+  package com.example.kotlin.repeat
+  
+  import org.slf4j.LoggerFactory
+  import org.springframework.batch.core.Job
+  import org.springframework.batch.core.Step
+  import org.springframework.batch.core.job.builder.JobBuilder
+  import org.springframework.batch.core.repository.JobRepository
+  import org.springframework.batch.core.step.builder.StepBuilder
+  import org.springframework.batch.core.step.tasklet.Tasklet
+  import org.springframework.batch.repeat.RepeatStatus
+  import org.springframework.batch.repeat.policy.SimpleCompletionPolicy
+  import org.springframework.batch.repeat.support.RepeatTemplate
+  import org.springframework.context.annotation.Bean
+  import org.springframework.context.annotation.Configuration
+  import org.springframework.transaction.PlatformTransactionManager
+  
+  @Configuration
+  class RepeatTakletJobConfiguration {
+      private val log = LoggerFactory.getLogger(this.javaClass)!!
+  
+      fun repeatBusinessTaskLet(): Tasklet {
+          return Tasklet { contribution, chunkContext ->
+              log.info(">>>> repeatBusinessTaskLet")
+              RepeatStatus.CONTINUABLE
+          };
+      }
+  
+      @Bean
+      fun repeatStep(
+          jobRepository: JobRepository,
+          singleTaskLet: Tasklet,
+          platformTransactionManager: PlatformTransactionManager,
+      ): Step {
+          log.info(">>>> repeatStep")
+          return StepBuilder("repeatStep", jobRepository)
+              .tasklet({ contribution, chunkContext ->
+                  log.info(">>>> repeatStepTasklet")
+                  val repeatTemplate = RepeatTemplate()
+  
+                  repeatTemplate.setCompletionPolicy(SimpleCompletionPolicy(3))
+                  repeatTemplate.iterate { repeatBusinessTaskLet().execute(contribution, chunkContext)!! }
+  
+                  RepeatStatus.FINISHED
+              }, platformTransactionManager).build()
+      }
+  
+      @Bean
+      fun repeatTaskletJob(
+          jobRepository: JobRepository,
+          repeatStep: Step,
+          platformTransactionManager: PlatformTransactionManager
+      ): Job {
+          log.info(">>>> repeatTaskletJob")
+          return JobBuilder("repeatTaskletJob", jobRepository)
+              .start(repeatStep)
+              .build()
+      }
+  
+  }
+  ```
+</details>
+
+<details>
+  <summary>RepeatChunkJobConfiguration</summary>
+
+- java 와 동일.
+
+  ```kotlin
+  package com.example.kotlin.repeat
+  
+  import org.slf4j.LoggerFactory
+  import org.springframework.batch.core.Job
+  import org.springframework.batch.core.Step
+  import org.springframework.batch.core.job.builder.JobBuilder
+  import org.springframework.batch.core.repository.JobRepository
+  import org.springframework.batch.core.step.builder.StepBuilder
+  import org.springframework.batch.item.ItemProcessor
+  import org.springframework.batch.item.ItemReader
+  import org.springframework.batch.item.ItemWriter
+  import org.springframework.batch.item.support.ListItemReader
+  import org.springframework.batch.repeat.RepeatStatus
+  import org.springframework.batch.repeat.policy.SimpleCompletionPolicy
+  import org.springframework.batch.repeat.support.RepeatTemplate
+  import org.springframework.context.annotation.Bean
+  import org.springframework.context.annotation.Configuration
+  import org.springframework.transaction.PlatformTransactionManager
+  import java.util.*
+  
+  @Configuration
+  class RepeatChunkJobConfiguration {
+      private val log = LoggerFactory.getLogger(this.javaClass)!!
+  
+  
+      @Bean
+      fun repeatChunkItemReader(): ItemReader<String> = ListItemReader(listOf("one", "two", "three"))
+  
+      @Bean
+      fun repeatChunkItemProcessor(): ItemProcessor<String, String> = ItemProcessor {
+          val repeatTemplate = RepeatTemplate()
+          repeatTemplate.setCompletionPolicy(SimpleCompletionPolicy(3))
+          repeatTemplate.iterate{
+              log.info("repeatChunkProcessor")
+              RepeatStatus.CONTINUABLE
+          }
+  
+          it.uppercase(Locale.getDefault()) }
+  
+      @Bean
+      fun repeatChunkItemWriter(): ItemWriter<String> = ItemWriter { items -> items.forEach { log.info(it) } }
+  
+      @Bean
+      fun repeatChunkStep(
+          jobRepository: JobRepository,
+          platformTransactionManager: PlatformTransactionManager
+      ): Step {
+          log.info(">>>> repeatChunkStep")
+          return StepBuilder("repeatChunkStep", jobRepository)
+              .chunk<String, String>(10, platformTransactionManager)
+              .reader(repeatChunkItemReader())
+              .processor(repeatChunkItemProcessor())
+              .writer(repeatChunkItemWriter())
+              .build()
+      }
+  
+      @Bean
+      fun repeatChunkJob(jobRepository: JobRepository, repeatChunkStep: Step): Job {
+          log.info(">>>> repeatChunkJob")
+          return JobBuilder("repeatChunkJob", jobRepository)
+              .start(repeatChunkStep)
+              .build()
+      }
+  
+  }
+  ```
+
+
+</details>
