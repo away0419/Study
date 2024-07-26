@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.encryption.user.mapper.UserMapper">
+    <select id="selectAllUser" resultType="com.example.encryption.user.UserDTO">
+        SELECT *
+        FROM USERS
+    </select>
+
+    <insert id="insertUser" parameterType="com.example.encryption.user.UserDTO">
+        INSERT INTO USERS (NAME, ADDRESS, PHONE, EMAIL, ETC)
+        VALUES (#{name}, #{address}, #{phone}, #{email}, #{etc})
+    </insert>
+</mapper>
