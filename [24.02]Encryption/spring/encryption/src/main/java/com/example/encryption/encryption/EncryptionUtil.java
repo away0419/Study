@@ -33,9 +33,9 @@ public class EncryptionUtil {
     }
 
     /**
-     * 암호화
-     * @param data
-     * @return
+     * 데이터를 AES 알고리즘으로 암호화
+     * @param data 암호화할 데이터
+     * @return 암호화된 데이터 (Base64 인코딩된 문자열)
      */
     public String encrypt(String data) {
         log.info("encrypt: data = {}", data);
@@ -73,9 +73,9 @@ public class EncryptionUtil {
     }
 
     /**
-     * 복호화
-     * @param data
-     * @return
+     * 데이터를 AES 알고리즘으로 복호화
+     * @param data 복호화할 데이터 (Base64 인코딩된 문자열)
+     * @return 복호화된 데이터
      */
     public String decrypt(String data) {
         log.info("decrypt: data = {}", data);
@@ -110,9 +110,9 @@ public class EncryptionUtil {
     }
 
     /**
-     * 객체 클래스 검증 후 암복호화 실행
-     * @param cryptoData
-     * @param isCryptoMode
+     * 객체의 클래스 확인 후 재귀 또는 cryptoDataFields 메소드 실행 또는 아무것도 안함.
+     * @param cryptoData 암호화 또는 복호화할 객체
+     * @param cryptoMode 암호화 또는 복호화 모드
      */
     public void validateAndCrypto(Object cryptoData, CryptoMode cryptoMode) {
         if (cryptoData == null) {
@@ -145,11 +145,10 @@ public class EncryptionUtil {
     }
 
     /**
-     * 객체 필드들 확인
-     * 필드 어노테이션 확인 후 @EncryptedField 있으면 암복호화
-     * 없으면 객체 암복호화 검증
-     * @param cryptoData
-     * @param cryptoMode
+     * 객체의 필드를 탐색하여 @EncryptedField 있는 필드를 암호화 또는 복호화
+     * @EncryptedField 없는 경우 validateAndCrypto 메소드 실행
+     * @param cryptoData 암호화 또는 복호화할 객체
+     * @param cryptoMode 암호화 또는 복호화 모드
      */
     public void cryptoDataFields(Object cryptoData, CryptoMode cryptoMode) {
         Field[] fields = cryptoData.getClass().getDeclaredFields();
@@ -179,8 +178,8 @@ public class EncryptionUtil {
 
     /**
      * 객체가 원시 타입 혹은 래퍼 타입인지 확인
-     * @param object
-     * @return
+     * @param object 확인할 객체
+     * @return 원시 타입 혹은 래퍼 타입이면 true, 아니면 false
      */
     private boolean isPrimitiveOrWrapper(Object object) {
         Class<?> type = object.getClass();
@@ -200,8 +199,8 @@ public class EncryptionUtil {
 
     /**
      * 객체가 암호화 가능한 타입인지 확인
-     * @param object
-     * @return
+     * @param object 확인할 객체
+     * @return 암호화 가능한 타입이면 true, 아니면 false
      */
     private boolean isClassCryptoPossible(Object object) {
         return object instanceof UserDTO;
