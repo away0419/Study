@@ -368,6 +368,56 @@
 
 </details>
 
+<details>
+  <summary>FaultTolerant</summary>
+
+- Job 실행 중 오류 발생 시 장애를 처리하기 위한 기능.
+- 오류가 발생하면 Step이 즉시 종료되지 않고 Retry 혹은 Skip 기능을 활성화 하여 서비스가 돌아가도록 할 수 있음.
+- FaultTolerant는 청크 기반의 포로세스 기반위에 Skip, Retry 기능이 추가되어 재정의 되어 있음.
+</details>
+
+<details>
+  <summary>Skip</summary>
+
+- ItemReader, ItemProcessor, ItemWriter 에서 적용 가능.
+- 데이터를 처리하는 동안 설정된 Exception 발생한 경우, 해당 처리를 건너 뛰는 기능.
+- 사소한 오류에 대해 Step 실패 처리 대신 Skip을 할 수 있음.
+- 오류 발생 시 스킵 설정에 의해 Item2 건너뛰고 Item3부터 다시 처리.
+- ItemReader는 예외가 발생하면 해당 아이템만 스킵하고 진행.
+- ItemWriter, ItemProcessor에서 예외 발생 시 Chunk의 처음으로 돌아간 뒤 스킵된 아이템을 제외한 나머지 아이템들을 가지고 처리함.
+- ItemReader가 캐싱을 해놓기 때문에 따로 io 작업 하지 않으며, processor는 캐싱된 것을 받은 뒤 item2 처리 때 skip함.
+- ItemWriter도 ItemProcessor 캐싱 데이터를 가져와 예외 발생한 Item Skip.
+- Skip 설정 시 횟수는 총 횟수임. 즉, Reader, Processor, Writer에서 일어난 모든 Skip 횟수가 넘으면 Exception 던지고 Batch 종료.
+
+  ![alt text](image/image-22.png)
+
+</details>
+
+<details>
+  <summary>Retry</summary>
+
+- ItemProcessor, ItemWriter 에서 적용 가능. (두개만 RetryTemplate 안에서 돌기 때문.)
+- 설정된 Exception 발생 시 데이터 처리를 재시도하는 기능.
+- Reader는 retry 기능이 없다. 오류 발생 시 Chunk 단계의 처음부터 다시 시작함.
+- 예외 발생 시 재시도 대상에 포함된 예외인지와 재시도 카운터를 체크해서 retry 결정함. 만약 retry 할 수 없다면 recoverCallback을 수행함.
+
+  ![alt text](image/image-23.png)
+
+</details>
+
+<details>
+  <summary>skip&retry</summary>
+
+- 기본적으로 retry 후 skip.
+- retry로 예외를 처리했다면 skip은 예외가 발생하지 않은 것이 되어 작동 x.
+- retry 횟수가 초과되더라도 recover에서 어떻게 처리하는지에 따라 skip 작동 유무가 다름. (recover에서 예외를 처리해버릴 수도 있기 때문.)
+
+  ![alt text](image/image-24.png)
+  ![alt text](image/image-25.png)
+  ![alt text](image/image-26.png)
+
+</details>
+
 <br/>
 <br/>
 
