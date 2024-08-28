@@ -56,12 +56,7 @@ public class EncryptionUtil {
                     System.arraycopy(encrypted, 0, combined, salt.length, encrypted.length);
 
                     return Base64.getEncoder().encodeToString(combined);
-                } catch (BadPaddingException |
-                         IllegalBlockSizeException |
-                         InvalidAlgorithmParameterException |
-                         InvalidKeyException |
-                         NoSuchPaddingException |
-                         NoSuchAlgorithmException e) {
+                } catch (Exception e) {
                     log.info(e.getLocalizedMessage());
                     return EMPTY;
                 }
@@ -83,7 +78,7 @@ public class EncryptionUtil {
         return Optional.ofNullable(data)
             .map(d -> {
                 try {
-                    byte[] dataBytes = Base64.getDecoder().decode(data);
+                    byte[] dataBytes = Base64.getDecoder().decode(d);
                     byte[] salt = new byte[saltUtil.getSALT_LENGTH()];
                     byte[] encrypted = new byte[dataBytes.length - salt.length];
 
@@ -95,13 +90,9 @@ public class EncryptionUtil {
                     cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, iv);
 
                     return new String(cipher.doFinal(encrypted), StandardCharsets.UTF_8);
-                } catch (InvalidAlgorithmParameterException |
-                         NoSuchPaddingException |
-                         NoSuchAlgorithmException |
-                         InvalidKeyException |
-                         IllegalBlockSizeException |
-                         BadPaddingException e) {
-                    return EMPTY;
+                } catch (Exception e) {
+                        log.info("decrypt error: {}", e.getLocalizedMessage());
+                    return d;
                 }
             }).orElseGet(() -> {
                 log.info("decrypt: decryptData is NULL");

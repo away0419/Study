@@ -1,10 +1,14 @@
 package com.example.encryption.user;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -21,6 +25,12 @@ public class UserController {
     @PostMapping("/insert")
     public int insertUser(@RequestBody UserDTO userDTO) {
         return userService.addUser(userDTO);
+    }
+
+    @GetMapping("/repeat")
+    public int getRepeatUsers() {
+        userService.repeat();
+        return 1;
     }
 
 }

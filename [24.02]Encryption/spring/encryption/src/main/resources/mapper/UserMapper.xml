@@ -6,6 +6,11 @@
         SELECT *
         FROM USERS
     </select>
+    <select id="selectUserByName" resultType="com.example.encryption.user.UserDTO">
+        SELECT *
+        FROM USERS
+        WHERE name = #{name}
+    </select>
 
     <insert id="insertUser" parameterType="com.example.encryption.user.UserDTO">
         INSERT INTO USERS (NAME, ADDRESS, PHONE, EMAIL, ETC)

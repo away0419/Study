@@ -8,4 +8,5 @@ import java.util.List;
 public interface UserMapper {
     int insertUser(UserDTO userDTO);
     List<UserDTO> selectAllUser();
+    UserDTO selectUserByName(String name);
 }

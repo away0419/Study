@@ -1,5 +1,7 @@
 package com.example.encryption.encryption;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -15,9 +17,11 @@ import org.springframework.stereotype.Component;
 public class EncryptionAspect {
 
     private final EncryptionUtil encryptionUtil;
+    private final ConcurrentHashMap<String, Object> cache;
 
     public EncryptionAspect(EncryptionUtil encryptionUtil) {
         this.encryptionUtil = encryptionUtil;
+        this.cache = new ConcurrentHashMap<>();
     }
 
     /**
@@ -37,8 +41,19 @@ public class EncryptionAspect {
      */
     @AfterReturning(pointcut = "execution(* com.example.encryption..*Mapper.select*(..)) || execution(* com.example.encryption..*Mapper.get*(..)) || execution(* com.example.encryption..*Mapper.findBy*(..))", returning = "entity")
     public void decryptEntity(Object entity) {
-        encryptionUtil.validateAndCrypto(entity, CryptoMode.DECRYPTION);
+        String cacheKey = generateCacheKey(entity);
+
+        if (!cache.containsKey(cacheKey)) {
+            encryptionUtil.validateAndCrypto(entity, CryptoMode.DECRYPTION);
+            cache.put(cacheKey, entity);
+        } else {
+            log.info("Using cached entity for decryption");
+        }
+        log.info("hashcode: {}, identityHashCode: {}, entity: {}", entity.hashCode(), System.identityHashCode(entity), entity);
     }
 
+    private String generateCacheKey(Object entity) {
+        return String.valueOf(entity.hashCode());
+    }
 
 }

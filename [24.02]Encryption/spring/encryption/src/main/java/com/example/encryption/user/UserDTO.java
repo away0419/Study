@@ -8,7 +8,6 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @Builder
-@ToString
 public class UserDTO {
     private String name;
     @EncryptedField
