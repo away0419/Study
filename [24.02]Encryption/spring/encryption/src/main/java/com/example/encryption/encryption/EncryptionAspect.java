@@ -3,6 +3,8 @@ package com.example.encryption.encryption;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -40,9 +42,14 @@ public class EncryptionAspect {
      * @param entity
      */
     @AfterReturning(pointcut = "execution(* com.example.encryption..*Mapper.select*(..)) || execution(* com.example.encryption..*Mapper.get*(..)) || execution(* com.example.encryption..*Mapper.findBy*(..))", returning = "entity")
-    public void decryptEntity(Object entity) {
-        String cacheKey = generateCacheKey(entity);
+    public void decryptEntity(JoinPoint joinPoint, Object entity) {
+        String cacheKey = generateCacheKey(joinPoint.getTarget());
 
+        if (AopUtils.isProxy(entity)) {
+            log.info("The result is a proxy object.");
+        } else {
+            log.info("The result is not a proxy object.");
+        }
         if (!cache.containsKey(cacheKey)) {
             encryptionUtil.validateAndCrypto(entity, CryptoMode.DECRYPTION);
             cache.put(cacheKey, entity);
@@ -50,10 +57,12 @@ public class EncryptionAspect {
             log.info("Using cached entity for decryption");
         }
         log.info("hashcode: {}, identityHashCode: {}, entity: {}", entity.hashCode(), System.identityHashCode(entity), entity);
+
     }
 
     private String generateCacheKey(Object entity) {
-        return String.valueOf(entity.hashCode());
+        log.info("identityHashCode: {}, entity: {}", System.identityHashCode(entity), entity);
+        return String.valueOf(System.identityHashCode(entity));
     }
 
 }

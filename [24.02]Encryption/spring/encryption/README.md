@@ -614,4 +614,11 @@ public enum CryptoMode {
 - 해결 방법
   - 인터셉터를 이용해 SQL에서 캐싱이 발생했는지 잡아내고 이를 AOP에서 확인하고 처리하는 방법.
   - AOP 실행 시 반환 받은 값의 HashCode를 캐싱하여 관리하는 방법. (System.identityHashCode() 사용.-> 거의 항상 유니크) 이때, Caching 사용하여 시간 지나면 삭제되도록 짜는게 효율적.
+  - System.identityHashCode() 사용하여 캐시 구현할 때 주의점이 있음. AOP가 Object를 받아올 때 프록시를 활용하여 실제 객체의 프록시 객체를 만들어 가져옴.
+  - 프록시 객체를 AOP 실행할 때마다 새로 만들기 때문에 System.identityHashCode() 사용할 경우 매번 다름. (hashcode()는 동일할 수도 다를 수도 있음. 유니크 보장이 안됨)
+  - 따라서 프록시 객체의 타겟 객체를 가져와 실제 타겟 객체의 System.identityHashCode()로 캐싱을 활용해야 함.
+  - 프록시 객체로 받아와서 값을 변경해도 실제 타겟 객체 값이 변경되는 이유는 참조 객체이기 때문임.
+  - 결국 AOP로 작업시 프록시 객체와 관련된 추가적인 설정이 필요하다는 뜻.
+  - [AOP정리참고](https://github.com/away0419/Study_2023-2024/tree/main/%5B23.06%5DAOP/spring_aop/springboot_java)
+
 </details>

@@ -27,9 +27,19 @@ public class UserController {
         return userService.addUser(userDTO);
     }
 
-    @GetMapping("/repeat")
-    public int getRepeatUsers() {
+    @GetMapping("/repeat1")
+    public int getRepeat1Users() {
         userService.repeat();
+        return 1;
+    }
+    @GetMapping("/repeat2")
+    public int getRepeat2Users() {
+        userService.repeat2();
+        return 1;
+    }
+    @GetMapping("/test")
+    public int getTestUsers() {
+        userService.test();
         return 1;
     }
 

@@ -15,5 +15,7 @@ spring:
       mode: always
       data-locations: classpath:data.sql
 
+
 mybatis:
   mapper-locations: classpath:mapper/*.xml
+

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,11 +25,28 @@ public class UserService {
         return userMapper.insertUser(userDTO);
     }
 
-    @Transactional
     public void repeat(){
         for (int i = 0; i < 10; i++) {
-            log.info("반복: {}",i);
-            userMapper.selectUserByName("홍길동");
+            log.info("1. 반복: {}",i);
+            Optional<UserDTO> optionalUserDTO = userMapper.selectOptionaltUserByName("홍길동");
+            log.info("sdfsd : {}",optionalUserDTO.get());
         }
     }
+
+    @Transactional
+    public void repeat2(){
+        repeat();
+
+        for (int i = 0; i < 10; i++) {
+            log.info("2. 반복: {}",i);
+            userMapper.selectOptionaltUserByName("홍길동");
+        }
+    }
+
+    @Transactional
+    public void test(){
+        this.repeat();
+        this.repeat2();
+    }
+
 }
