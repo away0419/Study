@@ -5,7 +5,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
@@ -19,11 +21,11 @@ import org.springframework.stereotype.Component;
 public class EncryptionAspect {
 
     private final EncryptionUtil encryptionUtil;
-    private final ConcurrentHashMap<String, Object> cache;
+    private final EncryptionCacheUtil encryptionCacheUtil;
 
-    public EncryptionAspect(EncryptionUtil encryptionUtil) {
+    public EncryptionAspect(EncryptionUtil encryptionUtil, EncryptionCacheUtil encryptionCacheUtil) {
         this.encryptionUtil = encryptionUtil;
-        this.cache = new ConcurrentHashMap<>();
+        this.encryptionCacheUtil = encryptionCacheUtil;
     }
 
     /**
@@ -32,37 +34,43 @@ public class EncryptionAspect {
      *
      * @param entity
      */
-    @Before("(execution(* com.example.encryption..*Mapper.insert*(..)) || execution(* com.example.encryption..*Mapper.update*(..))) && args(entity)")
-    public void encryptEntity(Object entity) {
-        encryptionUtil.validateAndCrypto(entity, CryptoMode.ENCRYPTION);
+    // @Before("(execution(* com.example.encryption..*Mapper.insert*(..)) || execution(* com.example.encryption..*Mapper.update*(..))) && args(entity)")
+    // public void encryptEntity(Object entity) {
+    //     encryptionUtil.validateAndCrypto(entity, CryptoMode.ENCRYPTION);
+    // }
+
+    /**
+     * SQL 호출 전 매개변수를 암호화 할 경우, SQL 호출 이후 해당 매개변수는 암호화가 되어 있으므로 이를 재사용하기 힘듬. 따라서 사용 후 복호화 해야함.
+     *
+     * @param joinPoint
+     * @return
+     * @throws Throwable
+     */
+    @Around("(execution(* com.example.encryption..*Mapper.insert*(..)) || execution(* com.example.encryption..*Mapper.update*(..)))")
+    public Object encryptEntity(ProceedingJoinPoint joinPoint) throws Throwable {
+        Object[] args = joinPoint.getArgs();
+
+        for (Object arg : args) {
+            encryptionUtil.validateAndCrypto(arg, CryptoMode.ENCRYPTION);
+        }
+
+        Object result = joinPoint.proceed();
+
+        for (Object arg : args) {
+            encryptionUtil.validateAndCrypto(arg, CryptoMode.DECRYPTION);
+        }
+
+        return result;
     }
 
     /**
      * select, get, findBy 등등 메소드 실행 완료 후 결과 값이 있다면 받아와 AOP 실행.
-     * @param entity
+     * @param result
      */
-    @AfterReturning(pointcut = "execution(* com.example.encryption..*Mapper.select*(..)) || execution(* com.example.encryption..*Mapper.get*(..)) || execution(* com.example.encryption..*Mapper.findBy*(..))", returning = "entity")
-    public void decryptEntity(JoinPoint joinPoint, Object entity) {
-        String cacheKey = generateCacheKey(joinPoint.getTarget());
-
-        if (AopUtils.isProxy(entity)) {
-            log.info("The result is a proxy object.");
-        } else {
-            log.info("The result is not a proxy object.");
-        }
-        if (!cache.containsKey(cacheKey)) {
-            encryptionUtil.validateAndCrypto(entity, CryptoMode.DECRYPTION);
-            cache.put(cacheKey, entity);
-        } else {
-            log.info("Using cached entity for decryption");
-        }
-        log.info("hashcode: {}, identityHashCode: {}, entity: {}", entity.hashCode(), System.identityHashCode(entity), entity);
-
+    @AfterReturning(pointcut = "execution(* com.example.encryption..*Mapper.select*(..)) || execution(* com.example.encryption..*Mapper.get*(..)) || execution(* com.example.encryption..*Mapper.findBy*(..))", returning = "result")
+    public void decryptEntity(JoinPoint joinPoint, Object result) {
+        encryptionCacheUtil.ifAbsent(joinPoint.getTarget(), result, t -> {
+            encryptionUtil.validateAndCrypto(t, CryptoMode.DECRYPTION);
+        });
     }
-
-    private String generateCacheKey(Object entity) {
-        log.info("identityHashCode: {}, entity: {}", System.identityHashCode(entity), entity);
-        return String.valueOf(System.identityHashCode(entity));
-    }
-
 }

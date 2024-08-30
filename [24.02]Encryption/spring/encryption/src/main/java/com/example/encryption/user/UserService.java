@@ -21,15 +21,22 @@ public class UserService {
         return userMapper.selectAllUser();
     }
 
+    @Transactional
     public int addUser(UserDTO userDTO) {
-        return userMapper.insertUser(userDTO);
+        for (int i = 0; i < 10; i++) {
+            userMapper.insertUser(userDTO);
+            String str = userDTO.getName()+ i;
+            log.info(str);
+            userDTO.setName(str);
+        }
+
+        return 1;
     }
 
     public void repeat(){
         for (int i = 0; i < 10; i++) {
             log.info("1. 반복: {}",i);
-            Optional<UserDTO> optionalUserDTO = userMapper.selectOptionaltUserByName("홍길동");
-            log.info("sdfsd : {}",optionalUserDTO.get());
+            userMapper.selectOptionaltUserByName("홍길동");
         }
     }
 

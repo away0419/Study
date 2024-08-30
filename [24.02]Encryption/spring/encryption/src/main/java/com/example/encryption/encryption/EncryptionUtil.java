@@ -1,22 +1,23 @@
 package com.example.encryption.encryption;
 
-import com.example.encryption.user.UserDTO;
-import lombok.extern.slf4j.Slf4j;
+import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import com.example.encryption.user.UserDTO;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -91,7 +92,7 @@ public class EncryptionUtil {
 
                     return new String(cipher.doFinal(encrypted), StandardCharsets.UTF_8);
                 } catch (Exception e) {
-                        log.info("decrypt error: {}", e.getLocalizedMessage());
+                    log.info("decrypt error: {}", e.getLocalizedMessage());
                     return d;
                 }
             }).orElseGet(() -> {
@@ -111,22 +112,22 @@ public class EncryptionUtil {
         }
 
         if (cryptoData instanceof Optional<?>) {
-            Optional<?> optionalResult = (Optional<?>) cryptoData;
+            Optional<?> optionalResult = (Optional<?>)cryptoData;
             if (optionalResult.isPresent()) {
                 validateAndCrypto(optionalResult.get(), cryptoMode);
             }
         } else if (cryptoData instanceof List<?>) {
-            List<?> listResult = (List<?>) cryptoData;
+            List<?> listResult = (List<?>)cryptoData;
             listResult.forEach(v -> {
                 validateAndCrypto(v, cryptoMode);
             });
         } else if (cryptoData instanceof Set<?>) {
-            Set<?> setResult = (Set<?>) cryptoData;
+            Set<?> setResult = (Set<?>)cryptoData;
             setResult.forEach(v -> {
                 validateAndCrypto(v, cryptoMode);
             });
         } else if (cryptoData instanceof Map<?, ?>) {
-            Map<?, ?> mapResult = (Map<?, ?>) cryptoData;
+            Map<?, ?> mapResult = (Map<?, ?>)cryptoData;
             mapResult.forEach((k, v) -> {
                 validateAndCrypto(v, cryptoMode);
             });
@@ -155,7 +156,7 @@ public class EncryptionUtil {
                         continue;
                     }
 
-                    String text = (String) value;
+                    String text = (String)value;
                     String processedValue = cryptoMode == CryptoMode.ENCRYPTION ? encrypt(text) : decrypt(text);
                     field.set(cryptoData, processedValue);
                 } else {

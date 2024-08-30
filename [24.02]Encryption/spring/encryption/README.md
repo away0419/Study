@@ -597,11 +597,13 @@ public enum CryptoMode {
 
 </details>
 
-
 <br/>
 <br/>
 
 > ## 발견된 주의사항
+실제 사용하며 발생한 문제.
+해결 후 소스는 문서에 업데이트 하지 않음. 실제 파일 확인할 것.
+
 <details>
 <summary>transactional</summary>
 
