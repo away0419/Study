@@ -18,7 +18,7 @@
     </select>
 
     <insert id="insertUser" parameterType="com.example.encryption.user.UserDTO">
-        INSERT INTO USERS (NAME, ADDRESS, PHONE, EMAIL, ETC)
-        VALUES (#{name}, #{address}, #{phone}, #{email}, #{etc})
+        INSERT INTO USERS (NAME, ADDRESS, PHONEH, PHONEE, EMAIL, ETC)
+        VALUES (#{name}, #{address}, #{phoneh}, #{phonee}, #{email}, #{etc})
     </insert>
 </mapper>

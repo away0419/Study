@@ -1,4 +1,4 @@
-package com.example.encryption.encryption;
+package com.example.encryption.crypto;
 
 import org.springframework.stereotype.Component;
 

@@ -1,4 +1,4 @@
-package com.example.encryption.encryption;
+package com.example.encryption.cache;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;

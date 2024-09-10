@@ -35,8 +35,7 @@ public class UserService {
 
     public void repeat(){
         for (int i = 0; i < 10; i++) {
-            log.info("1. 반복: {}",i);
-            userMapper.selectOptionaltUserByName("홍길동");
+            log.info("1. {}반복: {} ",i, userMapper.selectOptionaltUserByName("홍길동"));
         }
     }
 
@@ -45,8 +44,7 @@ public class UserService {
         repeat();
 
         for (int i = 0; i < 10; i++) {
-            log.info("2. 반복: {}",i);
-            userMapper.selectOptionaltUserByName("홍길동");
+            log.info("2. {}반복: {} ",i, userMapper.selectOptionaltUserByName("홍길동"));
         }
     }
 

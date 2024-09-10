@@ -1,10 +1,11 @@
-package com.example.encryption.encryption;
+package com.example.encryption.cache;
 
 import lombok.Getter;
 
 @Getter
 public enum CommonCache {
-    ENCRYPT(CommonCacheConstants.ENCRYPT, 20000, 300),
+    ENCRYPT(CommonCacheName.ENCRYPT, 20000, 300),
+    HASHING(CommonCacheName.HASHING, 20000, 300),
     ;
 
     private final String cacheName;      // 캐시명

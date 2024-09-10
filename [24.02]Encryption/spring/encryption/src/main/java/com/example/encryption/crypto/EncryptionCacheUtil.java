@@ -1,4 +1,4 @@
-package com.example.encryption.encryption;
+package com.example.encryption.crypto;
 
 import java.util.Optional;
 import java.util.function.Consumer;
