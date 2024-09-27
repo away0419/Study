@@ -1583,7 +1583,7 @@ spring:
 <br/>
 <br/>
 
-> ## repeat
+> ## Repeat
 
 <details>
   <summary>repeatJobConfiguration</summary>
@@ -1846,6 +1846,9 @@ spring:
 
 > ## Retry
 
+<details>
+  <summary>RetryJobConfiguration</summary>
+
 - retryPolicy 종류
   - AlwaysRetryPolicy: 항상 재시도를 허용함.
   - ExceptionClassifierRetryPolicy: 예외대상을 분류하여 재시도 여부를 결정함.
@@ -1932,4 +1935,8 @@ spring:
   
   }
   ```
+
+</details>
+
+
 

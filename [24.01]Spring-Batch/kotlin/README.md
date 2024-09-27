@@ -1697,6 +1697,9 @@ class MultiJobConfiguration {
 
 > ## Retry
 
+<details>
+  <summary>RetryJobConfiguration</summary>
+
 - java와 동일.
 
   ```kotlin
@@ -1773,3 +1776,6 @@ class MultiJobConfiguration {
   
   }
   ```
+</details>
+
+
