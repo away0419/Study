@@ -421,6 +421,129 @@
 <br/>
 <br/>
 
+> ## 멀티 스레드 프로세싱
+
+- 스프링 배치는 기본적으로 단일 스레드 방식임.
+- 성능 향상과 대규모 데이터 작업을 위한 비동기 처리 및 Scale out 기능을 제공함.
+- Local과 Remote 처리를 지원함.
+- 여러 방식이 있음.
+  <details>
+    <summary>AsyncItemProcessor/AsyncItemWriter</summary>
+
+  ![alt text](image/image-27.png)
+
+  - step 안에서 해당 Processor/Writer에 별도의 스레드가 할당되어 비동기 동작하는 구조.
+  - processor에서 리턴 값으로 List<Future<"T">> 반환.
+  - writer는 processor에서 비동기 실행이 완료될 때까지 대기.
+  - 주의할 점은 AsyncItem은 비동기 실행을 위한 박스이고 해당 로직 안에서 실제 실행하려는 Item을 SetDelegate() 해줘야 함.
+
+  ```java
+  @Bean
+  public AsyncItemProcessor asyncItemProcessor() throws Exception {
+      AsyncItemProcessor<Customer, Customer> asyncItemProcessor = new AsyncItemProcessor();
+
+      asyncItemProcessor.setDelegate(customItemProcessor());
+      asyncItemProcessor.setTaskExecutor(new SimpleAsyncTaskExecutor());
+      // asyncItemProcessor.setTaskExecutor(taskExecutor());
+      asyncItemProcessor.afterPropertiesSet();
+
+      return asyncItemProcessor;
+  }
+
+  @Bean
+  public AsyncItemWriter asyncItemWriter() throws Exception {
+      AsyncItemWriter<Customer> asyncItemWriter = new AsyncItemWriter<>();
+
+      asyncItemWriter.setDelegate(customItemWriter());
+      asyncItemWriter.afterPropertiesSet();
+
+      return asyncItemWriter;
+  }
+
+  ```
+
+  </details>
+  <details>
+    <summary>Multi-threaded Step</summary>
+
+  ![alt text](image/image-28.png)
+
+  - Step 내에서 멀티 스레드로 Chunk 기반 처리가 이루어는 방법.
+  - TaskExecutorRepeatTemplate가 반복자로 사용되며 설정된 개수 만큼의 스레드를 생성하여 수행함.
+  - 각각의 스레드가 독립적으로 수행되는데, ItemReader에서 충돌 방지를 위해 Thread-Safe 한 Reader만 사용해야 함.
+  - JDBCPagingItemReader, JPAPagingItemReader는 Thread-Safe 함.
+  - Thread-Safe 하지 않을 경우 동시성 오류가 발생함.
+
+  </details>
+  <details>
+    <summary>Parallel Steps</summary>
+
+  ![alt text](image/image-29.png)
+
+  - SplitState 사용해서 여러 개의 Flow를 병렬로 실행하는 구조.
+  - FlowExecutionStatus에서 Flow 실행 완료 결과들을 취합하여 다음 단계로 넘어갈지 결정함.
+
+  ```java
+  @Bean
+  public Job job() {
+      return jobBuilderFactory.get("batchJob")
+              .incrementer(new RunIdIncrementer())
+              .start(flow1())
+              .split(taskExecutor()).add(flow2(),flow3())
+              .next(flow4())
+              .end()
+              .listener(new StopWatchJobListener())
+              .build();
+  }
+  // flow1이 끝나면 flow2, flow3가 병렬 실행됨.
+  // 2,3이 끝난 뒤 flow4가 실행됨.
+  ```
+
+  </details>
+  <details>
+    <summary>Partitioning</summary>
+
+  ![alt text](image/image-30.png)
+  ![alt text](image/image-31.png)
+
+  - MasterStep이 SlaveStep 실행하는 구조.
+  - SlaveStep은 각 스레드에 의해 독립적으로 실행되며, 독립적인 StepExecution 파라미터 환경을 구성함.
+  - ItemReader, ItemProcessor, ItemWriter 등 비동기 설정이 되어 있어야 다른 step의 멀티 스레드가 동작한다는 것을 잊지 말자.
+  - MasterStep = PartitionStep. 파티셔닝 기능을 수행하는 Step 구현체이며 파티셔닝 수행 후 StepExecutionAggregator를 사용해 각각의 StepExecution 정보를 최종 집계함.
+  - PartitionHandler. PartitionStep에 의해 호출되며 스레드를 생성해 WorkStep을 병렬로 실행함. WorkStep에서 사용할 StepExecution 생성은 StepExecutionSplitter와 Partitioner에게 위임함. WorkStep을 병렬로 실행 후 최종 결과를 담은 StepExecution을 PartitionStep에 반환함.
+  - StepExecutionSplitter. WorkStep에서 사용할 StepExecution을 gridSize 만큼 생성함. Partitioner를 통해 ExecutionContext를 얻어서 StepExecution에 매핑함.
+  - Partitioner. StepExecution에 매핑할 ExecutionContext를 gridSize 만큼 생성함. 각 ExecutionContext에 저장된 정보는 WorkStep을 실행하는 스레드마다 독립적으로 참조 및 활용이 가능함.
+  - 결국 Step을 실행시키기 위해 필요한 StepExecution, ExecutionContext를 만드는 과정임.
+
+  </details>
+  <details>
+    <summary>SynchronizedItemStreamReader</summary>
+
+  - Thread-Safe 하지 않은 ItemReader를 Thread-Safe 하게 처리하도록 만들어주는 역할
+  - Spring Batch 4.0 부터 지원함.
+  - AsyncItemProcessor의 구성과 비슷한 구성.
+
+  ```java
+  @Bean
+  @StepScope
+  public SynchronizedItemStreamReader<Customer> customItemReader() {
+      JdbcCursorItemReader<Customer> notSafetyReader = new JdbcCursorItemReaderBuilder<Customer>()
+              .fetchSize(60)
+              .dataSource(dataSource)
+              .rowMapper(new BeanPropertyRowMapper<>(Customer.class))
+              .sql("select id, firstName, lastName, birthdate from customer")
+              .name("SafetyReader")
+              .build();
+
+      return new SynchronizedItemStreamReaderBuilder<Customer>()
+              .delegate(notSafetyReader)
+              .build();
+  }
+  ```
+
+<br/>
+<br/>
+
 > ## Scheduler
 
 - Batch Job을 실행 시키기 위한 방법.
