@@ -231,8 +231,8 @@ class MyRepositoryTests {
     - 추가적으로 when() 으로 시작하는 메서드도 있음.
     - 차이점은 when()의 경우 실제 메소드를 호출하기 때문에 대상 메소드에 문제점이 있을 경우 발견 가능.
     - 그러나 시간이 더 걸릴 수 있으므로 상황에 따라 사용하면 됨.
-- Junit과 결합하여 사용하기 위해선 @ExtendWith(MockitoExtension.class) 적용해야 함.
-  - SpringBoot 2.2.0 전에는 @RunWith(MockitoJUnitRunner.class)
+- Junit5과 결합하여 사용하기 위해선 @ExtendWith(MockitoExtension.class) 적용해야 함.
+  - SpringBoot 2.2.0 전에는 @RunWith(MockitoJUnitRunner.class) (Junit4)
 
 <br/>
 <br/>
