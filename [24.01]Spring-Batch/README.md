@@ -544,6 +544,29 @@
 <br/>
 <br/>
 
+> ## Listener
+
+![alt text](image/image-32.png)
+
+- Job, Step, Chunk 등 단계의 실행 전후에 발생하는 이벤트를 용도에 맞게 활용할 수 있도록 제공하는 인터셉터 개념의 클래스
+- 각 단계별 로그 기록을 남기거나 소요된 시간을 계산하거나 실행 상태 정보들을 참조 및 조회 할 수 있음.
+- API 설정에서 각 단계별로 지정 가능.
+- 따로 상속 받는 클래스 없이 커스텀 클래스를 작성한 뒤, 메소드에 어노테이션을 추가하여 로직 생성. 이후 해당 클래스를 listener()로 셋팅해 사용함.
+- SkipListener
+  ![alt text](image/image-33.png)
+
+  - 예외 발생할 때 각각 리스너 메소드를 통해 사용자가 지정한 작업 수행함.
+
+- RetryListener
+  ![alt text](image/image-34.png)
+
+  - open: 재시도 전 매번 호출, false 반환 시 retry 시도 안함.
+  - close: 재시도 후 매번 호출함.
+  - onError: 재시도 실패시 마다 호출함.
+
+<br/>
+<br/>
+
 > ## Scheduler
 
 - Batch Job을 실행 시키기 위한 방법.
