@@ -569,12 +569,106 @@
 
 > ## Test Code
 
-- 스프링 배치의 경우 단위 테스트보다 통합 테스트 작성이 좀 더 쉬움.
+- 스프링 배치의 경우 단위 테스트보다 통합 테스트 작성이 좀 더 쉬움. (단위 테스트는 [링크](https://jojoldu.tistory.com/456)참조)
 - @SpringBatchTest 어노테이션을 통해 테스트에 필요한 여러 유틸 Bean을 먼저 등록 후, @Autowired 로 사용하기.
   - JobLauncherTestUtils: 스프링 배치 테스트에 필요한 전반적인 유틸 기능 지원.
   - JobRepositoryTestUtils: DB에 생성된 JobExecution을 쉽게 생성/삭제 가능하게 지원.
   - StepScopeTestExecutionListener: 배치 단위 테스트시 StepScope 컨텓스트 생성. 해당 컨텍스트를 통해 JobParameter등을 단위테스트에서 DI 받을 수 있음.
   - JobScopeTestExecutionListener: 배치 단위 테스트시 JobScope 컨텍스트를 생성. 해당 컨텍스트를 통해 JobParameter 등을 단위 테스트에서 DI 받을 수 있음.
+
+<br/>
+<br/>
+
+> ## 기타
+
+  <details>
+    <summary>JobRegistry</summary>
+
+- 생성된 Job을 자동으로 등록, 추적, 관리하며 여러 곳에서 Job을 생성한 경우 ApplicationContext에서 Job을 수집해서 사용할 수 있음.
+- 기본 구현체로 Map 기반의 MapJobRegistry 클래스를 제공함. (JobName이 Key, job 인스턴스가 value)
+- JobRegistryBeanPostProcessor: BeanPostProcessor 단계에서 bean 초기화 시 자동으로 JobRegistry에 Job 등록 시켜주는 Processor
+
+  </details>
+
+  <details>
+    <summary>JobExplorer</summary>
+
+- JobRepository의 readeOnly 버전.
+- 실행중인 Job의 실행 정보인 JobExecution 또는 Step의 실행 정보인 StepExecution을 조회할 수 있음.
+
+  </details>
+
+  <details>
+    <summary>JobOperator</summary>
+
+- JobExplorer, JobRepository, JobRegistry, JobLauncher를 포함하고 있음.
+- 배치의 중단, 재시작, Job 요약 등의 모니터링 가능.
+- 기본 구현체로 SimpleJobOperator 클래스 제공함.
+
+```java
+@RestController
+public class JobController {
+
+ @Autowired
+ private JobRegistry jobRegistry;
+
+ @Autowired
+ private JobOperator jobOperator;
+
+ @Autowired
+ private JobExplorer jobExplorer;
+
+ @PostMapping(value = "/batch/start")
+ public String start(@RequestBody JobInfo jobInfo) throws Exception {
+
+    for(Iterator<String> iterator = jobRegistry.getJobNames().iterator(); iterator.hasNext();){
+
+       SimpleJob job = (SimpleJob)jobRegistry.getJob(iterator.next());
+       System.out.println("job name: " + job.getName());
+
+       jobOperator.start(job.getName(), "id=" + jobInfo.getId());
+    }
+
+    return "batch is started";
+ }
+
+ @PostMapping(value = "/batch/restart")
+ public String restart() throws Exception {
+
+    for(Iterator<String> iterator = jobRegistry.getJobNames().iterator(); iterator.hasNext();){
+
+       SimpleJob job = (SimpleJob)jobRegistry.getJob(iterator.next());
+       System.out.println("job name: " + job.getName());
+
+       JobInstance lastJobInstance = jobExplorer.getLastJobInstance(job.getName());
+       JobExecution lastJobExecution = jobExplorer.getLastJobExecution(lastJobInstance);
+       jobOperator.restart(lastJobExecution.getId());
+
+    }
+
+    return "batch is restarted";
+ }
+
+ @PostMapping(value = "/batch/stop")
+ public String stop() throws Exception {
+
+    for(Iterator<String> iterator = jobRegistry.getJobNames().iterator(); iterator.hasNext();){
+
+       SimpleJob job = (SimpleJob)jobRegistry.getJob(iterator.next());
+       System.out.println("job name: " + job.getName());
+
+       Set<JobExecution> runningJobExecutions = jobExplorer.findRunningJobExecutions(job.getName());
+       JobExecution jobExecution = runningJobExecutions.iterator().next();
+
+       jobOperator.stop(jobExecution.getId());
+    }
+
+    return "batch is stopped";
+  }
+}
+```
+
+  </details>
 
 <br/>
 <br/>
