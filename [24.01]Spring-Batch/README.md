@@ -676,5 +676,4 @@ public class JobController {
 > ## Scheduler
 
 - Batch Job을 실행 시키기 위한 방법.
-- Quartz, Scheduler, Jenkins 등이 있음.
-- Spring에서 Quartz Scheduler 지원함.
+- Quartz, Spring Scheduler, Jenkins 등이 있음. (주로 Quartz 사용함.)
