@@ -581,94 +581,94 @@
 
 > ## 기타
 
-  <details>
-    <summary>JobRegistry</summary>
+<details>
+  <summary>JobRegistry</summary>
 
 - 생성된 Job을 자동으로 등록, 추적, 관리하며 여러 곳에서 Job을 생성한 경우 ApplicationContext에서 Job을 수집해서 사용할 수 있음.
 - 기본 구현체로 Map 기반의 MapJobRegistry 클래스를 제공함. (JobName이 Key, job 인스턴스가 value)
 - JobRegistryBeanPostProcessor: BeanPostProcessor 단계에서 bean 초기화 시 자동으로 JobRegistry에 Job 등록 시켜주는 Processor
 
-  </details>
+</details>
 
-  <details>
-    <summary>JobExplorer</summary>
+<details>
+  <summary>JobExplorer</summary>
 
 - JobRepository의 readeOnly 버전.
 - 실행중인 Job의 실행 정보인 JobExecution 또는 Step의 실행 정보인 StepExecution을 조회할 수 있음.
 
-  </details>
+</details>
 
-  <details>
-    <summary>JobOperator</summary>
+<details>
+  <summary>JobOperator</summary>
 
 - JobExplorer, JobRepository, JobRegistry, JobLauncher를 포함하고 있음.
 - 배치의 중단, 재시작, Job 요약 등의 모니터링 가능.
 - 기본 구현체로 SimpleJobOperator 클래스 제공함.
 
-```java
-@RestController
-public class JobController {
+  ```java
+  @RestController
+  public class JobController {
 
- @Autowired
- private JobRegistry jobRegistry;
+  @Autowired
+  private JobRegistry jobRegistry;
 
- @Autowired
- private JobOperator jobOperator;
+  @Autowired
+  private JobOperator jobOperator;
 
- @Autowired
- private JobExplorer jobExplorer;
+  @Autowired
+  private JobExplorer jobExplorer;
 
- @PostMapping(value = "/batch/start")
- public String start(@RequestBody JobInfo jobInfo) throws Exception {
+  @PostMapping(value = "/batch/start")
+  public String start(@RequestBody JobInfo jobInfo) throws Exception {
 
-    for(Iterator<String> iterator = jobRegistry.getJobNames().iterator(); iterator.hasNext();){
+      for(Iterator<String> iterator = jobRegistry.getJobNames().iterator(); iterator.hasNext();){
 
-       SimpleJob job = (SimpleJob)jobRegistry.getJob(iterator.next());
-       System.out.println("job name: " + job.getName());
+        SimpleJob job = (SimpleJob)jobRegistry.getJob(iterator.next());
+        System.out.println("job name: " + job.getName());
 
-       jobOperator.start(job.getName(), "id=" + jobInfo.getId());
-    }
+        jobOperator.start(job.getName(), "id=" + jobInfo.getId());
+      }
 
-    return "batch is started";
- }
-
- @PostMapping(value = "/batch/restart")
- public String restart() throws Exception {
-
-    for(Iterator<String> iterator = jobRegistry.getJobNames().iterator(); iterator.hasNext();){
-
-       SimpleJob job = (SimpleJob)jobRegistry.getJob(iterator.next());
-       System.out.println("job name: " + job.getName());
-
-       JobInstance lastJobInstance = jobExplorer.getLastJobInstance(job.getName());
-       JobExecution lastJobExecution = jobExplorer.getLastJobExecution(lastJobInstance);
-       jobOperator.restart(lastJobExecution.getId());
-
-    }
-
-    return "batch is restarted";
- }
-
- @PostMapping(value = "/batch/stop")
- public String stop() throws Exception {
-
-    for(Iterator<String> iterator = jobRegistry.getJobNames().iterator(); iterator.hasNext();){
-
-       SimpleJob job = (SimpleJob)jobRegistry.getJob(iterator.next());
-       System.out.println("job name: " + job.getName());
-
-       Set<JobExecution> runningJobExecutions = jobExplorer.findRunningJobExecutions(job.getName());
-       JobExecution jobExecution = runningJobExecutions.iterator().next();
-
-       jobOperator.stop(jobExecution.getId());
-    }
-
-    return "batch is stopped";
+      return "batch is started";
   }
-}
-```
 
-  </details>
+  @PostMapping(value = "/batch/restart")
+  public String restart() throws Exception {
+
+      for(Iterator<String> iterator = jobRegistry.getJobNames().iterator(); iterator.hasNext();){
+
+        SimpleJob job = (SimpleJob)jobRegistry.getJob(iterator.next());
+        System.out.println("job name: " + job.getName());
+
+        JobInstance lastJobInstance = jobExplorer.getLastJobInstance(job.getName());
+        JobExecution lastJobExecution = jobExplorer.getLastJobExecution(lastJobInstance);
+        jobOperator.restart(lastJobExecution.getId());
+
+      }
+
+      return "batch is restarted";
+  }
+
+  @PostMapping(value = "/batch/stop")
+  public String stop() throws Exception {
+
+      for(Iterator<String> iterator = jobRegistry.getJobNames().iterator(); iterator.hasNext();){
+
+        SimpleJob job = (SimpleJob)jobRegistry.getJob(iterator.next());
+        System.out.println("job name: " + job.getName());
+
+        Set<JobExecution> runningJobExecutions = jobExplorer.findRunningJobExecutions(job.getName());
+        JobExecution jobExecution = runningJobExecutions.iterator().next();
+
+        jobOperator.stop(jobExecution.getId());
+      }
+
+      return "batch is stopped";
+    }
+  }
+  ```
+
+</details>
 
 <br/>
 <br/>
