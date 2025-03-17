@@ -2129,3 +2129,302 @@ spring:
   ```
 
 </details>
+
+<br/>
+<br/>
+
+> ## Quartz
+
+<details>
+  <summary>BatchJob</summary>
+
+- Spring Batch 필수 기능을 추상화한 커스텀 인터페이스
+- 따로 만든 이유는 다른 사용자가 쿼츠를 이용한 배치를 만들 때 강제성을 주기 위해 만듬
+
+  ```java
+  package com.example.java.quartz;
+  
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.JobParameters;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.item.ItemProcessor;
+  import org.springframework.batch.item.ItemReader;
+  import org.springframework.batch.item.ItemWriter;
+  
+  /**
+   * Batch 기본 정보
+   * @param <T> 입력 클래스
+   * @param <V> 출력 클래스
+   */
+  public interface BatchJob<T, V> {
+  
+      Job job(); // Spring Batch JobBuilder
+  
+      Step step(); // Spring Batch StepBuilder
+  
+      ItemReader<T> reader(); // Spring Batch ItemReader
+  
+      ItemWriter<V> writer(); // Spring Batch ItemWriter
+  
+      ItemProcessor<T, V> processor(); // Spring Batch ItemProcessor
+  
+      JobParameters createJobParameters(); // Spring Batch Job Parameters
+  
+      String getJobName(); // Job ClassName
+  
+      String getTriggerInterval(); // Quartz Scheduler Trigger Interval
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>QuartzJob</summary>
+
+- 위에서 작성한 BatchJob 상속 받으며, 여러 배치에서 동일하게 사용될 Quartz 설정 기능을 구현한 추상 클래스.
+
+  ```java
+  package com.example.java.quartz;
+  
+  import org.quartz.CronScheduleBuilder;
+  import org.quartz.Job;
+  import org.quartz.JobBuilder;
+  import org.quartz.JobDetail;
+  import org.quartz.JobExecutionContext;
+  import org.quartz.JobExecutionException;
+  import org.quartz.Trigger;
+  import org.quartz.TriggerBuilder;
+  import org.springframework.batch.core.launch.JobLauncher;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  import lombok.Getter;
+  import lombok.Setter;
+  
+  /**
+   * 커스텀한 Spring Batch + Quartz Scheduler 추상 클래스
+   * 다른 개발자는 Batch Job 설정만 하면 자동으로 Quartz 관련 설정이 되도록 만들고자 만듬.
+   * @param <T> 입력 클래스
+   * @param <V> 출력 클래스
+   */
+  
+  @Getter
+  @Setter
+  public abstract class QuartzJob<T,V> implements Job, BatchJob<T,V> {
+      private final JobLauncher jobLauncher;
+      private final JobRepository jobRepository;
+      private final PlatformTransactionManager transactionManager;
+      private org.springframework.batch.core.Job job;
+  
+      // QuartzJob 생성자 주입
+      protected QuartzJob(JobLauncher jobLauncher, JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+          this.jobLauncher = jobLauncher;
+          this.jobRepository = jobRepository;
+          this.transactionManager = transactionManager;
+      }
+  
+      // Quartz JobDetail 생성.
+      public JobDetail jobDetailBuilder() {
+          return JobBuilder.newJob(this.getClass())
+              .withIdentity(this.getJobName())
+              .storeDurably()
+              .build();
+      }
+  
+      // Quartz Scheduler Trigger 설정. 다른 개발자가 Batch Job Class 만들 때 getTriggerInterval() 정의해야함.
+      public Trigger trigger(JobDetail jobDetail) {
+          return TriggerBuilder.newTrigger()
+              .forJob(jobDetail)
+              .withIdentity(this.getJobName() + "Trigger")
+              .withSchedule(CronScheduleBuilder.cronSchedule(this.getTriggerInterval()))
+              .build();
+      }
+  
+      // Quartz Job 실행. 다른 개발자가 Batch Job Class 만들 때 job() 정의해야함.
+      @Override
+      public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+          try {
+              if (job == null) {
+                  job = this.job();
+              }
+              jobLauncher.run(job, this.createJobParameters()); // 다른 개발자가 만든 Batch Job 실행
+          } catch (Exception e) {
+              throw new JobExecutionException(e);
+          }
+      }
+  
+      // 다른 개발자가 만든 Spring Batch Job Class Name
+      @Override
+      public String getJobName() {
+          return this.getClass().getName();
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>TestBatchJob</summary>
+
+- 사용자가 만든 Batch Job.
+- 추상 클래스인 QuartzJob 상속 받아 사용자가 기능을 완성 시킨 클래스. 
+- Bean 등록하였으나 등록 하지않고 Scheduler 등록 할 수 도 있음.
+
+  ```java
+  package com.example.java.quartz;
+  
+  import java.util.Arrays;
+  
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.JobParameters;
+  import org.springframework.batch.core.JobParametersBuilder;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.launch.JobLauncher;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.item.ItemProcessor;
+  import org.springframework.batch.item.ItemReader;
+  import org.springframework.batch.item.ItemWriter;
+  import org.springframework.batch.item.support.ListItemReader;
+  import org.springframework.stereotype.Component;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  import lombok.extern.slf4j.Slf4j;
+  
+  /**
+   * 다른 개발자가 만든 Batch Job
+   * QuartzJob 상속 받고 Batch 관련 설정만 한다면 Quartz 자동 등록 됨.
+   * yaml 추가 하지 않아도 실행됨.
+   */
+  @Slf4j
+  @Component
+  public class TestBatchJob extends QuartzJob<Integer,String>{
+  
+      public TestBatchJob(JobLauncher jobLauncher, JobRepository jobRepository,
+          PlatformTransactionManager transactionManager) {
+          super(jobLauncher, jobRepository, transactionManager);
+      }
+  
+      // Spring Batch Job 생성
+      @Override
+      public Job job() {
+          return new JobBuilder(getJobName(), super.getJobRepository())
+              .start(step())
+              .build();
+      }
+  
+      // Spring Batch Step 생성
+      // 필요시 여러개 생성 가능
+      @Override
+      public Step step() {
+          log.info(">>>> TestBatchJob Step1");
+          return new StepBuilder(getJobName() + "Step", super.getJobRepository())
+              .<Integer, String>chunk(10, super.getTransactionManager())
+              .reader(reader())
+              .processor(processor())
+              .writer(writer())
+              .build();
+      }
+  
+      // Trigger Interval 세팅
+      @Override
+      public String getTriggerInterval() {
+          // 초 분 시 일 월 요일
+          return "*/1 * * * * ?";
+      }
+  
+      // 가져올 데이터
+      @Override
+      public ItemReader<Integer> reader() {
+          return new ListItemReader<>(Arrays.asList(1,2,3));
+      }
+  
+      // 데이터 가공
+      @Override
+      public ItemProcessor<Integer, String> processor() {
+          return String::valueOf;
+      }
+  
+      // 가공된 데이터 저장
+      @Override
+      public ItemWriter<String> writer() {
+          return items -> items.forEach(log::info);
+      }
+  
+      // Job Parameter 생성
+      @Override
+      public JobParameters createJobParameters() {
+          return new JobParametersBuilder()
+              .addLong("time", System.currentTimeMillis())
+              .toJobParameters();
+      }
+  }
+  
+  ```
+</details>
+
+<details>
+  <summary>CustomQuartzScheduler</summary>
+
+- 사용자가 만든 BatchJob (TestBatchJob) 클래스를 Scheduler 등록해주는 클래스.
+- 등록 된 Bean 중 QuartzJob 클래스를 상속 받은 모든 Bean 을 찾아 스케줄러에 등록한 뒤 스케줄러 실행.
+
+  ```java
+  package com.example.java.quartz;
+  
+  import java.util.Map;
+  
+  import org.quartz.JobDetail;
+  import org.quartz.Scheduler;
+  import org.quartz.SchedulerException;
+  import org.springframework.context.ApplicationContext;
+  import org.springframework.stereotype.Component;
+  
+  import jakarta.annotation.PostConstruct;
+  import lombok.extern.slf4j.Slf4j;
+  
+  @Slf4j
+  @Component
+  public class CustomQuartzScheduler {
+      private final Scheduler scheduler;
+      private final ApplicationContext applicationContext;
+  
+      // QuartzScheduler 생성자 주입
+      public CustomQuartzScheduler(Scheduler scheduler, ApplicationContext applicationContext) {
+          this.scheduler = scheduler;
+          this.applicationContext = applicationContext;
+      }
+  
+      // QuartzJob 타입의 모든 빈 가져오기
+      public Map<String, QuartzJob> getAllQuartzJobs() {
+          // QuartzJob 타입으로 등록된 모든 빈을 검색
+          return applicationContext.getBeansOfType(QuartzJob.class);
+      }
+  
+      @PostConstruct
+      public void scheduleJobs() throws SchedulerException {
+  
+          Map<String, QuartzJob> quartzJobs = this.getAllQuartzJobs();
+          quartzJobs.forEach((key, value) -> {
+              try {
+                  // 1. 스케줄러 인스턴스 생성
+                  JobDetail jobDetail = value.jobDetailBuilder();
+                  // 2. 스케줄러에 JobDetail과 Trigger 등록
+                  scheduler.scheduleJob(jobDetail, value.trigger(jobDetail));
+              } catch (Exception e) {
+                  log.error(e.getMessage(), e);
+              }
+          });
+  
+          // 3. 스케줄러 시작
+          scheduler.start();
+      }
+  }
+  
+  ```
+
+
+</details>
+
+
