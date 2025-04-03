@@ -60,7 +60,7 @@ public class ControllerTestJob2Config {
         따라서 Reader 에 @Bean, @StepScope 적용해야 한다.
         (Step, Job 은 Builder 시 매개변수로 던지는 이름이 Bean name이 되지만 reader() 는 그렇지 못하므로 명시해줘야하는 번거러움이 있다.)
      */
-    @Bean(name ="ControllerTestReader2")
+    @Bean(name = "ControllerTestReader2")
     @StepScope
     public ItemReader<Integer> reader() {
         return new ListItemReader<>(Arrays.asList(321321, 2, 3));

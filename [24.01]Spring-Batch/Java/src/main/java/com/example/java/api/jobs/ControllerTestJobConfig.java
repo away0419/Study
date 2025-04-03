@@ -60,7 +60,7 @@ public class ControllerTestJobConfig {
         이를 해결하는 방법은 결국 reader()에 @StepScope 적용하여 job 실행될 때마다 새로운 ItemReader 만드는게 최선이다.
         따라서 Reader 에 @Bean, @StepScope 적용해야 한다.
      */
-    @Bean(name ="ControllerTestReader")
+    @Bean(name = "ControllerTestReader")
     @StepScope
     public ItemReader<Integer> reader() {
         return new ListItemReader<>(Arrays.asList(123123, 2, 3));

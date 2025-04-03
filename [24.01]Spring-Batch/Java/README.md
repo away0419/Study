@@ -2428,3 +2428,380 @@ spring:
 </details>
 
 
+<br/>
+<br/>
+
+> ## API
+
+<details>
+  <summary>BatchConfig</summary>
+
+- 등록된 Job 목록 확인하기 위한 기본 설정. (선택사항)
+- Job 이름과 Bean 이름은 서로 다를 수 있으므로 구현 시 주의해야 함.
+
+  ```java
+  package com.example.java.api.jobs;
+  
+  import org.springframework.batch.core.configuration.JobRegistry;
+  import org.springframework.boot.ApplicationArguments;
+  import org.springframework.boot.ApplicationRunner;
+  import org.springframework.context.annotation.Configuration;
+  
+  import lombok.RequiredArgsConstructor;
+  
+  @Configuration
+  @RequiredArgsConstructor
+  public class BatchConfig implements ApplicationRunner {
+      private final JobRegistry jobRegistry;
+  
+      @Override
+      public void run(ApplicationArguments args) {
+          try {
+              System.out.println("=== 등록된 Job 목록 ===");
+              jobRegistry.getJobNames().forEach(System.out::println);
+          } catch (Exception e) {
+              e.printStackTrace();
+          }
+      }
+  }
+  ```
+</details>
+
+<details>
+  <summary>ControllerTestJobConfig</summary>
+
+- 구현하고자 하는 Job 설정 파일.
+- API Batch 구동 시 주의점을 소스안 주석에 서술했으니 확인 요망.
+
+  ```java
+  package com.example.java.api.jobs;
+  
+  import java.util.Arrays;
+  
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.configuration.annotation.StepScope;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.item.ItemProcessor;
+  import org.springframework.batch.item.ItemReader;
+  import org.springframework.batch.item.ItemWriter;
+  import org.springframework.batch.item.support.ListItemReader;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  import lombok.RequiredArgsConstructor;
+  import lombok.extern.slf4j.Slf4j;
+  
+  @Slf4j
+  @Configuration
+  @RequiredArgsConstructor
+  public class ControllerTestJobConfig {
+      private final JobRepository jobRepository;
+      private final PlatformTransactionManager transactionManager;
+  
+      private String getJobName() {
+          return "ControllerTestJob";
+      }
+  
+      // Bean 네임은 ControllerTestJob 가 되고 Job 네임은 getJobName()이 된다. jobRegistry에는 getJobName()으로 등록됨.
+      @Bean(name = "ControllerTestJob")
+      public Job job() {
+          return new JobBuilder(getJobName(), jobRepository)
+              .start(this.step())
+              .build();
+      }
+  
+      @Bean(name = "ControllerTestStep")
+      public Step step() {
+          log.info(">>>> {} Step 시작", getJobName());
+          return new StepBuilder(getJobName() + "Step", jobRepository)
+              .<Integer, String>chunk(10, transactionManager)
+              .reader(this.reader())
+              .processor(processor())
+              .writer(writer())
+              .build();
+      }
+  
+      /*
+          해당 부분을 Bean 등록 하고 StepScope 를 넣는 이유는 다음과 같다.
+          만약 하나라도 없다면 reader() 메소드를 사용하는 Step에서 한번만 실행하고 생성된 ItemReader를 계속 사용한다.
+          따라서 한번 호출 이후에는 이미 Writer를 통해 데이터가 빠져나가 ItemReader 데이터가 없어지므로 정상 작동하지 않는다.
+          왜 한번만 호출하냐 Job이 @Bean 등록 되어 있기때문으로 추측된다. Job이라는 객체를 한번만 만들어지기 때문에 연쇄적으로
+          step(), reader(), writer() 등은 하나만 만들어 진다. 이후 해당 Job + Parameter로 새로운 인스턴스를 만들어도 결국
+          Job은 동일한 하나의 객체를 공유하여 사용하기 때문에 원하는 결과가 나오지 않는 것이다.
+          결국, Job을 새로 생성해서 jobLauncher.run(job, jobParameters); 해야 하는데 이럴 경우 Spring Batch의 기능을 활용하기 어려워진다.
+          이를 해결하는 방법은 결국 reader()에 @StepScope 적용하여 job 실행될 때마다 새로운 ItemReader 만드는게 최선이다.
+          따라서 Reader 에 @Bean, @StepScope 적용해야 한다.
+       */
+      @Bean(name = "ControllerTestReader")
+      @StepScope
+      public ItemReader<Integer> reader() {
+          return new ListItemReader<>(Arrays.asList(123123, 2, 3));
+      }
+  
+      private ItemProcessor<Integer, String> processor() {
+          return String::valueOf;
+      }
+  
+      private ItemWriter<String> writer() {
+          return items -> items.forEach(log::info);
+      }
+  
+  }
+  
+  ```
+</details>
+
+<details>
+  <summary>ControllerTestJob2Config</summary>
+
+- 두번째 Job 설정 파일.
+
+  ```java
+  package com.example.java.api.jobs;
+  
+  import java.util.Arrays;
+  
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.Step;
+  import org.springframework.batch.core.configuration.annotation.StepScope;
+  import org.springframework.batch.core.job.builder.JobBuilder;
+  import org.springframework.batch.core.repository.JobRepository;
+  import org.springframework.batch.core.step.builder.StepBuilder;
+  import org.springframework.batch.item.ItemProcessor;
+  import org.springframework.batch.item.ItemReader;
+  import org.springframework.batch.item.ItemWriter;
+  import org.springframework.batch.item.support.ListItemReader;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.transaction.PlatformTransactionManager;
+  
+  import lombok.RequiredArgsConstructor;
+  import lombok.extern.slf4j.Slf4j;
+  
+  @Slf4j
+  @Configuration
+  @RequiredArgsConstructor
+  public class ControllerTestJob2Config {
+      private final JobRepository jobRepository;
+      private final PlatformTransactionManager transactionManager;
+  
+      private String getJobName() {
+          return "ControllerTestJob2";
+      }
+  
+      @Bean(name = "ControllerTestJob2")
+      public Job job() {
+          return new JobBuilder(getJobName(), jobRepository)
+              .start(this.step())
+              .build();
+      }
+  
+      @Bean(name = "ControllerTestStep2")
+      public Step step() {
+          log.info(">>>> {} Step 시작", getJobName());
+          return new StepBuilder(getJobName() + "Step", jobRepository)
+              .<Integer, String>chunk(10, transactionManager)
+              .reader(this.reader())
+              .processor(processor())
+              .writer(writer())
+              .build();
+      }
+  
+      /*
+          해당 부분을 Bean 등록 하고 StepScope 를 넣는 이유는 다음과 같다.
+          만약 하나라도 없다면 reader() 메소드를 사용하는 Step에서 한번만 실행하고 생성된 ItemReader를 계속 사용한다.
+          따라서 한번 호출 이후에는 이미 Writer를 통해 데이터가 빠져나가 ItemReader 데이터가 없어지므로 정상 작동하지 않는다.
+          왜 한번만 호출하냐 Job이 @Bean 등록 되어 있기때문으로 추측된다. Job이라는 객체를 한번만 만들어지기 때문에 연쇄적으로
+          step(), reader(), writer() 등은 하나만 만들어 진다. 이후 해당 Job + Parameter로 새로운 인스턴스를 만들어도 결국
+          Job은 동일한 하나의 객체를 공유하여 사용하기 때문에 원하는 결과가 나오지 않는 것이다.
+          결국, Job을 새로 생성해서 jobLauncher.run(job, jobParameters); 해야 하는데 이럴 경우 Spring Batch의 기능을 활용하기 어려워진다.
+          이를 해결하는 방법은 결국 reader()에 @StepScope 적용하여 job 실행될 때마다 새로운 ItemReader 만드는게 최선이다.
+          따라서 Reader 에 @Bean, @StepScope 적용해야 한다.
+          (Step, Job 은 Builder 시 매개변수로 던지는 이름이 Bean name이 되지만 reader() 는 그렇지 못하므로 명시해줘야하는 번거러움이 있다.)
+       */
+      @Bean(name = "ControllerTestReader2")
+      @StepScope
+      public ItemReader<Integer> reader() {
+          return new ListItemReader<>(Arrays.asList(321321, 2, 3));
+      }
+  
+      private ItemProcessor<Integer, String> processor() {
+          return String::valueOf;
+      }
+  
+      private ItemWriter<String> writer() {
+          return items -> items.forEach(log::info);
+      }
+  
+  }
+  
+  ```
+</details>
+
+<details>
+  <summary>QuartzJobRunner</summary>
+
+- Quartz Scheduler 등록 클래스.
+
+  ```java
+  package com.example.java.api.jobs;
+  
+  import java.util.UUID;
+  
+  import org.quartz.JobExecutionContext;
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.JobParameters;
+  import org.springframework.batch.core.JobParametersBuilder;
+  import org.springframework.batch.core.configuration.JobRegistry;
+  import org.springframework.batch.core.launch.JobLauncher;
+  import org.springframework.stereotype.Component;
+  
+  import lombok.RequiredArgsConstructor;
+  import lombok.extern.slf4j.Slf4j;
+  
+  @Slf4j
+  @Component
+  @RequiredArgsConstructor
+  public class QuartzJobRunner implements org.quartz.Job {
+      private final JobLauncher jobLauncher;
+      private final JobRegistry jobRegistry;
+  
+      @Override
+      public void execute(JobExecutionContext context) {
+          try {
+              String jobName = context.getJobDetail().getJobDataMap().getString("jobName");
+              Job job = jobRegistry.getJob(jobName);
+              if (job == null) {
+                  log.error("Quartz 실행 실패: 존재하지 않는 Job -> {}", jobName);
+                  return;
+              }
+  
+              JobParameters jobParameters = new JobParametersBuilder()
+                  .addString("runId", UUID.randomUUID().toString()) // 실행 구분
+                  .toJobParameters();
+  
+              jobLauncher.run(job, jobParameters);
+              log.info("Quartz 배치 실행 성공: {}", jobName);
+          } catch (Exception e) {
+              log.error("Quartz Job 실행 중 오류 발생", e);
+          }
+      }
+  }
+  ```
+
+</details>
+
+<details>
+  <summary>BatchService</summary>
+
+- 비즈니스 로직.
+
+  ```java
+  package com.example.java.api.service;
+  
+  import java.util.UUID;
+  
+  import org.quartz.CronScheduleBuilder;
+  import org.quartz.JobBuilder;
+  import org.quartz.JobDetail;
+  import org.quartz.Scheduler;
+  import org.quartz.Trigger;
+  import org.quartz.TriggerBuilder;
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.JobParameters;
+  import org.springframework.batch.core.JobParametersBuilder;
+  import org.springframework.batch.core.configuration.JobRegistry;
+  import org.springframework.batch.core.launch.JobLauncher;
+  import org.springframework.stereotype.Service;
+  
+  import com.example.java.api.jobs.QuartzJobRunner;
+  
+  import lombok.RequiredArgsConstructor;
+  
+  @Service
+  @RequiredArgsConstructor
+  public class BatchService {
+      private final JobLauncher jobLauncher;
+      private final JobRegistry jobRegistry;
+      private final Scheduler scheduler;
+  
+      public void runJob(String jobName) throws Exception {
+          Job job = jobRegistry.getJob(jobName);
+          JobParameters jobParameters = new JobParametersBuilder()
+              // .addLong("time", System.currentTimeMillis()) // Spring Batch는 내부적으로 밀리초 차이 정도는 동일한 Job Instance로 취급할 수 있으므로 UUID를 사용하자
+              .addString("runId", UUID.randomUUID().toString()) // UUID 추가
+              .toJobParameters();
+  
+          jobLauncher.run(job, jobParameters);
+      }
+  
+      public void scheduleJob(String jobName, String cronExpression) throws Exception {
+          JobDetail jobDetail = JobBuilder.newJob(QuartzJobRunner.class)
+              .withIdentity(jobName)
+              .usingJobData("jobName", jobName)
+              .build();
+  
+          Trigger trigger = TriggerBuilder.newTrigger()
+              .withIdentity(jobName + "Trigger")
+              .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
+              .build();
+  
+          scheduler.scheduleJob(jobDetail, trigger);
+      }
+  }
+  
+  ```
+
+</details>
+
+<details>
+  <summary>BatchController</summary>
+
+- API 요청 매핑.
+
+  ```java
+  package com.example.java.api.controller;
+  
+  import java.util.Map;
+  
+  import org.springframework.http.ResponseEntity;
+  import org.springframework.web.bind.annotation.PathVariable;
+  import org.springframework.web.bind.annotation.PostMapping;
+  import org.springframework.web.bind.annotation.RequestBody;
+  import org.springframework.web.bind.annotation.RequestMapping;
+  import org.springframework.web.bind.annotation.RestController;
+  
+  import com.example.java.api.service.BatchService;
+  
+  import lombok.RequiredArgsConstructor;
+  
+  @RestController
+  @RequestMapping("/batch")
+  @RequiredArgsConstructor
+  public class BatchController {
+      private final BatchService batchService;
+  
+      @PostMapping("/{jobName}")
+      public void batch(@PathVariable String jobName) throws Exception {
+          batchService.runJob(jobName);
+      }
+  
+      @PostMapping("/schedule")
+      public ResponseEntity<String> scheduleJob(
+          @RequestBody Map<String, String> jobData) throws Exception {
+          try {
+              batchService.scheduleJob(jobData.get("jobName"), jobData.get("cronExpression"));
+              return ResponseEntity.ok("Quartz 스케줄 등록 완료");
+          } catch (Exception e) {
+              return ResponseEntity.internalServerError().body("Quartz 스케줄 등록 실패: " + e.getMessage());
+          }
+      }
+  }
+  
+  ```
+
+</details>
