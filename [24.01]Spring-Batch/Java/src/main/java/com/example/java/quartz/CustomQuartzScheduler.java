@@ -33,18 +33,18 @@ public class CustomQuartzScheduler {
     public void scheduleJobs() throws SchedulerException {
 
         Map<String, QuartzJob> quartzJobs = this.getAllQuartzJobs();
-        quartzJobs.forEach((key, value) -> {
-            try {
-                // 1. 스케줄러 인스턴스 생성
-                JobDetail jobDetail = value.jobDetailBuilder();
-                // 2. 스케줄러에 JobDetail과 Trigger 등록
-                scheduler.scheduleJob(jobDetail, value.trigger(jobDetail));
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-        });
-
-        // 3. 스케줄러 시작
-        scheduler.start();
+        // quartzJobs.forEach((key, value) -> {
+        //     try {
+        //         // 1. 스케줄러 인스턴스 생성
+        //         JobDetail jobDetail = value.jobDetailBuilder();
+        //         // 2. 스케줄러에 JobDetail과 Trigger 등록
+        //         scheduler.scheduleJob(jobDetail, value.trigger(jobDetail));
+        //     } catch (Exception e) {
+        //         log.error(e.getMessage(), e);
+        //     }
+        // });
+        //
+        // // 3. 스케줄러 시작
+        // scheduler.start();
     }
 }
