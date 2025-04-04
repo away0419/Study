@@ -1,4 +1,4 @@
-package com.example.java.api.jobs;
+package com.example.java.api.config;
 
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.boot.ApplicationArguments;
