@@ -2434,6 +2434,42 @@ spring:
 > ## API
 
 <details>
+  <summary>application.yaml</summary>
+
+- Quartz 제공하는 DB를 사용하고 싶다면 다음과 같이 yaml 추가하면 됨.
+- 해당 DB를 사용하려면 Config 설정도 필요함. (DB 연결 및 Quartz Bean 등록 등)
+
+  ```yaml
+    datasource:
+      main: # 데이터소스 타입으로 Config 설정에서 연결해 주어야 함. main 안쓰면 바로 연결 되는 듯함.
+      url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      driverClassName: org.h2.Driver
+      username: sa
+      password:
+  
+    quartz:
+      job-store-type: jdbc
+      jdbc:
+        initialize-schema: always # DB 테이블 자동 생성. never - 테이블 생성 x
+      properties:
+        org:
+          quartz:
+            scheduler:
+              instanceName: ksmsQuartzScheduler # 스케줄러 이름
+            jobStore:
+              class: org.quartz.impl.jdbcjobstore.JobStoreTX # 쿼츠 라이브러리 안에 있음.
+              driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate # 위와 동일. MySQL 기반?
+              tablePrefix: QRTZ_ # 테이블 접두사
+              isClustered: false # 클러스터링 
+              dataSource: quartzDataSource # 이 부분은 바꾸지 않는걸 추천. 바꾸면 제대로 작동하지 않을 수 있음.
+            threadPool:
+              class: org.quartz.simpl.SimpleThreadPool # 배치를 동시에 몇개까지 허용할 건지 설정
+              threadCount: 10
+              threadPriority: 5
+  ```
+</details>
+
+<details>
   <summary>BatchConfig</summary>
 
 - 등록된 Job 목록 확인하기 위한 기본 설정. (선택사항)
@@ -2470,7 +2506,7 @@ spring:
 <details>
   <summary>ControllerTestJobConfig</summary>
 
-- 구현하고자 하는 Job 설정 파일.
+- 구현하고자 하는 Batch.Job 설정 파일.
 - API Batch 구동 시 주의점을 소스안 주석에 서술했으니 확인 요망.
 
   ```java
@@ -2553,13 +2589,7 @@ spring:
   }
   
   ```
-</details>
-
-<details>
-  <summary>ControllerTestJob2Config</summary>
-
-- 두번째 Job 설정 파일.
-
+  
   ```java
   package com.example.java.api.jobs;
   
@@ -2639,13 +2669,15 @@ spring:
   
   }
   
-  ```
+  ```  
+
 </details>
+
 
 <details>
   <summary>QuartzJobRunner</summary>
 
-- Quartz Scheduler 등록 클래스.
+- 커스텀 Quartz.Job 실행 클래스.
 
   ```java
   package com.example.java.api.jobs;
@@ -2696,61 +2728,77 @@ spring:
 </details>
 
 <details>
-  <summary>BatchService</summary>
+  <summary>SpringJobFactory</summary>
 
-- 비즈니스 로직.
+- quartz 라이브러리 DB 설정 사용할 경우 커스텀으로 만듬 QuartzJob.class 가 아닌 기본 라이브러리에 있는 quart.job 인터페이스를 사용함.
+- 따라서, DB에 데이터를 정상적으로 적재하고자 할 경우 커스텀한 QuartzJob.class 사용하도록 설정해야함.
+- Quartz.job 사용할 때 QuartzJob.class 사용하도록 주입하는 설정임.
+ 
 
   ```java
-  package com.example.java.api.service;
+  package com.example.java.api.config;
   
-  import java.util.UUID;
+  import org.quartz.Job;
+  import org.quartz.spi.JobFactory;
+  import org.quartz.spi.TriggerFiredBundle;
+  import org.springframework.context.ApplicationContext;
   
-  import org.quartz.CronScheduleBuilder;
-  import org.quartz.JobBuilder;
-  import org.quartz.JobDetail;
-  import org.quartz.Scheduler;
-  import org.quartz.Trigger;
-  import org.quartz.TriggerBuilder;
-  import org.springframework.batch.core.Job;
-  import org.springframework.batch.core.JobParameters;
-  import org.springframework.batch.core.JobParametersBuilder;
-  import org.springframework.batch.core.configuration.JobRegistry;
-  import org.springframework.batch.core.launch.JobLauncher;
-  import org.springframework.stereotype.Service;
+  import com.example.java.quartz.QuartzJob;
   
-  import com.example.java.api.jobs.QuartzJobRunner;
+  public class SpringJobFactory implements JobFactory {
   
-  import lombok.RequiredArgsConstructor;
+      private final ApplicationContext applicationContext;
   
-  @Service
-  @RequiredArgsConstructor
-  public class BatchService {
-      private final JobLauncher jobLauncher;
-      private final JobRegistry jobRegistry;
-      private final Scheduler scheduler;
-  
-      public void runJob(String jobName) throws Exception {
-          Job job = jobRegistry.getJob(jobName);
-          JobParameters jobParameters = new JobParametersBuilder()
-              // .addLong("time", System.currentTimeMillis()) // Spring Batch는 내부적으로 밀리초 차이 정도는 동일한 Job Instance로 취급할 수 있으므로 UUID를 사용하자
-              .addString("runId", UUID.randomUUID().toString()) // UUID 추가
-              .toJobParameters();
-  
-          jobLauncher.run(job, jobParameters);
+      public SpringJobFactory(ApplicationContext applicationContext) {
+          this.applicationContext = applicationContext;
       }
   
-      public void scheduleJob(String jobName, String cronExpression) throws Exception {
-          JobDetail jobDetail = JobBuilder.newJob(QuartzJobRunner.class)
-              .withIdentity(jobName)
-              .usingJobData("jobName", jobName)
-              .build();
+      @Override
+      public Job newJob(TriggerFiredBundle bundle, org.quartz.Scheduler scheduler) {
+          return applicationContext.getBean(QuartzJob.class);
+      }
+  }
   
-          Trigger trigger = TriggerBuilder.newTrigger()
-              .withIdentity(jobName + "Trigger")
-              .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
-              .build();
   
-          scheduler.scheduleJob(jobDetail, trigger);
+  ```
+</details>
+
+<details>
+  <summary>QuartzConfig</summary>
+
+- yaml에서 설정한 main 데이터베이스를 스케줄러에서 사용하도록 주입.
+- 또한 Quartz.job 생성 시 위에서 설정한 것처럼 QuartJob.class 사용하도록 주입.
+
+  ```java
+  package com.example.java.api.config;
+  
+  import javax.sql.DataSource;
+  
+  import org.quartz.spi.JobFactory;
+  import org.springframework.beans.factory.annotation.Autowired;
+  import org.springframework.beans.factory.annotation.Qualifier;
+  import org.springframework.context.ApplicationContext;
+  import org.springframework.context.annotation.Bean;
+  import org.springframework.context.annotation.Configuration;
+  import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+  
+  @Configuration
+  public class QuartzConfig {
+      @Autowired
+      private ApplicationContext applicationContext;
+  
+      // Spring의 JobFactory를 사용하여 Quartz가 Spring 빈을 사용할 수 있게 설정
+      @Bean
+      public JobFactory jobFactory() {
+          return new SpringJobFactory(applicationContext);
+      }
+  
+      @Bean
+      public SchedulerFactoryBean schedulerFactoryBean(@Qualifier("dataSource") DataSource mainDataSource, JobFactory jobFactory) {
+          SchedulerFactoryBean factory = new SchedulerFactoryBean();
+          factory.setDataSource(mainDataSource);  // main 데이터 소스를 설정
+          factory.setJobFactory(jobFactory);      // Quartz에서 Spring 빈을 사용할 수 있도록 설정
+          return factory;
       }
   }
   
@@ -2759,47 +2807,421 @@ spring:
 </details>
 
 <details>
-  <summary>BatchController</summary>
+  <summary>DTO</summary>
 
-- API 요청 매핑.
+- 사용자 요청용 DTO
+
+  ```java
+  package com.example.java.api.dto;
+  
+  import lombok.AllArgsConstructor;
+  import lombok.Builder;
+  import lombok.Getter;
+  import lombok.NoArgsConstructor;
+  import lombok.Setter;
+  
+  @Getter
+  @Setter
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @Builder
+  public class JobRequest {
+      private String jobName;
+      private String cronExpression;
+  }
+  
+  ```
+  
+  ```java
+  package com.example.java.api.dto;
+  
+  import lombok.AllArgsConstructor;
+  import lombok.Builder;
+  import lombok.Getter;
+  import lombok.NoArgsConstructor;
+  import lombok.Setter;
+  
+  @Getter
+  @Setter
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @Builder
+  public class ScheduleRequest {
+      private String jobName;
+      private String cronExpression;
+      private String triggerName;
+  }
+  
+  ```
+
+</details>
+
+<details>
+  <summary>Service</summary>
+
+- 비즈니스 로직.
+- QuartJob, Trigger, Job 세가지로 분류.
+
+  ```java
+  package com.example.java.api.service;
+  
+  import java.util.UUID;
+  
+  import org.springframework.batch.core.Job;
+  import org.springframework.batch.core.JobParameters;
+  import org.springframework.batch.core.JobParametersBuilder;
+  import org.springframework.batch.core.configuration.JobRegistry;
+  import org.springframework.batch.core.launch.JobLauncher;
+  import org.springframework.stereotype.Service;
+  
+  import lombok.RequiredArgsConstructor;
+  import lombok.extern.slf4j.Slf4j;
+  
+  @Slf4j
+  @Service
+  @RequiredArgsConstructor
+  public class JobService {
+      private final JobLauncher jobLauncher;
+      private final JobRegistry jobRegistry;
+  
+      // Job 단일 실행
+      public void runJob(String jobName) throws Exception {
+          Job job = jobRegistry.getJob(jobName);
+          if (job == null) {
+              log.error("Job 실행 실패: 존재하지 않는 Job -> {}", jobName);
+              return;
+          }
+          JobParameters jobParameters = new JobParametersBuilder()
+              .addString("runId", UUID.randomUUID().toString())
+              .toJobParameters();
+  
+          jobLauncher.run(job, jobParameters);
+      }
+  
+  }
+  
+  ```
+
+  ```java
+  package com.example.java.api.service;
+  
+  import org.quartz.JobBuilder;
+  import org.quartz.JobDetail;
+  import org.quartz.JobExecutionException;
+  import org.quartz.JobKey;
+  import org.quartz.Scheduler;
+  import org.quartz.SchedulerException;
+  import org.springframework.stereotype.Service;
+  
+  import com.example.java.api.dto.ScheduleRequest;
+  import com.example.java.api.jobs.QuartzJobRunner;
+  
+  import lombok.RequiredArgsConstructor;
+  import lombok.extern.slf4j.Slf4j;
+  
+  @Slf4j
+  @Service
+  @RequiredArgsConstructor
+  public class QuartzJobService {
+  
+      private final Scheduler scheduler;
+  
+      // Job 삭제 (연결된 트리거 포함)
+      public void deleteScheduledJob(ScheduleRequest scheduleRequest) throws SchedulerException {
+          JobKey jobKey = JobKey.jobKey(scheduleRequest.getJobName());
+  
+          if (scheduler.checkExists(jobKey)) {
+              scheduler.pauseJob(jobKey); // 정지
+              boolean result = scheduler.deleteJob(jobKey);
+              if (result) {
+                  log.info("Job 삭제 완료: {}", jobKey);
+              } else {
+                  log.warn("Job 삭제 실패: {}", jobKey);
+              }
+          } else {
+              log.warn("삭제하려는 Job이 존재하지 않음: {}", jobKey);
+          }
+      }
+  
+      // Job 정지 (연결된 트리거 포함)
+      public void pauseScheduledJob(ScheduleRequest scheduleRequest) throws SchedulerException {
+          JobKey jobKey = JobKey.jobKey(scheduleRequest.getJobName());
+  
+          if (scheduler.checkExists(jobKey)) {
+              scheduler.pauseJob(jobKey);
+              log.info("Job 정지: {}", scheduleRequest.getJobName());
+          } else {
+              log.warn("정지하려는 Job이 존재하지 않음: {}", scheduleRequest.getJobName());
+          }
+      }
+  
+      // Job 재시작 (연결된 트리거 포함)
+      public void resumeScheduledJob(ScheduleRequest scheduleRequest) throws SchedulerException {
+          JobKey jobKey = JobKey.jobKey(scheduleRequest.getJobName());
+  
+          if (scheduler.checkExists(jobKey)) {
+              scheduler.resumeJob(jobKey);
+              log.info("Job 재시작: {}", scheduleRequest.getJobName());
+          } else {
+              log.warn("재시작하려는 Job이 존재하지 않음: {}", scheduleRequest.getJobName());
+          }
+      }
+  
+      // Job 없으면 예외 발생
+      public void validateJobExists(String jobName) throws SchedulerException {
+          JobKey jobKey = JobKey.jobKey(jobName);
+          if (!scheduler.checkExists(jobKey)) {
+              throw new JobExecutionException("업데이트 실패: 등록되지 않은 Job -> " + jobName);
+          }
+      }
+  
+      // Job 등록
+      public void createScheduledJob(String jobName) throws SchedulerException {
+          JobKey jobKey = JobKey.jobKey(jobName);
+  
+          if (!scheduler.checkExists(jobKey)) {
+              JobDetail jobDetail = JobBuilder.newJob(QuartzJobRunner.class)
+                  .withIdentity(jobKey)
+                  .usingJobData("jobName", jobName)
+                  .storeDurably()
+                  .build();
+  
+              scheduler.addJob(jobDetail, true);
+              log.info("새로운 Job 등록: {}", jobName);
+          }
+      }
+  }
+  
+  ```
+  ```java
+  package com.example.java.api.service;
+  
+  import org.quartz.CronScheduleBuilder;
+  import org.quartz.JobKey;
+  import org.quartz.Scheduler;
+  import org.quartz.SchedulerException;
+  import org.quartz.Trigger;
+  import org.quartz.TriggerBuilder;
+  import org.quartz.TriggerKey;
+  import org.springframework.stereotype.Service;
+  
+  import lombok.RequiredArgsConstructor;
+  import lombok.extern.slf4j.Slf4j;
+  
+  @Slf4j
+  @Service
+  @RequiredArgsConstructor
+  public class TriggerService {
+      private final Scheduler scheduler;
+  
+      // 트리거 없으면 등록
+      public void createTrigger(String jobName, String triggerName, String cronExpression) throws SchedulerException {
+          TriggerKey triggerKey = buildTriggerKey(jobName, triggerName);
+  
+          if (!scheduler.checkExists(triggerKey)) {
+              scheduler.scheduleJob(buildTrigger(jobName, triggerKey, cronExpression));
+              log.info("새로운 트리거 등록: {} / {}", jobName, cronExpression);
+          } else {
+              log.info("이미 존재하는 트리거");
+          }
+      }
+  
+      // 트리거 있으면 업데이트
+      public void updateTrigger(String jobName, String triggerName, String cronExpression) throws SchedulerException {
+          TriggerKey triggerKey = buildTriggerKey(jobName, triggerName);
+  
+          if (scheduler.checkExists(triggerKey)) {
+              scheduler.pauseTrigger(triggerKey);
+              scheduler.rescheduleJob(triggerKey, buildTrigger(jobName, triggerKey, cronExpression));
+              log.info("기존 트리거 갱신: {} / {}", jobName, cronExpression);
+          } else {
+              log.warn("등록 하려는 트리거가 존재하지 않음: {}", triggerKey);
+          }
+      }
+  
+      // 트리거(쿼츠 스케줄러) 정지
+      public void pauseTrigger(String jobName, String triggerName) throws SchedulerException {
+          TriggerKey triggerKey = buildTriggerKey(jobName, triggerName);
+          if (scheduler.checkExists(triggerKey)) {
+              scheduler.pauseTrigger(triggerKey);
+              log.info("트리거 일시정지: {}", triggerKey);
+          } else {
+              log.warn("정지 하려는 트리거가 존재하지 않음: {}", triggerKey);
+          }
+      }
+  
+      // 트리거(쿼츠 스케줄러) 재시작
+      public void resumeTrigger(String jobName, String triggerName) throws SchedulerException {
+          TriggerKey triggerKey = buildTriggerKey(jobName, triggerName);
+          if (scheduler.checkExists(triggerKey)) {
+              scheduler.resumeTrigger(triggerKey);
+              log.info("트리거 다시 활성화: {}", triggerKey);
+          } else {
+              log.warn("변경 하려는 트리거가 존재하지 않음: {}", triggerKey);
+          }
+      }
+  
+      // 트리거(쿼츠 스케줄러) 삭제
+      public void deleteTrigger(String jobName, String triggerName) throws SchedulerException {
+          TriggerKey triggerKey = buildTriggerKey(jobName, triggerName);
+          if (scheduler.checkExists(triggerKey)) {
+              scheduler.pauseTrigger(triggerKey);
+              boolean result = scheduler.unscheduleJob(triggerKey);
+              if (result) {
+                  log.info("트리거 삭제 완료: {}", triggerKey);
+              } else {
+                  log.warn("트리거 삭제 실패: {}", triggerKey);
+              }
+          } else {
+              log.warn("삭제 하려는 트리거가 존재하지 않음: {}", triggerKey);
+          }
+      }
+  
+      // ──────────────────────────────────────────────────────────────
+      // 공통 유틸 메서드
+      // ──────────────────────────────────────────────────────────────
+  
+      // triggerName 생성 로직을 별도의 메소드로 분리
+      private TriggerKey buildTriggerKey(String jobName, String triggerName) {
+          return TriggerKey.triggerKey(String.format("%s-%s-Trigger", jobName, triggerName));
+      }
+  
+      // 트리거 객체 생성 공통 메서드
+      private Trigger buildTrigger(String jobName, TriggerKey triggerKey, String cronExpression) {
+          return TriggerBuilder.newTrigger()
+              .withIdentity(triggerKey)
+              .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
+              .forJob(JobKey.jobKey(jobName))
+              .build();
+      }
+  }
+  
+  ```
+
+</details>
+
+<details>
+  <summary>Controller</summary>
+
+- 컨트롤러
 
   ```java
   package com.example.java.api.controller;
   
-  import java.util.Map;
-  
   import org.springframework.http.ResponseEntity;
-  import org.springframework.web.bind.annotation.PathVariable;
   import org.springframework.web.bind.annotation.PostMapping;
   import org.springframework.web.bind.annotation.RequestBody;
   import org.springframework.web.bind.annotation.RequestMapping;
   import org.springframework.web.bind.annotation.RestController;
   
-  import com.example.java.api.service.BatchService;
+  import com.example.java.api.dto.JobRequest;
+  import com.example.java.api.service.JobService;
   
   import lombok.RequiredArgsConstructor;
   
   @RestController
-  @RequestMapping("/batch")
+  @RequestMapping("/job")
   @RequiredArgsConstructor
-  public class BatchController {
-      private final BatchService batchService;
+  public class JobController {
+      private final JobService jobService;
   
-      @PostMapping("/{jobName}")
-      public void batch(@PathVariable String jobName) throws Exception {
-          batchService.runJob(jobName);
+      @PostMapping("/run")
+      public ResponseEntity<String> runJob(@RequestBody JobRequest jobRequest) throws Exception {
+          jobService.runJob(jobRequest.getJobName());
+          return ResponseEntity.ok("Job 단일 실행 완료");
+      }
+  }
+  
+  ```
+  
+  ```java
+  package com.example.java.api.controller;
+  
+  import org.springframework.http.ResponseEntity;
+  import org.springframework.web.bind.annotation.DeleteMapping;
+  import org.springframework.web.bind.annotation.PostMapping;
+  import org.springframework.web.bind.annotation.PutMapping;
+  import org.springframework.web.bind.annotation.RequestBody;
+  import org.springframework.web.bind.annotation.RequestMapping;
+  import org.springframework.web.bind.annotation.RestController;
+  
+  import com.example.java.api.dto.ScheduleRequest;
+  import com.example.java.api.service.QuartzJobService;
+  import com.example.java.api.service.TriggerService;
+  
+  import lombok.RequiredArgsConstructor;
+  
+  @RestController
+  @RequestMapping("/schedule")
+  @RequiredArgsConstructor
+  public class ScheduleController {
+      private final QuartzJobService quartzJobService;
+      private final TriggerService triggerService;
+  
+      // Job & Trigger 등록
+      @PostMapping("/register")
+      public ResponseEntity<String> registerScheduledJob(@RequestBody ScheduleRequest scheduleRequest) throws Exception {
+          quartzJobService.createScheduledJob(scheduleRequest.getJobName()); // 등록 Job 없으면 새로 생성
+          triggerService.createTrigger(scheduleRequest.getJobName(), scheduleRequest.getTriggerName(),
+              scheduleRequest.getCronExpression()); // Trigger 등록
+          return ResponseEntity.ok("Job & Trigger 등록");
       }
   
-      @PostMapping("/schedule")
-      public ResponseEntity<String> scheduleJob(
-          @RequestBody Map<String, String> jobData) throws Exception {
-          try {
-              batchService.scheduleJob(jobData.get("jobName"), jobData.get("cronExpression"));
-              return ResponseEntity.ok("Quartz 스케줄 등록 완료");
-          } catch (Exception e) {
-              return ResponseEntity.internalServerError().body("Quartz 스케줄 등록 실패: " + e.getMessage());
-          }
+      // Job 정지
+      @PostMapping("/job/pause")
+      public ResponseEntity<String> pauseScheduledJob(@RequestBody ScheduleRequest scheduleRequest) throws Exception {
+          quartzJobService.pauseScheduledJob(scheduleRequest);
+          return ResponseEntity.ok("Job 정지 완료");
       }
+  
+      // Job 재시작
+      @PostMapping("/job/resume")
+      public ResponseEntity<String> resumeScheduledJob(@RequestBody ScheduleRequest scheduleRequest) throws Exception {
+          quartzJobService.resumeScheduledJob(scheduleRequest);
+          return ResponseEntity.ok("Job 재시작 완료");
+      }
+  
+      // Job 삭제
+      @DeleteMapping("/job/delete")
+      public ResponseEntity<String> deleteScheduledJob(@RequestBody ScheduleRequest scheduleRequest) throws Exception {
+          quartzJobService.deleteScheduledJob(scheduleRequest);
+          return ResponseEntity.ok("Job 삭제 완료");
+      }
+  
+      // Trigger 수정
+      @PutMapping("/trigger/update")
+      public ResponseEntity<String> updateScheduledTrigger(@RequestBody ScheduleRequest scheduleRequest) throws
+          Exception {
+          quartzJobService.validateJobExists(scheduleRequest.getJobName()); // 등록 Job 없으면 예외 발생
+          triggerService.updateTrigger(scheduleRequest.getJobName(), scheduleRequest.getTriggerName(),
+              scheduleRequest.getCronExpression()); // Trigger 수정
+          return ResponseEntity.ok("Trigger 수정 완료");
+      }
+  
+      // Trigger 정지
+      @PostMapping("/trigger/pause")
+      public ResponseEntity<String> pauseTrigger(@RequestBody ScheduleRequest scheduleRequest) throws Exception {
+          quartzJobService.validateJobExists(scheduleRequest.getJobName()); // 등록 Job 없으면 예외 발생
+          triggerService.pauseTrigger(scheduleRequest.getJobName(), scheduleRequest.getTriggerName()); // Trigger 정지
+          return ResponseEntity.ok("Trigger 정지 완료");
+      }
+  
+      // Trigger 재시작
+      @PostMapping("/trigger/resume")
+      public ResponseEntity<String> resumeTrigger(@RequestBody ScheduleRequest scheduleRequest) throws Exception {
+          quartzJobService.validateJobExists(scheduleRequest.getJobName()); // 등록 Job 없으면 예외 발생
+          triggerService.resumeTrigger(scheduleRequest.getJobName(), scheduleRequest.getTriggerName()); // Trigger 재시작
+          return ResponseEntity.ok("Trigger 재시작 완료");
+      }
+  
+      // Trigger 삭제
+      @DeleteMapping("/trigger/delete")
+      public ResponseEntity<String> deleteTrigger(@RequestBody ScheduleRequest scheduleRequest) throws Exception {
+          quartzJobService.validateJobExists(scheduleRequest.getJobName()); // 등록 Job 없으면 예외 발생
+          triggerService.deleteTrigger(scheduleRequest.getJobName(), scheduleRequest.getTriggerName()); // Trigger 삭제
+          return ResponseEntity.ok("Trigger 삭제 완료");
+      }
+  
   }
   
   ```
