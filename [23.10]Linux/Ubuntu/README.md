@@ -10,6 +10,61 @@
 > ## 설치 & 명령어
 
 <details>
+  <summary>사용자</summary>
+
+- 사용자 추가
+
+  ```ubuntu
+  sudo adduser 사용자이름
+  # 이후 나오는 질문은 엔터로 넘어가도 무방
+  # 사용자 추가하면 /home/사용자이름 폴더가 생성됨.
+  ```
+
+- sudo 권한 부여
+
+  ```ubuntu
+  sudo usermod -aG sudo 사용자이름
+  ```
+
+- 사용자 확인
+
+  ```ubuntu
+  id 사용자이름
+  ```
+
+- 사용자 로그인
+
+  ```ubuntu
+  su 사용자이름
+  ```
+
+- 사용자 로그인 시 사용될 key 등록
+
+  ```ubuntu
+  # 사용자 로그인 후 해당 홈 폴더에 .ssh 폴더 생성
+  mkdir ~/.ssh
+
+  # 사용자 홈 폴더에 .ssh 폴더 권한 설정
+  chmod 700  ~/.ssh
+
+  # 프라이빗키로 퍼블릭키 생성
+  ssh-keygen -y -f 프라이빗키.pem > 퍼블릭키.pub
+
+  # 사용자 홈 폴더에 .ssh 폴더 내에 authorized_keys 파일 생성
+
+  # 퍼블릭키 내용을 authorized_keys 파일 생성 후 내용 추가 (nano 에디터 또는 vim 에디터 사용)
+  nano ~/.ssh/authorized_keys
+
+  # authorized_keys 파일 권한 설정
+  chmod 600 ~/.ssh/authorized_keys
+
+  # 소유권 변경 (만약 다른 사용자로 진행한 경우)
+  sudo chown -R 사용자이름:사용자이름 home/사용자이름/.ssh
+  ```
+
+</details>
+
+<details>
     <summary>APT</summary>
 
 - 최신 패키지를 다운 받기 위해 APT 업데이트.
