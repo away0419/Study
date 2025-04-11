@@ -8,7 +8,10 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.stereotype.Component;
+
+import com.example.java.api.code.OmErrorMessage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,20 +27,19 @@ public class QuartzJobRunner implements org.quartz.Job {
     public void execute(JobExecutionContext context) {
         try {
             String jobName = context.getJobDetail().getJobDataMap().getString("jobName");
+            log.info("jobName: {}", jobName);
             Job job = jobRegistry.getJob(jobName);
-            if (job == null) {
-                log.error("Quartz 실행 실패: 존재하지 않는 Job -> {}", jobName);
-                return;
-            }
 
             JobParameters jobParameters = new JobParametersBuilder()
-                .addString("runId", UUID.randomUUID().toString()) // 실행 구분
+                .addString("runId", UUID.randomUUID().toString()) // 새로운 인스턴스 실행
                 .toJobParameters();
 
             jobLauncher.run(job, jobParameters);
-            log.info("Quartz 배치 실행 성공: {}", jobName);
+        } catch (NoSuchJobException e) {
+            throw new RuntimeException(OmErrorMessage.SPRING_BATCH_JOB_BEAN_NOT_FOUND.getDesc());
         } catch (Exception e) {
-            log.error("Quartz Job 실행 중 오류 발생", e);
+            throw new RuntimeException(OmErrorMessage.QUARTZ_JOB_EXECUTION_ERROR.getDesc());
         }
+
     }
 }

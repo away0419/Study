@@ -2690,7 +2690,10 @@ spring:
   import org.springframework.batch.core.JobParametersBuilder;
   import org.springframework.batch.core.configuration.JobRegistry;
   import org.springframework.batch.core.launch.JobLauncher;
+  import org.springframework.batch.core.launch.NoSuchJobException;
   import org.springframework.stereotype.Component;
+  
+  import com.example.java.api.code.OmErrorMessage;
   
   import lombok.RequiredArgsConstructor;
   import lombok.extern.slf4j.Slf4j;
@@ -2706,21 +2709,20 @@ spring:
       public void execute(JobExecutionContext context) {
           try {
               String jobName = context.getJobDetail().getJobDataMap().getString("jobName");
+              log.info("jobName: {}", jobName);
               Job job = jobRegistry.getJob(jobName);
-              if (job == null) {
-                  log.error("Quartz 실행 실패: 존재하지 않는 Job -> {}", jobName);
-                  return;
-              }
   
               JobParameters jobParameters = new JobParametersBuilder()
-                  .addString("runId", UUID.randomUUID().toString()) // 실행 구분
+                  .addString("runId", UUID.randomUUID().toString()) // 새로운 인스턴스 실행
                   .toJobParameters();
   
               jobLauncher.run(job, jobParameters);
-              log.info("Quartz 배치 실행 성공: {}", jobName);
+          } catch (NoSuchJobException e) {
+              throw new RuntimeException(OmErrorMessage.SPRING_BATCH_JOB_BEAN_NOT_FOUND.getDesc());
           } catch (Exception e) {
-              log.error("Quartz Job 실행 중 오류 발생", e);
+              throw new RuntimeException(OmErrorMessage.QUARTZ_JOB_EXECUTION_ERROR.getDesc());
           }
+  
       }
   }
   ```
@@ -2798,12 +2800,12 @@ spring:
           SchedulerFactoryBean factory = new SchedulerFactoryBean();
           factory.setDataSource(mainDataSource);  // main 데이터 소스를 설정
           factory.setJobFactory(jobFactory);      // Quartz에서 Spring 빈을 사용할 수 있도록 설정
+          factory.setWaitForJobsToCompleteOnShutdown(true); // applicationContext 종료 전에 먼저 shutdown
           return factory;
       }
   }
   
   ```
-
 </details>
 
 <details>
@@ -2873,14 +2875,15 @@ spring:
       QUARTZ_JOB_PAUSED("I-OM-1202", "Quartz Job 정지 성공"),
       QUARTZ_JOB_RESUMED("I-OM-1203", "Quartz Job 재시작 성공"),
       QUARTZ_JOB_DELETED("I-OM-1204", "Quartz Job 삭제 성공"),
-      
-      TRIGGER_REGISTERED("I-OM-1205", "Trigger 등록 성공"),
-      TRIGGER_UPDATED("I-OM-1206", "Trigger 수정 성공"),
-      TRIGGER_PAUSED("I-OM-1207", "Trigger 정지 성공"),
-      TRIGGER_RESUMED("I-OM-1208", "Trigger 재시작 성공"),
-      TRIGGER_DELETED("I-OM-1209", "Trigger 삭제 성공"),
-      
-      SPRING_BATCH_JOB_SUCCESS("I-OM-1210", "배치 실행 성공");
+  
+      TRIGGER_REGISTERED("I-OM-1220", "Trigger 등록 성공"),
+      TRIGGER_UPDATED("I-OM-1221", "Trigger 수정 성공"),
+      TRIGGER_PAUSED("I-OM-1222", "Trigger 정지 성공"),
+      TRIGGER_RESUMED("I-OM-1223", "Trigger 재시작 성공"),
+      TRIGGER_DELETED("I-OM-1224", "Trigger 삭제 성공"),
+  
+      SPRING_BATCH_JOB_SUCCESS("I-OM-1240", "배치 실행 성공"),
+      SPRING_BATCH_JOB_RETRIEVE_LIST("I-OM-1241", "배치 목록 조회 성공");
   
       private final String code;
       private final String desc;
@@ -2890,6 +2893,7 @@ spring:
           this.desc = desc;
       }
   }
+  
   ```
 
   ```java
@@ -2908,16 +2912,22 @@ spring:
       QUARTZ_JOB_PAUSE_FAILED("E-OM-1205", "Quartz Job 정지 실패"),
       QUARTZ_JOB_RESUME_FAILED("E-OM-1206", "Quartz Job 재시작 실패"),
       QUARTZ_JOB_DELETE_FAILED("E-OM-1207", "Quartz Job 삭제 실패"),
+      QUARTZ_JOB_EXECUTION_ERROR("E-OM-1208", "Quartz Job 실행 중 오류 발생"),
   
-      TRIGGER_ALREADY_EXISTS("E-OM-1208", "이미 존재하는 Trigger"),
-      TRIGGER_NOT_FOUND("E-OM-1209", "존재하지 않는 Trigger"),
-      TRIGGER_CREATION_FAILED("E-OM-1210", "Trigger 생성 실패"),
-      TRIGGER_PAUSE_FAILED("E-OM-1211", "Trigger 정지 실패"),
-      TRIGGER_RESUME_FAILED("E-OM-1212", "Trigger 재시작 실패"),
-      TRIGGER_DELETE_FAILED("E-OM-1213", "Trigger 삭제 실패"),
-      TRIGGER_UPDATE_FAILED("E-OM-1214", "Trigger 수정 실패"),
+      TRIGGER_ALREADY_EXISTS("E-OM-1220", "이미 존재하는 Trigger"),
+      TRIGGER_NOT_FOUND("E-OM-1221", "존재하지 않는 Trigger"),
+      TRIGGER_CREATION_FAILED("E-OM-1222", "Trigger 생성 실패"),
+      TRIGGER_PAUSE_FAILED("E-OM-1223", "Trigger 정지 실패"),
+      TRIGGER_RESUME_FAILED("E-OM-1224", "Trigger 재시작 실패"),
+      TRIGGER_DELETE_FAILED("E-OM-1225", "Trigger 삭제 실패"),
+      TRIGGER_UPDATE_FAILED("E-OM-1226", "Trigger 수정 실패"),
+      TRIGGER_CHECK_FAILED("E-OM-1227", "Trigger 여부 판별 중 실패"),
+      TRIGGER_RETRIEVE_LIST_ERROR("E-OM-1228", "Trigger 목록 조회 중 오류 발생"),
   
-      BATCH_EXECUTION_ERROR("E-OM-1215", "배치 실행 중 오류 발생");
+      SPRING_BATCH_JOB_NOT_FOUND("E-OM-1240", "존재하지 않는 Spring Batch Job"),
+      SPRING_BATCH_JOB_EXECUTION_ERROR("E-OM-1241", "Spring Batch Job 실행 중 오류 발생"),
+      SPRING_BATCH_JOB_RETRIEVE_LIST_ERROR("E-OM-1242", "Spring Batch Job 목록 조회 중 오류 발생"),
+      SPRING_BATCH_JOB_BEAN_NOT_FOUND("E-OM-1243", "존재하지 않는 Spring Batch Job Bean");
   
       private final String code;
       private final String desc;
@@ -2926,7 +2936,9 @@ spring:
           this.code = code;
           this.desc = desc;
       }
-  }
+  
+      }
+  
   ```
 
 </details>
@@ -3130,71 +3142,55 @@ spring:
               scheduler.scheduleJob(buildTrigger(jobName, triggerKey, cronExpression));
               log.info("트리거 등록 완료: {} / {}", triggerKey.getName(), cronExpression);
           } catch (SchedulerException e) {
-              throw new RuntimeException(OmErrorMessage.TRIGGER_CREATION_FAILED.getDesc(), e);
+              throw new RuntimeException(OmErrorMessage.TRIGGER_CREATION_FAILED.getDesc());
           }
       }
   
       // 트리거 갱신
       public void updateTrigger(String jobName, String triggerName, String cronExpression) {
           TriggerKey triggerKey = buildTriggerKey(jobName, triggerName);
-  
+          validateTriggerExists(triggerKey);
           try {
-              if (!scheduler.checkExists(triggerKey)) {
-                  throw new RuntimeException(OmErrorMessage.TRIGGER_NOT_FOUND.getDesc());
-              }
-  
               scheduler.rescheduleJob(triggerKey, buildTrigger(jobName, triggerKey, cronExpression));
               log.info("트리거 갱신 완료: {} / {}", triggerKey.getName(), cronExpression);
           } catch (SchedulerException e) {
-              throw new RuntimeException(OmErrorMessage.TRIGGER_UPDATE_FAILED.getDesc(), e);
+              throw new RuntimeException(OmErrorMessage.TRIGGER_UPDATE_FAILED.getDesc());
           }
       }
   
       // 트리거 일시정지
       public void pauseTrigger(String jobName, String triggerName) {
           TriggerKey triggerKey = buildTriggerKey(jobName, triggerName);
-  
+          validateTriggerExists(triggerKey);
           try {
-              if (!scheduler.checkExists(triggerKey)) {
-                  throw new RuntimeException(OmErrorMessage.TRIGGER_NOT_FOUND.getDesc());
-              }
-  
               scheduler.pauseTrigger(triggerKey);
               log.info("트리거 정지 완료: {}", triggerKey.getName());
           } catch (SchedulerException e) {
-              throw new RuntimeException(OmErrorMessage.TRIGGER_PAUSE_FAILED.getDesc(), e);
+              throw new RuntimeException(OmErrorMessage.TRIGGER_PAUSE_FAILED.getDesc());
           }
       }
   
       // 트리거 재시작
       public void resumeTrigger(String jobName, String triggerName) {
           TriggerKey triggerKey = buildTriggerKey(jobName, triggerName);
-  
+          validateTriggerExists(triggerKey);
           try {
-              if (!scheduler.checkExists(triggerKey)) {
-                  throw new RuntimeException(OmErrorMessage.TRIGGER_NOT_FOUND.getDesc());
-              }
-  
               scheduler.resumeTrigger(triggerKey);
               log.info("트리거 재시작 완료: {}", triggerKey.getName());
           } catch (SchedulerException e) {
-              throw new RuntimeException(OmErrorMessage.TRIGGER_RESUME_FAILED.getDesc(), e);
+              throw new RuntimeException(OmErrorMessage.TRIGGER_RESUME_FAILED.getDesc());
           }
       }
   
       // 트리거 삭제
       public void deleteTrigger(String jobName, String triggerName) {
           TriggerKey triggerKey = buildTriggerKey(jobName, triggerName);
-  
+          validateTriggerExists(triggerKey);
           try {
-              if (!scheduler.checkExists(triggerKey)) {
-                  throw new RuntimeException(OmErrorMessage.TRIGGER_NOT_FOUND.getDesc());
-              }
-  
               scheduler.unscheduleJob(triggerKey);
               log.info("트리거 삭제 완료: {}", triggerKey.getName());
           } catch (SchedulerException e) {
-              throw new RuntimeException(OmErrorMessage.TRIGGER_DELETE_FAILED.getDesc(), e);
+              throw new RuntimeException(OmErrorMessage.TRIGGER_DELETE_FAILED.getDesc());
           }
       }
   
@@ -3202,10 +3198,12 @@ spring:
       // 공통 유틸 메서드
       // ──────────────────────────────────────────────────────────────
   
+      // triggerName 생성 로직을 별도의 메소드로 분리
       private TriggerKey buildTriggerKey(String jobName, String triggerName) {
           return TriggerKey.triggerKey(String.format("%s-%s-Trigger", jobName, triggerName));
       }
   
+      // 트리거 객체 생성 공통 메서드
       private Trigger buildTrigger(String jobName, TriggerKey triggerKey, String cronExpression) {
           return TriggerBuilder.newTrigger()
               .withIdentity(triggerKey)
@@ -3213,10 +3211,20 @@ spring:
               .forJob(JobKey.jobKey(jobName))
               .build();
       }
+  
+      // 트리거 존재 여부 검증 (내부 호출용)
+      private void validateTriggerExists(TriggerKey triggerKey) {
+          try {
+              if (!scheduler.checkExists(triggerKey)) {
+                  throw new RuntimeException(OmErrorMessage.TRIGGER_NOT_FOUND.getDesc());
+              }
+          } catch (SchedulerException e) {
+              throw new RuntimeException(OmErrorMessage.TRIGGER_CHECK_FAILED.getDesc());
+          }
+      }
   }
   
   ```
-
 </details>
 
 <details>

@@ -26,6 +26,7 @@ public class QuartzConfig {
         SchedulerFactoryBean factory = new SchedulerFactoryBean();
         factory.setDataSource(mainDataSource);  // main 데이터 소스를 설정
         factory.setJobFactory(jobFactory);      // Quartz에서 Spring 빈을 사용할 수 있도록 설정
+        factory.setWaitForJobsToCompleteOnShutdown(true); // applicationContext 종료 전에 먼저 shutdown
         return factory;
     }
 }
