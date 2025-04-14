@@ -1,11 +1,7 @@
-```
+``` version
 java : 17
 spring boot : 3.1.0
 spring ecurity : 6.1.5
-
-- 해당 기록은 흐름에 맞춰 작성 되었음.
-- 따라서, OAtuh2에서 작성한 코드가 JWT에서 다르게 작성 될 수 있음.
-- 완성된 코드가 필요하다면 파일 소스를 직접 보는게 좋음.
 ```
 
 <details>
