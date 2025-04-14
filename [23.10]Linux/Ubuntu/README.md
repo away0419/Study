@@ -62,23 +62,38 @@
   sudo chown -R 사용자이름:사용자이름 home/사용자이름/.ssh
   ```
 
+- 비밀번호 없이 sudo 사용 설정 방법
+
+  ```ubuntu
+  # 먼저 sudo 권한이 있는 사용자로 로그인
+  sudo su ubuntu
+
+  # sudoers 파일 수정
+  sudo visudo
+
+  # 맨 아래 내용 추가
+  username ALL=(ALL) NOPASSWD: ALL
+
+  # username 로그인 후 확인
+  su username
+  sudo ls /root
+  ```
+
 </details>
 
 <details>
-    <summary>APT</summary>
+    <summary>패키지 다운로드</summary>
 
 - 최신 패키지를 다운 받기 위해 APT 업데이트.
+
   ```ubuntu
   sudo apt update
   ```
 
-<br/>
-<br/>
-
 - Ubuntu 버전에 따라 APT 명령어 차이 있음.
   ```ubuntu
-  apt 패키지
-  apt-get 패키지
+  apt 패키지명
+  apt-get 패키지명
   ```
 
 </details>
@@ -87,8 +102,17 @@
     <summary>방화벽</summary>
 
 - 여러 방법이 존재함. Ubuntu 버전에 따라 적용이 안될 수 있음.
+- 만약 AWS, Oracle Cloud 등 클라우드 서비스를 이용하는 경우 클라우드 서비스 내에서 방화벽 설정이 가능하며, 리눅스 명려어로 방화벽을 설정해도 클라우드 서비스 내에서 방화벽 설정이 우선됨.
 
 <br/>
+
+- ufw 패키지
+
+  ```ubuntu
+  # ufw는 설치되어 있을 확률이 큼.
+  sudo ufw status
+
+  ```
 
 - firewall 패키지
 
