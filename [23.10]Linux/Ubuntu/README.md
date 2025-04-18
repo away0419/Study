@@ -15,9 +15,9 @@
 - 사용자 추가
 
   ```ubuntu
-  sudo adduser 사용자이름
   # 이후 나오는 질문은 엔터로 넘어가도 무방
   # 사용자 추가하면 /home/사용자이름 폴더가 생성됨.
+  sudo adduser 사용자이름
   ```
 
 - sudo 권한 부여
@@ -106,75 +106,148 @@
 
 <br/>
 
-- ufw 패키지
+- ufw (간단한 방화벽 설정)
 
   ```ubuntu
-  # ufw는 설치되어 있을 확률이 큼.
+  # 상태 확인. ufw는 설치되어 있을 확률이 큼.
   sudo ufw status
 
+  # ufw 활성화. 활성화 후 모든 인바운드 트래픽 차단하고 아웃 바운드 트래픽은 허용함.
+  sudo ufw enable
+
+  # 기본 정책 설정. 인바운드 트래픽 차단.
+  sudo ufw default deny incoming
+
+  # 기본 정책 설정. 아웃 바운드 트래픽 허용.
+  sudo ufw default allow outgoing
+
+  # 특정 포트 열기. 포트 22, 80, 443 포트는 프로토콜 생략 가능.
+  sudo ufw allow 포트번호/프로토콜
+
+  # 특정 포트 닫기. 포트 22, 80, 443 포트는 프로토콜 생략 가능.
+  sudo ufw deny 포트번호/프로토콜
+
+  # 특정 IP 특정 포트만 접근 허용. to any port 포트번호 생략 시 모든 포트 허용.
+  sudo ufw allow from IP주소 to any port 포트번호
+
+  # 특정 IP 특정 포트만 접근 차단. to any port 포트번호 생략 시 모든 포트 차단.
+  sudo ufw deny from IP주소 to any port 포트번호
+
+  # IP 포트 허용 범위 지정.
+  sudo ufw allow from IP주소 to any port 포트번호:포트번호/프로토콜
+
+  # IP 포트 차단 범위 지정.
+  sudo ufw deny from IP주소 to any port 포트번호:포트번호/프로토콜
+
+  # 방화벽 로그 활성화
+  sudo ufw logging on
+
+  # 포트 규칙 삭제
+  sudo ufw delete allow 포트번호/프로토콜
+
+  # 규칙 초기화
+  sudo ufw reset
+
+  # 현재 규칙 확인
+  sudo ufw status verbose
+
+  # 방화벽 비활성화
+  sudo ufw disable
+
   ```
 
-- firewall 패키지
+- firewall (복잡한 방화벽 설정). 영역 개념을 중심으로 방화벽 관리.
 
   ```ubuntu
+  # 영역: public, trusted, internal, external, dmz
+  # 서비스: 미리 정의된 포트 집합. ex) http, ssh, mysql 등
   # firewall 설치
+  # 영구 설정과 임시 설정 분리 관리함.
+
+  # 설치
   sudo apt install firewalld
 
-  # 특정 포트 열기 규칙 추가
+  # 상태 확인
+  sudo firewall-cmd --state
+
+  # firewall 시작/중지/재시작
+  sudo systemctl start firewalld
+  sudo systemctl stop firewalld
+  sudo systemctl restart firewalld
+
+  # 사용 가능한 영역 목록 확인
+  firewall-cmd --get-zones
+
+  # 현재 영역 확인
+  firewall-cmd --get-active-zones
+
+  # 현재 영역 변경
+  sudo firewall-cmd --set-default-zone=public
+
+  # 서비스 목록 확인
+  firewall-cmd --get-services
+
+  # 모든 포트 닫기 (기본설정)
+  sudo firewall-cmd --zone=public --set-target=DROP
+
+  # 특정 포트 열기 규칙 추가.
   sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
 
-  # 추가한 규칙 적용 하는 초기화
+  # 특정 포트 닫기 규칙 추가
+  sudo firewall-cmd --permanent --zone=public --remove-port=80/tcp
+
+  # 특정 서비스 열기 규칙 추가
+  sudo firewall-cmd --permanent --zone=public --add-service=http
+
+  # 특정 서비스 닫기 규칙 추가
+  sudo firewall-cmd --permanent --zone=public --remove-service=http
+
+  # 추가한 규칙 적용 하는 초기화. 영구 설정(--permanent) 반영시 리로드 필요
   sudo firewall-cmd --reload
 
-  ```
+  # 현재 규칙 확인
+  sudo firewall-cmd --list-all
 
-<br/>
+  # 특정 영역 규칙 확인
+  sudo firewall-cmd --zone=public --list-all
 
-- iptables 패키지
+  # 설정 초기화 (임시 설정만)
+  sudo firewall-cmd --complete-reload
 
-  ```ubuntu
-  # 특정 포트 규칙 추가
-  sudo iptables -I INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
+  # 설정 초기화 (영구 설정 포함)
+  sudo rm -rf /etc/firewalld/zones/*
+  sudo firewall-cmd --reload
 
-  # 특정 포트 규칙 삭제
-  sudo iptables -D INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
-
-  # 특정 IP로만 특정 포트 규칙 추가
-  sudo iptables -I INPUT -p tcp -s 123.123.123.123 --dport 8009 -j ACCEPT
-
-  # 위의 규칙 삭제
-  iptables -D INPUT -p tcp -s 123.123.123.123 --dport 8009 -j ACCEPT
-
-  # 변경 사항 저장
-  sudo netfilter-persistent save
-
-  # 추가한 규칙 초기화
-  sudo iptables -F
   ```
 
 </details>
 
 <details>
-    <summary>Time</summary>
+    <summary>시간</summary>
 
-- 클라우드 사용시 해당 서버의 지역이 우리나라와 다를 경우 설정
+- 클라우드 사용시 해당 서버의 지역이 우리나라와 다를 경우 설정 필요함.
+
   ```ubuntu
+  # 현재 시간 확인
+  timedatectl
+
+  # 서울로 변경
   sudo timedatectl set-timezone Asia/Seoul
   ```
 
 </details>
 
 <details>
-    <summary>Java</summary>
+    <summary>자바</summary>
 
 - JDK 설치
 
   ```ubuntu
-  ubuntu # 운영체제에 기본으로 있는 jdk 설치, 또는 원하는 버전 설치 #
+  # 운영체제에 기본으로 있는 jdk 설치, 또는 원하는 버전 설치
   sudo apt install default-jdk
   sudo apt-get install openjdk-11-jdk
 
-  # 설치 확인 #
+  # 설치 확인
   java -version
   javac -version
   ```
@@ -194,7 +267,7 @@
   export CLASSPATH=$CLASSPATH:$JAVA_HOME/jre/lib/ext:$JAVA_HOME/lib/tools.jar
   ...
 
-  #확인
+  # 확인
   source /etc/profile
   echo $JAVA_HOME
   ```
