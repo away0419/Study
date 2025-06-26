@@ -81,7 +81,8 @@
 
 # 해당 포트 열기 (맨 위에 해당 룰 추가하여 아래 룰 무력화 시키기)
 sudo iptables -I INPUT 1 -p tcp --dport 6379 -j ACCEPT
-sudo iptables -I INPUT 1 -p tcp -m multiport --dports 26379,80,443,8080,8081,8082,8083,8084,8085 -j ACCEPT
+sudo iptables -I INPUT 1 -p tcp -m multiport --dports 26379,80,443,8080,8081,8082,8083,8084,8085 -j ACCEPT # 범위로 열기 --dport 6370:6380
+
 
 # 룰 확인하기
 sudo iptables -L --line-numbers
