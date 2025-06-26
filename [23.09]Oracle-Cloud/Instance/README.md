@@ -73,16 +73,23 @@
 5. 서버간 라우팅 허용 규칙 추가
    ![Alt text](image3/4.png)
 
-</details>
+<br/>
 
-<details>
-    <summary>서버 구성</summary>
+6. 해당 서버에서 포트 열기 (ubuntu ver.24)
 
-- [Ubuntu](https://github.com/away0419/Study-2023/tree/main/Linux/Ubuntu#명령어)
-</details>
+```ubuntu
 
-<details>
-    <summary>CI/CD</summary>
+# 해당 포트 열기 (맨 위에 해당 룰 추가하여 아래 룰 무력화 시키기)
+sudo iptables -I INPUT 1 -p tcp --dport 6379 -j ACCEPT
 
-- [CI/CD](https://github.com/away0419/Study-2023/tree/main/CI-CD)
+# 룰 확인하기
+sudo iptables -L --line-numbers
+
+# 재부팅 시에도 해당 룰 적용하기
+sudo apt install iptables-persistent
+sudo netfilter-persistent save
+
+
+```
+
 </details>
